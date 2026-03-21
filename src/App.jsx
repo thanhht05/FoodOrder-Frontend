@@ -7,7 +7,8 @@ import {
   Outlet,
 } from "react-router-dom";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
+import LoginPage from "./pages/login/LoginPage";
+import RegisterPage from "./pages/register/RegisterPage";
 import Contact from "./pages/contact";
 import BookPage from "./pages/book";
 import Header from "./components/header/header";
@@ -39,11 +40,15 @@ function App() {
           path: "book",
           element: <BookPage />,
         },
-        {
-          path: "/login",
-          element: <Login />,
-        },
       ],
+    },
+    {
+      path: "/register",
+      element: <RegisterPage />,
+    },
+    {
+      path: "/login",
+      element: <LoginPage />,
     },
   ]);
   return <RouterProvider router={router} />;
