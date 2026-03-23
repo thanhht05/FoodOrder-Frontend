@@ -13,3 +13,12 @@ export const callRegister = (email, fullName, phone, password) => {
   };
   return axios.post(URL, data);
 };
+
+export const callLogin = (username, password) => {
+  const URL = "/api/v1/auth/login";
+  const data = {
+    username,
+    password,
+  };
+  return axios.post(URL, data);
+};

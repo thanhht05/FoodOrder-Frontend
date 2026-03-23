@@ -55,7 +55,7 @@ const RegisterPage = () => {
   return (
     <>
       {/* FORM antd */}
-      <Row className="main-container" style={{ minHeight: "100vh" }}>
+      <Row className="register-container" style={{ minHeight: "100vh" }}>
         {/* LEFT - HERO */}
         <Col xs={0} md={12} className="hero-section">
           <div className="overlay">
