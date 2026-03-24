@@ -15,10 +15,10 @@ instance.interceptors.request.use(
       typeof window !== "undefined" &&
       window &&
       window.localStorage &&
-      window.localStorage.getItem("accessToken")
+      window.localStorage.getItem("access_token")
     ) {
       config.headers.Authorization =
-        "Bearer " + window.localStorage.getItem("accessToken");
+        "Bearer " + window.localStorage.getItem("access_token");
     }
     return config;
   },

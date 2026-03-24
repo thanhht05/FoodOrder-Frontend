@@ -12,11 +12,15 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./loginPage.scss";
 import { callLogin } from "../../services/api";
+import { useDispatch } from "react-redux";
+import { doLoginAction } from "../../redux/slices/account/accountSlice";
 
 const LoginPage = () => {
   const [form] = Form.useForm();
   const [isSubmit, setIsSubmit] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const onFinish = async (values) => {
     const { username, password } = values;
     setIsSubmit(true);
@@ -24,6 +28,7 @@ const LoginPage = () => {
       const res = await callLogin(username, password);
       if (res.data) {
         localStorage.setItem("access_token", res.data.accessToken);
+        dispatch(doLoginAction(res.data.userLogin));
         message.success("Login successfully!");
 
         navigate("/");

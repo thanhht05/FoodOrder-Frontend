@@ -22,3 +22,8 @@ export const callLogin = (username, password) => {
   };
   return axios.post(URL, data);
 };
+
+export const callGetAccount = () => {
+  const URL = "/api/v1/auth/me";
+  return axios.get(URL);
+};
