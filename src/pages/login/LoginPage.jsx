@@ -26,9 +26,10 @@ const LoginPage = () => {
     setIsSubmit(true);
     try {
       const res = await callLogin(username, password);
+      console.log("res.data", res.data);
       if (res.data) {
         localStorage.setItem("access_token", res.data.accessToken);
-        dispatch(doLoginAction(res.data.userLogin));
+        dispatch(doLoginAction(res.data));
         message.success("Login successfully!");
 
         navigate("/");
@@ -41,7 +42,7 @@ const LoginPage = () => {
       }
     } catch (error) {
       notification.error({
-        message: "Register failed",
+        message: "Login  faile d",
         description: error?.response?.data?.message || error.message,
         duration: 5,
       });

@@ -1,0 +1,112 @@
+// Variables
+$primary-color: #ff4d4f; // Đỏ cam đặc trưng ngành thực phẩm
+$secondary-color: #ffa940;
+$text-color: #333;
+$white: #ffffff;
+$breakpoint-md: 768px;
+$breakpoint-sm: 576px;
+
+.food-header {
+  background-color: $white;
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  height: 70px;
+  display: flex;
+  align-items: center;
+
+  .header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px;
+
+    // 1. Logo
+    .logo {
+      flex-shrink: 0;
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: bold;
+
+      .logo-brand {
+        color: $primary-color;
+      }
+      .logo-sub {
+        color: $secondary-color;
+      }
+    }
+
+    // 2. Search Box
+    .search-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      max-width: 500px;
+
+      .search-input {
+        width: 100%;
+
+        :global(.ant-btn-primary) {
+          background-color: $primary-color;
+          border-color: $primary-color;
+
+          &:hover {
+            background-color: darken($primary-color, 10%);
+          }
+        }
+      }
+    }
+
+    // 3. Actions (Cart & Account)
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-shrink: 0;
+
+      .cart-icon {
+        font-size: 22px;
+        color: $text-color;
+        cursor: pointer;
+        transition: color 0.3s;
+
+        &:hover {
+          color: $primary-color;
+        }
+      }
+
+      .account-dropdown {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .user-name {
+          font-weight: 600;
+          color: $text-color;
+        }
+
+        // Ẩn tên trên Mobile
+        @media (max-width: $breakpoint-sm) {
+          .user-name {
+            display: none;
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive cho màn hình nhỏ (Search thu hẹp)
+  @media (max-width: $breakpoint-md) {
+    padding: 0 10px;
+    .header-wrapper {
+      gap: 10px;
+    }
+  }
+}

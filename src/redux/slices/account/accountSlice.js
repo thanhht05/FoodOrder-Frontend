@@ -2,28 +2,38 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   isAuthenticated: false,
+  isLoading: true,
   user: {
-    email: "",
-    phone: "",
-    fullName: "",
-    avatar: "",
     id: "",
+    email: "",
+    fullname: "",
     role: {
-      id: "",
+      name: "",
     },
   },
 };
+const mapUser = (data) => ({
+  id: data.id,
+  email: data.email,
+  fullName: data.fullname,
+  role: {
+    name: data.role?.name,
+  },
+});
 export const accountSlide = createSlice({
   name: "account",
   initialState,
   reducers: {
     doLoginAction: (state, action) => {
       state.isAuthenticated = true;
-      state.user = action.payload;
+      state.isLoading = false;
+      state.user = mapUser(action.payload.userLogin);
     },
     doGetAccountAction: (state, action) => {
       state.isAuthenticated = true;
-      state.user = action.payload;
+      state.isLoading = false;
+
+      state.user = mapUser(action.payload.userLogin);
     },
   },
   extraReducers: () => {},

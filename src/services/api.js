@@ -27,3 +27,8 @@ export const callGetAccount = () => {
   const URL = "/api/v1/auth/me";
   return axios.get(URL);
 };
+
+export const callLogout = () => {
+  const URL = "/api/v1/auth/logout";
+  return axios.post(URL);
+};
