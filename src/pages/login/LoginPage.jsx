@@ -32,7 +32,11 @@ const LoginPage = () => {
         dispatch(doLoginAction(res.data));
         message.success("Login successfully!");
 
-        navigate("/");
+        if (res.data.userLogin.role.name === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       } else {
         notification.error({
           message: "Occur error",

@@ -55,10 +55,6 @@ $breakpoint-sm: 576px;
         :global(.ant-btn-primary) {
           background-color: $primary-color;
           border-color: $primary-color;
-
-          &:hover {
-            background-color: darken($primary-color, 10%);
-          }
         }
       }
     }

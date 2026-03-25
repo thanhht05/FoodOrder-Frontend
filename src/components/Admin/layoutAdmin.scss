@@ -1,0 +1,69 @@
+$primary-color: #4f46e5; // Indigo hiện đại
+$bg-body: #f8fafc;
+$sidebar-bg: #ffffff;
+$header-bg: rgba(255, 255, 255, 0.8);
+$border-radius: 12px;
+$shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+$shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+$transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+.admin-layout {
+  min-height: 100vh;
+  background-color: $bg-body;
+
+  .ant-layout-sider {
+    background: $sidebar-bg;
+    box-shadow: $shadow-sm;
+    border-right: 1px solid #f1f5f9;
+    z-index: 10;
+
+    .logo {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: $primary-color;
+      border-bottom: 1px solid #f8fafc;
+    }
+  }
+
+  .ant-layout-header {
+    background: $header-bg;
+    backdrop-filter: blur(8px); // Hiệu ứng kính mờ hiện đại
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 9;
+    box-shadow: $shadow-sm;
+  }
+
+  .ant-layout-content {
+    margin: 24px;
+    padding: 24px;
+    background: #fff;
+    border-radius: $border-radius;
+    box-shadow: $shadow-sm;
+    min-height: 280px;
+  }
+
+  // Custom Menu Antd cho đẹp hơn
+  .ant-menu {
+    border-inline-end: none !important;
+    padding: 8px;
+
+    .ant-menu-item {
+      border-radius: 8px;
+      margin-bottom: 4px;
+
+      &-selected {
+        background-color: rgba($primary-color, 0.1) !important;
+        color: $primary-color;
+      }
+    }
+  }
+}
