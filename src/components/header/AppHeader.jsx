@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { callLogout } from "../../services/api";
 import { doLogoutAction } from "../../redux/slices/account/accountSlice";
 import { Link, useNavigate } from "react-router-dom";
+import Logo from "../Logo/Logo";
 
 const { Header: AntHeader } = Layout;
 const { Search } = Input;
@@ -72,10 +73,7 @@ const AppHeader = () => {
   return (
     <AntHeader className="food-header">
       <div className="header-wrapper">
-        <div className="logo">
-          <span className="logo-brand">FOOD</span>
-          <span className="logo-sub">HUB</span>
-        </div>
+        <Logo />
 
         <div className="search-container">
           <Search

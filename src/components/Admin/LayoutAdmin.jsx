@@ -15,6 +15,7 @@ import {
   SettingOutlined,
   LogoutOutlined,
   BellOutlined,
+  HomeOutlined,
 } from "@ant-design/icons";
 import "./layoutAdmin.scss";
 import { useState } from "react";
@@ -73,10 +74,26 @@ const AdminLayout = () => {
         </Header>
 
         <Content>
-          <Breadcrumb style={{ marginBottom: 16 }}>
-            <Breadcrumb.Item>Admin</Breadcrumb.Item>
-            <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
-          </Breadcrumb>
+          <Breadcrumb
+            items={[
+              {
+                href: "",
+                title: <HomeOutlined />,
+              },
+              {
+                href: "",
+                title: (
+                  <>
+                    <UserOutlined />
+                    <span>Application List</span>
+                  </>
+                ),
+              },
+              {
+                title: "Application",
+              },
+            ]}
+          />
           <div className="main-body">
             {/* Nội dung trang web của bạn ở đây */}
             <h2>Chào mừng quay trở lại!</h2>
