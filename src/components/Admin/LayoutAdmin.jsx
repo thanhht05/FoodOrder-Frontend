@@ -20,6 +20,7 @@ import {
 import "./layoutAdmin.scss";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { Link, Outlet } from "react-router-dom";
 
 const { Header, Sider, Content } = Layout;
 
@@ -42,8 +43,16 @@ const AdminLayout = () => {
           mode="inline"
           defaultSelectedKeys={["1"]}
           items={[
-            { key: "1", icon: <DashboardOutlined />, label: "Dashboard" },
-            { key: "2", icon: <UserOutlined />, label: "Users" },
+            {
+              key: "1",
+              icon: <DashboardOutlined />,
+              label: <Link to="/admin">Dashboard</Link>,
+            },
+            {
+              key: "2",
+              icon: <UserOutlined />,
+              label: <Link to="/admin/user">User</Link>,
+            },
             { key: "3", icon: <SettingOutlined />, label: "Configuration" },
           ]}
         />
@@ -94,11 +103,7 @@ const AdminLayout = () => {
               },
             ]}
           />
-          <div className="main-body">
-            {/* Nội dung trang web của bạn ở đây */}
-            <h2>Chào mừng quay trở lại!</h2>
-            <p>Đây là layout admin hiện đại sử dụng Ant Design và SCSS.</p>
-          </div>
+          <Outlet />
         </Content>
       </Layout>
     </Layout>

@@ -32,3 +32,8 @@ export const callLogout = () => {
   const URL = "/api/v1/auth/logout";
   return axios.post(URL);
 };
+
+export const callFetchAllUser = (page, size) => {
+  const URL = `/api/v1/users?page=${page}&size=${size}`;
+  return axios.get(URL);
+};

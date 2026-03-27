@@ -22,6 +22,7 @@ import AdminPage from "./pages/admin/adminPage";
 import ProtectedRoute from "./pages/protectedRoute/ProtectedRoute";
 import AppHeader from "./components/Header/AppHeader";
 import LayoutAdmin from "./components/Admin/LayoutAdmin";
+import ManageUserPage from "./pages/admin/user";
 const Layout = () => {
   return (
     <div className="layout">
@@ -87,7 +88,11 @@ function App() {
 
         {
           path: "user",
-          element: <Contact />,
+          element: (
+            <ProtectedRoute>
+              <ManageUserPage />,
+            </ProtectedRoute>
+          ),
         },
         {
           path: "book",
