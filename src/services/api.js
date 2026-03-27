@@ -33,7 +33,7 @@ export const callLogout = () => {
   return axios.post(URL);
 };
 
-export const callFetchAllUser = (page, size) => {
-  const URL = `/api/v1/users?page=${page}&size=${size}`;
+export const callFetchAllUser = (query) => {
+  const URL = `/api/v1/users?${query}`;
   return axios.get(URL);
 };

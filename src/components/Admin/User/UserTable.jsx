@@ -6,6 +6,8 @@ import { callFetchAllUser } from "../../../services/api";
 const UserTable = () => {
   const [listUser, setListUser] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [filter, setFilter] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const pageSize = 5;
 
   const [total, setTotal] = useState(0);
@@ -17,14 +19,20 @@ const UserTable = () => {
   };
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await callFetchAllUser(currentPage, pageSize);
+      setIsLoading(true);
+      let query = `page=${currentPage}&size=${pageSize}`;
+      if (filter) {
+        query += `${filter}`;
+      }
+      const res = await callFetchAllUser(query);
       if (res && res.data) {
         setListUser(res.data.results);
         setTotal(res.data.meta.totalElements);
       }
+      setIsLoading(false);
     };
     fetchUser();
-  }, [currentPage, pageSize]);
+  }, [currentPage, pageSize, filter]);
   const columns = [
     {
       title: "ID",
@@ -59,14 +67,20 @@ const UserTable = () => {
     },
   ];
 
+  const handleSearch = (query) => {
+    setFilter(query);
+  };
+
   return (
     <>
       <Row gutter={[20, 20]}>
         <Col span={24}>
-          <FormSearch />
+          <FormSearch handleSearch={handleSearch} setFilter={setFilter} />
         </Col>
         <Col span={24}>
           <Table
+            loading={isLoading}
+            rowKey="id"
             columns={columns}
             dataSource={listUser}
             onChange={handlePaginationChange}

@@ -1,6 +1,6 @@
 import { Button, Col, Form, Input, Row, theme } from "antd";
 
-const FormSearch = () => {
+const FormSearch = ({ handleSearch, setFilter }) => {
   const { token } = theme.useToken();
   const [form] = Form.useForm();
   const formStyle = {
@@ -10,7 +10,18 @@ const FormSearch = () => {
     padding: 24,
   };
 
-  const onFinish = () => {};
+  const onFinish = (values) => {
+    let query = "";
+    // build Query
+    if (values.fullName) {
+      query += `&fullName=${values.fullName.trim()}`;
+    }
+    if (values.email) {
+      query += `&email=${values.email.trim()}`;
+    }
+
+    handleSearch(query);
+  };
   return (
     <Form
       form={form}
@@ -49,6 +60,7 @@ const FormSearch = () => {
             style={{ margin: "0 8px" }}
             onClick={() => {
               form.resetFields();
+              setFilter("");
             }}
           >
             Clear
