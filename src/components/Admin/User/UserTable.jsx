@@ -2,6 +2,7 @@ import { Col, Flex, Row, Space, Table, Tag } from "antd";
 import FormSearch from "./FormSearch";
 import { useEffect, useState } from "react";
 import { callFetchAllUser } from "../../../services/api";
+import UserViewDetail from "./UserViewDetail";
 
 const UserTable = () => {
   const [listUser, setListUser] = useState([]);
@@ -9,8 +10,10 @@ const UserTable = () => {
   const [filter, setFilter] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const pageSize = 5;
-
   const [total, setTotal] = useState(0);
+
+  const [openViewDetail, setOpenViewDetail] = useState(false);
+  const [userDataDetail, setUserDataDetail] = useState(null);
 
   const handlePaginationChange = (pagination) => {
     if (pagination && pagination.current !== currentPage) {
@@ -38,7 +41,16 @@ const UserTable = () => {
       title: "ID",
       dataIndex: "id",
       key: "naidme",
-      render: (id) => <a>{id}</a>,
+      render: (_, record) => (
+        <a
+          onClick={() => {
+            setOpenViewDetail(true);
+            setUserDataDetail(record);
+          }}
+        >
+          {record.id}
+        </a>
+      ),
     },
     {
       title: "Fullname",
@@ -93,6 +105,13 @@ const UserTable = () => {
           ;
         </Col>
       </Row>
+
+      <UserViewDetail
+        openViewDetail={openViewDetail}
+        setOpenViewDetail={setOpenViewDetail}
+        userDataDetail={userDataDetail}
+        setUserDataDetail={setUserDataDetail}
+      />
     </>
   );
 };
