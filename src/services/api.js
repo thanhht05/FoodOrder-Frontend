@@ -51,3 +51,13 @@ export const callCreateAUser = (fullName, email, password, phone) => {
   };
   return axios.post(URL, data);
 };
+export const callUpdateAUser = (id, fullName, phone, point) => {
+  const URL = "/api/v1/users";
+  const data = {
+    id,
+    fullName,
+    phone,
+    point,
+  };
+  return axios.put(URL, data);
+};

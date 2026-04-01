@@ -45,6 +45,9 @@ const UserViewDetail = ({
           <Descriptions.Item label="Telephone">
             {userDataDetail?.phone}
           </Descriptions.Item>
+          <Descriptions.Item label="Point">
+            {userDataDetail?.point}
+          </Descriptions.Item>
           <Descriptions.Item label="Role">
             {userDataDetail?.roleUser.name}
           </Descriptions.Item>

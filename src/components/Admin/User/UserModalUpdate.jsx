@@ -1,42 +1,36 @@
-import {
-  Button,
-  Divider,
-  Form,
-  Input,
-  message,
-  Modal,
-  notification,
-} from "antd";
-import { callCreateAUser } from "../../../services/api";
-import { useState } from "react";
-const UserModalCreate = ({
-  openModalCreateUser,
-  setOpenModalCreateUser,
+import { Divider, Form, Input, message, Modal, notification } from "antd";
+import { useEffect, useState } from "react";
+import { callUpdateAUser } from "../../../services/api";
+
+const UserModalUpdate = ({
+  openModalUpdateUser,
+  setOpenModalUpdateUser,
+  userDataUpdate,
+  setUserDataUpdate,
   fetchUser,
 }) => {
   const [form] = Form.useForm();
   const [isSubmit, setIsSubmit] = useState(false);
 
-  const showModal = () => {
-    setOpenModalCreateUser(true);
-  };
-
   const handleCancel = () => {
-    setOpenModalCreateUser(false);
+    setOpenModalUpdateUser(false);
+    setUserDataUpdate(null);
   };
-  const onFinish = async (values) => {
-    const { fullName, email, password, phone } = values;
-    setIsSubmit(true);
 
-    const res = await callCreateAUser(fullName, email, password, phone);
+  useEffect(() => {
+    form.setFieldsValue(userDataUpdate);
+  }, [userDataUpdate]);
+  const onFinish = async (values) => {
+    const { id, fullName, phone, point } = values;
+    setIsSubmit(true);
+    const res = await callUpdateAUser(id, fullName, phone, point);
     if (res && res.data) {
-      message.success("Create a user successfully");
-      form.resetFields();
-      setOpenModalCreateUser(false);
+      message.success("Cập nhật user thành công");
+      setOpenModalUpdateUser(false);
       await fetchUser();
     } else {
       notification.error({
-        message: "Create user have an error",
+        message: "Đã có lỗi xảy ra",
         description: res.message,
       });
     }
@@ -44,21 +38,23 @@ const UserModalCreate = ({
   };
   return (
     <>
-      <Button type="primary" onClick={showModal}>
-        Open Modal
-      </Button>
       <Modal
-        title="Basic Modal"
+        title="Update user"
         closable={{ "aria-label": "Custom Close Button" }}
-        open={openModalCreateUser}
+        open={openModalUpdateUser}
         onOk={() => {
           form.submit();
         }}
+        maskClosable={false}
+        okText={"Cập nhật"}
         onCancel={handleCancel}
         confirmLoading={isSubmit}
       >
         <Divider />
         <Form form={form} onFinish={onFinish} autoComplete="off" name="basic">
+          <Form.Item name="id" hidden>
+            <Input />
+          </Form.Item>
           <Form.Item
             name="email"
             label="Email"
@@ -74,12 +70,19 @@ const UserModalCreate = ({
             <Input />
           </Form.Item>
           <Form.Item
-            name="password"
-            label="Password"
-            rules={[{ required: true, message: "Please input password!" }]}
+            validateTrigger="onBlur"
+            name="point"
+            label="Point"
+            rules={[
+              { required: true, message: "Please enter point" },
+              {
+                type: "number",
+              },
+            ]}
           >
-            <Input.Password />
+            <Input />
           </Form.Item>
+
           <Form.Item
             name="phone"
             label="Phone"
@@ -92,4 +95,4 @@ const UserModalCreate = ({
     </>
   );
 };
-export default UserModalCreate;
+export default UserModalUpdate;

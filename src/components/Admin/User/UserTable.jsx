@@ -9,6 +9,7 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import UserModalCreate from "./UserModalCreate";
+import UserModalUpdate from "./UserModalUpdate";
 
 const UserTable = () => {
   const [listUser, setListUser] = useState([]);
@@ -22,6 +23,9 @@ const UserTable = () => {
   const [userDataDetail, setUserDataDetail] = useState(null);
 
   const [openModalCreateUser, setOpenModalCreateUser] = useState(false);
+
+  const [openModalUpdateUser, setOpenModalUpdateUser] = useState(false);
+  const [userDataUpdate, setUserDataUpdate] = useState(null);
   const handlePaginationChange = (pagination) => {
     if (pagination && pagination.current !== currentPage) {
       setCurrentPage(pagination.current);
@@ -80,7 +84,14 @@ const UserTable = () => {
       key: "action",
       render: (_, record) => (
         <Space size="medium">
-          <a>Invite {record.name}</a>
+          <a
+            onClick={() => {
+              setOpenModalUpdateUser(true);
+              setUserDataUpdate(record);
+            }}
+          >
+            Update{" "}
+          </a>
           <a>Delete</a>
         </Space>
       ),
@@ -149,6 +160,14 @@ const UserTable = () => {
       <UserModalCreate
         openModalCreateUser={openModalCreateUser}
         setOpenModalCreateUser={setOpenModalCreateUser}
+        fetchUser={fetchUser}
+      />
+
+      <UserModalUpdate
+        setOpenModalUpdateUser={setOpenModalUpdateUser}
+        openModalUpdateUser={openModalUpdateUser}
+        setUserDataUpdate={setUserDataUpdate}
+        userDataUpdate={userDataUpdate}
         fetchUser={fetchUser}
       />
     </>
