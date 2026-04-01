@@ -23,7 +23,6 @@ const UserViewDetail = ({
   console.log(userDataDetail);
   return (
     <>
-      <Button type="primary">Open</Button>
       <Drawer title="User Detail" onClose={onClose} open={openViewDetail}>
         {/* Header */}
         <Space align="center" style={{ marginBottom: 20 }}>

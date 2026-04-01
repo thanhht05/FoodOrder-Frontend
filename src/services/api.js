@@ -37,3 +37,17 @@ export const callFetchAllUser = (query) => {
   const URL = `/api/v1/users?${query}`;
   return axios.get(URL);
 };
+
+export const callCreateAUser = (fullName, email, password, phone) => {
+  const URL = "/api/v1/users";
+  const data = {
+    fullName,
+    email,
+    password,
+    phone,
+    role: {
+      id: 1,
+    },
+  };
+  return axios.post(URL, data);
+};

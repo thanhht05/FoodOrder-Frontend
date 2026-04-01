@@ -1,8 +1,14 @@
-import { Col, Flex, Row, Space, Table, Tag } from "antd";
+import { Button, Col, Flex, Row, Space, Table, Tag } from "antd";
 import FormSearch from "./FormSearch";
 import { useEffect, useState } from "react";
 import { callFetchAllUser } from "../../../services/api";
 import UserViewDetail from "./UserViewDetail";
+import {
+  CloudUploadOutlined,
+  ExportOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
+import UserModalCreate from "./UserModalCreate";
 
 const UserTable = () => {
   const [listUser, setListUser] = useState([]);
@@ -15,25 +21,27 @@ const UserTable = () => {
   const [openViewDetail, setOpenViewDetail] = useState(false);
   const [userDataDetail, setUserDataDetail] = useState(null);
 
+  const [openModalCreateUser, setOpenModalCreateUser] = useState(false);
   const handlePaginationChange = (pagination) => {
     if (pagination && pagination.current !== currentPage) {
       setCurrentPage(pagination.current);
     }
   };
+
+  const fetchUser = async () => {
+    setIsLoading(true);
+    let query = `page=${currentPage}&size=${pageSize}`;
+    if (filter) {
+      query += `${filter}`;
+    }
+    const res = await callFetchAllUser(query);
+    if (res && res.data) {
+      setListUser(res.data.results);
+      setTotal(res.data.meta.totalElements);
+    }
+    setIsLoading(false);
+  };
   useEffect(() => {
-    const fetchUser = async () => {
-      setIsLoading(true);
-      let query = `page=${currentPage}&size=${pageSize}`;
-      if (filter) {
-        query += `${filter}`;
-      }
-      const res = await callFetchAllUser(query);
-      if (res && res.data) {
-        setListUser(res.data.results);
-        setTotal(res.data.meta.totalElements);
-      }
-      setIsLoading(false);
-    };
     fetchUser();
   }, [currentPage, pageSize, filter]);
   const columns = [
@@ -82,6 +90,30 @@ const UserTable = () => {
   const handleSearch = (query) => {
     setFilter(query);
   };
+  const renderHeader = () => {
+    return (
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <span>Table List Users</span>
+        <span style={{ display: "flex", gap: 15 }}>
+          <Button icon={<ExportOutlined />} type="primary">
+            Export
+          </Button>
+
+          <Button icon={<CloudUploadOutlined />} type="primary">
+            Import
+          </Button>
+
+          <Button
+            icon={<PlusOutlined />}
+            type="primary"
+            onClick={() => setOpenModalCreateUser(true)}
+          >
+            Thêm mới
+          </Button>
+        </span>
+      </div>
+    );
+  };
 
   return (
     <>
@@ -91,6 +123,7 @@ const UserTable = () => {
         </Col>
         <Col span={24}>
           <Table
+            title={renderHeader}
             loading={isLoading}
             rowKey="id"
             columns={columns}
@@ -111,6 +144,12 @@ const UserTable = () => {
         setOpenViewDetail={setOpenViewDetail}
         userDataDetail={userDataDetail}
         setUserDataDetail={setUserDataDetail}
+      />
+
+      <UserModalCreate
+        openModalCreateUser={openModalCreateUser}
+        setOpenModalCreateUser={setOpenModalCreateUser}
+        fetchUser={fetchUser}
       />
     </>
   );
