@@ -10,6 +10,7 @@ import {
 } from "@ant-design/icons";
 import UserModalCreate from "./UserModalCreate";
 import UserModalUpdate from "./UserModalUpdate";
+import UserImport from "./UserImport";
 
 const UserTable = () => {
   const [listUser, setListUser] = useState([]);
@@ -26,6 +27,8 @@ const UserTable = () => {
 
   const [openModalUpdateUser, setOpenModalUpdateUser] = useState(false);
   const [userDataUpdate, setUserDataUpdate] = useState(null);
+
+  const [openModalUpload, setOpenMOdalUpload] = useState(false);
   const handlePaginationChange = (pagination) => {
     if (pagination && pagination.current !== currentPage) {
       setCurrentPage(pagination.current);
@@ -110,7 +113,11 @@ const UserTable = () => {
             Export
           </Button>
 
-          <Button icon={<CloudUploadOutlined />} type="primary">
+          <Button
+            onClick={() => setOpenMOdalUpload(true)}
+            icon={<CloudUploadOutlined />}
+            type="primary"
+          >
             Import
           </Button>
 
@@ -169,6 +176,11 @@ const UserTable = () => {
         setUserDataUpdate={setUserDataUpdate}
         userDataUpdate={userDataUpdate}
         fetchUser={fetchUser}
+      />
+
+      <UserImport
+        openModalUpload={openModalUpload}
+        setOpenModalUpload={setOpenMOdalUpload}
       />
     </>
   );

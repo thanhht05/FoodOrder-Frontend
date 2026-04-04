@@ -61,3 +61,7 @@ export const callUpdateAUser = (id, fullName, phone, point) => {
   };
   return axios.put(URL, data);
 };
+
+export const callBulkCreateUser = (data) => {
+  return axios.post("/api/v1/users/bulk", data);
+};
