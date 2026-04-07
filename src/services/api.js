@@ -61,7 +61,11 @@ export const callUpdateAUser = (id, fullName, phone, point) => {
   };
   return axios.put(URL, data);
 };
+export const callDeleteUser = (userId) => {
+  const URL = `/api/v1/users/${userId}`;
 
+  return axios.delete(URL);
+};
 export const callBulkCreateUser = (data) => {
   return axios.post("/api/v1/users/bulk", data);
 };

@@ -1,7 +1,18 @@
-import { Button, Col, Flex, Row, Space, Table, Tag } from "antd";
+import {
+  Button,
+  Col,
+  Flex,
+  message,
+  notification,
+  Popconfirm,
+  Row,
+  Space,
+  Table,
+  Tag,
+} from "antd";
 import FormSearch from "./FormSearch";
 import { useEffect, useState } from "react";
-import { callFetchAllUser } from "../../../services/api";
+import { callDeleteUser, callFetchAllUser } from "../../../services/api";
 import UserViewDetail from "./UserViewDetail";
 import {
   CloudUploadOutlined,
@@ -112,19 +123,30 @@ const UserTable = () => {
     {
       title: "Action",
       key: "action",
-      render: (_, record) => (
-        <Space size="medium">
-          <a
-            onClick={() => {
-              setOpenModalUpdateUser(true);
-              setUserDataUpdate(record);
-            }}
-          >
-            Update{" "}
-          </a>
-          <a>Delete</a>
-        </Space>
-      ),
+      render: (_, record) => {
+        return (
+          <>
+            <a
+              onClick={() => {
+                setOpenModalUpdateUser(true);
+                setUserDataUpdate(record);
+              }}
+            >
+              Update
+            </a>
+            <Popconfirm
+              title="Delete the user"
+              description="Are you sure to delete this user?"
+              onConfirm={() => handleDeleteUser(record.id)}
+              // onCancel={cancel}
+              okText="Yes"
+              cancelText="No"
+            >
+              <a style={{ marginLeft: "8px" }}>Delete</a>
+            </Popconfirm>
+          </>
+        );
+      },
     },
   ];
 
@@ -158,6 +180,18 @@ const UserTable = () => {
         </span>
       </div>
     );
+  };
+  const handleDeleteUser = async (userID) => {
+    const res = await callDeleteUser(userID);
+    if (res && res.data) {
+      message.success("Xóa user thành công");
+      fetchUser();
+    } else {
+      notification.error({
+        message: "Có lỗi xảy ra",
+        description: res.message,
+      });
+    }
   };
 
   return (
