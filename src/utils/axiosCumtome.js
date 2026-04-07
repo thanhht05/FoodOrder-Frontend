@@ -74,4 +74,30 @@ instance.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+// instance.interceptors.response.use(
+//   (response) => {
+//     return {
+//       success: true,
+//       data: response.data,
+//     };
+//   },
+//   (error) => {
+//     return {
+//       success: false,
+//       data: error.response?.data,
+//       message: error.response?.data?.message,
+//       status: error.response?.status,
+//     };
+//   }
+// );
+// const res = await callCreateAUser(...);
+
+// if (res.success) {
+//   message.success("Create a user successfully");
+// } else {
+//   notification.error({
+//     message: "Create user failed",
+//     description: res.message,
+//   });
+// }
 export default instance;

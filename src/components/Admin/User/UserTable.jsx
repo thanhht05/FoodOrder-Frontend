@@ -11,6 +11,7 @@ import {
 import UserModalCreate from "./UserModalCreate";
 import UserModalUpdate from "./UserModalUpdate";
 import UserImport from "./UserImport";
+import dayjs from "dayjs";
 
 const UserTable = () => {
   const [listUser, setListUser] = useState([]);
@@ -19,6 +20,8 @@ const UserTable = () => {
   const [isLoading, setIsLoading] = useState(false);
   const pageSize = 5;
   const [total, setTotal] = useState(0);
+
+  const [sortQuery, setSortQuery] = useState("");
 
   const [openViewDetail, setOpenViewDetail] = useState(false);
   const [userDataDetail, setUserDataDetail] = useState(null);
@@ -29,9 +32,18 @@ const UserTable = () => {
   const [userDataUpdate, setUserDataUpdate] = useState(null);
 
   const [openModalUpload, setOpenMOdalUpload] = useState(false);
-  const handlePaginationChange = (pagination) => {
+  const handlePaginationChange = (pagination, filters, sorter, extra) => {
+    console.log("Sorteer", sorter.field);
     if (pagination && pagination.current !== currentPage) {
       setCurrentPage(pagination.current);
+    }
+    if (sorter && sorter.field) {
+      const q =
+        sorter.order === "ascend"
+          ? `sort=${sorter.field},asc`
+          : `sort=${sorter.field},desc`;
+
+      setSortQuery(q);
     }
   };
 
@@ -40,6 +52,9 @@ const UserTable = () => {
     let query = `page=${currentPage}&size=${pageSize}`;
     if (filter) {
       query += `${filter}`;
+    }
+    if (sortQuery) {
+      query += `&${sortQuery}`;
     }
     const res = await callFetchAllUser(query);
     if (res && res.data) {
@@ -50,7 +65,7 @@ const UserTable = () => {
   };
   useEffect(() => {
     fetchUser();
-  }, [currentPage, pageSize, filter]);
+  }, [currentPage, pageSize, filter, sortQuery]);
   const columns = [
     {
       title: "ID",
@@ -71,6 +86,7 @@ const UserTable = () => {
       title: "Fullname",
       dataIndex: "fullName",
       key: "fullName",
+      sorter: true,
     },
     {
       title: "Email",
@@ -81,6 +97,17 @@ const UserTable = () => {
       title: "Phone",
       key: "phone",
       dataIndex: "phone",
+    },
+    {
+      title: "Updated day",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      sorter: true,
+
+      render: (updatedAt) =>
+        dayjs(updatedAt).isValid()
+          ? dayjs(updatedAt).format("DD/MM/YYYY HH:mm")
+          : "User chưa được cập nhật",
     },
     {
       title: "Action",
@@ -181,6 +208,7 @@ const UserTable = () => {
       <UserImport
         openModalUpload={openModalUpload}
         setOpenModalUpload={setOpenMOdalUpload}
+        fetchUser={fetchUser}
       />
     </>
   );

@@ -28,19 +28,23 @@ const UserModalCreate = ({
     const { fullName, email, password, phone } = values;
     setIsSubmit(true);
 
-    const res = await callCreateAUser(fullName, email, password, phone);
-    if (res && res.data) {
-      message.success("Create a user successfully");
-      form.resetFields();
-      setOpenModalCreateUser(false);
-      await fetchUser();
-    } else {
+    try {
+      const res = await callCreateAUser(fullName, email, password, phone);
+
+      if (res && res.data) {
+        message.success("Create a user successfully");
+        form.resetFields();
+        setOpenModalCreateUser(false);
+        await fetchUser();
+      }
+    } catch (error) {
       notification.error({
-        message: "Create user have an error",
-        description: res.message,
+        message: "Create user failed",
+        description: error?.response?.data?.message || "Server error",
       });
+    } finally {
+      setIsSubmit(false);
     }
-    setIsSubmit(false);
   };
   return (
     <>

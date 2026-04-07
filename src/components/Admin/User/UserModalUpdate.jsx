@@ -73,12 +73,7 @@ const UserModalUpdate = ({
             validateTrigger="onBlur"
             name="point"
             label="Point"
-            rules={[
-              { required: true, message: "Please enter point" },
-              {
-                type: "number",
-              },
-            ]}
+            rules={[{ required: true, message: "Please enter point" }]}
           >
             <Input />
           </Form.Item>

@@ -5,7 +5,7 @@ import { useState } from "react";
 import * as XLSX from "xlsx";
 import { callBulkCreateUser } from "../../../services/api";
 
-const UserImport = ({ openModalUpload, setOpenModalUpload }) => {
+const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
   const [dataExcel, setDataExcel] = useState([]);
 
   const handleOk = async () => {
@@ -28,6 +28,7 @@ const UserImport = ({ openModalUpload, setOpenModalUpload }) => {
         // console.log("All users created successfully");
         message.success(`Tạo thành công ${total} user`);
         setDataExcel([]);
+        await fetchUser();
         setOpenModalUpload(false);
       } else if (success.length > 0) {
         // some user are successfully imported and failure
@@ -45,6 +46,7 @@ const UserImport = ({ openModalUpload, setOpenModalUpload }) => {
           duration: 5,
         });
         setDataExcel([]);
+        await fetchUser();
         setOpenModalUpload(false);
       } else {
         // all user are falure import
@@ -141,6 +143,7 @@ const UserImport = ({ openModalUpload, setOpenModalUpload }) => {
         closable={{ "aria-label": "Custom Close Button" }}
         open={openModalUpload}
         onOk={handleOk}
+        okText="Import"
         onCancel={handleCancel}
       >
         <Dragger {...propsUserUpload}>
