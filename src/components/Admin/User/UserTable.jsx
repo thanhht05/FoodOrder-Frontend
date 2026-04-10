@@ -26,10 +26,10 @@ import dayjs from "dayjs";
 
 const UserTable = () => {
   const [listUser, setListUser] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [filter, setFilter] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const pageSize = 5;
+  const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
 
   const [sortQuery, setSortQuery] = useState("");
@@ -44,7 +44,6 @@ const UserTable = () => {
 
   const [openModalUpload, setOpenMOdalUpload] = useState(false);
   const handlePaginationChange = (pagination, filters, sorter, extra) => {
-    console.log("Sorteer", sorter.field);
     if (pagination && pagination.current !== currentPage) {
       setCurrentPage(pagination.current);
     }
@@ -138,7 +137,6 @@ const UserTable = () => {
               title="Delete the user"
               description="Are you sure to delete this user?"
               onConfirm={() => handleDeleteUser(record.id)}
-              // onCancel={cancel}
               okText="Yes"
               cancelText="No"
             >

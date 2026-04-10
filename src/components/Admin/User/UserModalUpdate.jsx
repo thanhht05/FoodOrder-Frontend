@@ -60,7 +60,7 @@ const UserModalUpdate = ({
             label="Email"
             rules={[{ required: true, message: "Please input email!" }]}
           >
-            <Input />
+            <Input disabled />
           </Form.Item>
           <Form.Item
             name="fullName"

@@ -23,6 +23,7 @@ import ProtectedRoute from "./pages/protectedRoute/ProtectedRoute";
 import AppHeader from "./components/Header/AppHeader";
 import LayoutAdmin from "./components/Admin/LayoutAdmin";
 import ManageUserPage from "./pages/admin/user";
+import ManageProductPage from "./pages/admin/product";
 const Layout = () => {
   return (
     <div className="layout">
@@ -95,8 +96,12 @@ function App() {
           ),
         },
         {
-          path: "book",
-          element: <BookPage />,
+          path: "product",
+          element: (
+            <ProtectedRoute>
+              <ManageProductPage />
+            </ProtectedRoute>
+          ),
         },
       ],
     },

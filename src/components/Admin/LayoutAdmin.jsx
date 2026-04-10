@@ -53,7 +53,12 @@ const AdminLayout = () => {
               icon: <UserOutlined />,
               label: <Link to="/admin/user">User</Link>,
             },
-            { key: "3", icon: <SettingOutlined />, label: "Configuration" },
+            {
+              key: "3",
+              icon: <UserOutlined />,
+              label: <Link to="/admin/product">Product</Link>,
+            },
+            { key: "4", icon: <SettingOutlined />, label: "Configuration" },
           ]}
         />
       </Sider>

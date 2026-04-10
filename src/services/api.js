@@ -69,3 +69,7 @@ export const callDeleteUser = (userId) => {
 export const callBulkCreateUser = (data) => {
   return axios.post("/api/v1/users/bulk", data);
 };
+
+export const callFetchAllProcut = (query) => {
+  return axios.get(`/api/v1/products?${query}`);
+};
