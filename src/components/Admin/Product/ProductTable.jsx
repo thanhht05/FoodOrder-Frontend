@@ -8,8 +8,12 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { callFetchAllProcut } from "../../../services/api";
 import FormSearch from "./FormSearch";
+import ProductViewDetail from "./ProductViewDetail";
 
 const ProductTable = () => {
+  const [openProductViewDetail, setOpenProductViewDetail] = useState(false);
+  const [productDataDetail, setProductDataDetail] = useState(null);
+
   const [listProcut, setlistProcut] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -21,11 +25,13 @@ const ProductTable = () => {
   const [sortQuery, setSortQuery] = useState("");
 
   const fetchProduct = async (query) => {
+    setIsLoading(true);
     const res = await callFetchAllProcut(query);
     if (res && res.data) {
       setlistProcut(res.data.results);
       setTotal(res.data.meta.totalElements);
     }
+    setIsLoading(false);
   };
   useEffect(() => {
     let query = `page=${currentPage}&size=${pageSize}`;
@@ -43,7 +49,15 @@ const ProductTable = () => {
       title: "ID",
       dataIndex: "id",
       key: "naidme",
-      render: (_, record) => <a>{record.id}</a>,
+      render: (_, record) => (
+        <a
+          onClick={() => {
+            (setOpenProductViewDetail(true), setProductDataDetail(record));
+          }}
+        >
+          {record.id}
+        </a>
+      ),
     },
     {
       title: "Name",
@@ -163,6 +177,13 @@ const ProductTable = () => {
           ;
         </Col>
       </Row>
+
+      <ProductViewDetail
+        openProductViewDetail={openProductViewDetail}
+        setOpenProductViewDetail={setOpenProductViewDetail}
+        productDataDetail={productDataDetail}
+        setProductDataDetail={setProductDataDetail}
+      />
     </>
   );
 };

@@ -20,7 +20,6 @@ const UserViewDetail = ({
     setOpenViewDetail(false);
     setUserDataDetail(null);
   };
-  console.log(userDataDetail);
   return (
     <>
       <Drawer title="User Detail" onClose={onClose} open={openViewDetail}>
