@@ -20,11 +20,18 @@ import {
 import "./layoutAdmin.scss";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 const { Header, Sider, Content } = Layout;
 
 const AdminLayout = () => {
+  const location = useLocation();
+  const getSelectedKey = () => {
+    if (location.pathname === "/admin") return "1";
+    if (location.pathname.startsWith("/admin/user")) return "2";
+    if (location.pathname.startsWith("/admin/product")) return "3";
+    return "1";
+  };
   const [collapsed, setCollapsed] = useState(false);
   const user = useSelector((state) => state.account.user);
 
@@ -41,7 +48,7 @@ const AdminLayout = () => {
         <div className="logo">{collapsed ? "GA" : "ADMIN DASHBOARD"}</div>
         <Menu
           mode="inline"
-          defaultSelectedKeys={["1"]}
+          selectedKeys={[getSelectedKey()]}
           items={[
             {
               key: "1",
