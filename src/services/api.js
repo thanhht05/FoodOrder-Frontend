@@ -73,3 +73,39 @@ export const callBulkCreateUser = (data) => {
 export const callFetchAllProcut = (query) => {
   return axios.get(`/api/v1/products?${query}`);
 };
+
+export const callFetchAllCategory = () => {
+  return axios.get("/api/v1/categories");
+};
+export const callUploadProductImg = (fileImg) => {
+  const bodyFormData = new FormData();
+  bodyFormData.append("file", fileImg);
+  return axios({
+    method: "post",
+    url: "/api/v1/upload",
+    data: bodyFormData,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+};
+
+export const callCreateProduct = (
+  name,
+  price,
+  quantity,
+  lstImg,
+  categoryName,
+  description,
+) => {
+  const URL = "/api/v1/products";
+  const data = {
+    name,
+    price,
+    quantity,
+    lstImg,
+    categoryName,
+    description,
+  };
+  return axios.post(URL, data);
+};

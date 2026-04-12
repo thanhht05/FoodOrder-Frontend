@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { callFetchAllProcut } from "../../../services/api";
 import FormSearch from "./FormSearch";
 import ProductViewDetail from "./ProductViewDetail";
+import ProductModalCreate from "./ProductModalCreate";
 
 const ProductTable = () => {
   const [openProductViewDetail, setOpenProductViewDetail] = useState(false);
@@ -23,6 +24,8 @@ const ProductTable = () => {
 
   const [filter, setFilter] = useState("");
   const [sortQuery, setSortQuery] = useState("");
+
+  const [openModalCreateProduct, setOpenModalCreateProduct] = useState(false);
 
   const fetchProduct = async (query) => {
     setIsLoading(true);
@@ -146,7 +149,7 @@ const ProductTable = () => {
           <Button
             icon={<PlusOutlined />}
             type="primary"
-            // onClick={() => setOpenModalCreateUser(true)}
+            onClick={() => setOpenModalCreateProduct(true)}
           >
             Thêm mới
           </Button>
@@ -183,6 +186,12 @@ const ProductTable = () => {
         setOpenProductViewDetail={setOpenProductViewDetail}
         productDataDetail={productDataDetail}
         setProductDataDetail={setProductDataDetail}
+      />
+
+      <ProductModalCreate
+        openModalCreateProduct={openModalCreateProduct}
+        setOpenModalCreateProduct={setOpenModalCreateProduct}
+        fetchProduct={fetchProduct}
       />
     </>
   );
