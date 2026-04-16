@@ -3,13 +3,22 @@ import {
   ExportOutlined,
   PlusOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Popconfirm, Row, Table } from "antd";
+import {
+  Button,
+  Col,
+  message,
+  notification,
+  Popconfirm,
+  Row,
+  Table,
+} from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { callFetchAllProcut } from "../../../services/api";
+import { callDeleteProduct, callFetchAllProcut } from "../../../services/api";
 import FormSearch from "./FormSearch";
 import ProductViewDetail from "./ProductViewDetail";
 import ProductModalCreate from "./ProductModalCreate";
+import ProductModalUpdate from "./ProductModalUpdate";
 
 const ProductTable = () => {
   const [openProductViewDetail, setOpenProductViewDetail] = useState(false);
@@ -26,6 +35,8 @@ const ProductTable = () => {
   const [sortQuery, setSortQuery] = useState("");
 
   const [openModalCreateProduct, setOpenModalCreateProduct] = useState(false);
+  const [openModalUpdateProduct, setOpenModalUpdateProduct] = useState(false);
+  const [productDataUpdate, setProductDataUpdate] = useState(null);
 
   const fetchProduct = async (query) => {
     setIsLoading(true);
@@ -46,6 +57,18 @@ const ProductTable = () => {
     }
     fetchProduct(query);
   }, [currentPage, filter, sortQuery]);
+  const handleDeleteProduct = async (id) => {
+    const res = await callDeleteProduct(id);
+    if (res && res.data) {
+      message.success("delete product success");
+    } else {
+      notification.error({
+        message: "Có lỗi xảy ra",
+        description: res.message,
+      });
+    }
+    await fetchProduct();
+  };
 
   const columns = [
     {
@@ -89,7 +112,7 @@ const ProductTable = () => {
       render: (updatedAt) =>
         dayjs(updatedAt).isValid()
           ? dayjs(updatedAt).format("DD/MM/YYYY HH:mm")
-          : "User chưa được cập nhật",
+          : "Product chưa được cập nhật",
     },
     {
       title: "Action",
@@ -97,11 +120,17 @@ const ProductTable = () => {
       render: (_, record) => {
         return (
           <>
-            <a>Update</a>
+            <a
+              onClick={() => {
+                (setOpenModalUpdateProduct(true), setProductDataUpdate(record));
+              }}
+            >
+              Update
+            </a>
             <Popconfirm
-              title="Delete the user"
-              description="Are you sure to delete this user?"
-              //   onConfirm={() => handleDeleteUser(record.id)}
+              title="Delete the pproduct"
+              description="Are you sure to delete this pproduct?"
+              onConfirm={() => handleDeleteProduct(record.id)}
               okText="Yes"
               cancelText="No"
             >
@@ -191,6 +220,14 @@ const ProductTable = () => {
       <ProductModalCreate
         openModalCreateProduct={openModalCreateProduct}
         setOpenModalCreateProduct={setOpenModalCreateProduct}
+        fetchProduct={fetchProduct}
+      />
+
+      <ProductModalUpdate
+        setOpenModalUpdateProduct={setOpenModalUpdateProduct}
+        openModalUpdateProduct={openModalUpdateProduct}
+        productDataUpdate={productDataUpdate}
+        setProductDataUpdate={setProductDataUpdate}
         fetchProduct={fetchProduct}
       />
     </>

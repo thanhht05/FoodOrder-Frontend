@@ -109,3 +109,29 @@ export const callCreateProduct = (
   };
   return axios.post(URL, data);
 };
+
+export const callDeleteProduct = (id) => {
+  return axios.delete(`/api/v1/products/${id}`);
+};
+
+export const calUpdateProduct = (
+  id,
+  name,
+  price,
+  quantity,
+  lstImg,
+  categoryName,
+  description,
+) => {
+  const URL = "/api/v1/products";
+  const data = {
+    id,
+    name,
+    price,
+    quantity,
+    lstImg,
+    categoryName,
+    description,
+  };
+  return axios.put(URL, data);
+};

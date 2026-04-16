@@ -10,45 +10,98 @@ import {
   Select,
   Upload,
 } from "antd";
-import TextArea from "antd/es/input/TextArea";
 import { useEffect, useState } from "react";
 import {
-  callCreateProduct,
   callFetchAllCategory,
+  calUpdateProduct,
   callUploadProductImg,
 } from "../../../services/api";
+import TextArea from "antd/es/input/TextArea";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import { v4 as uuidv4 } from "uuid";
 
-const ProductModalCreate = ({
-  openModalCreateProduct,
-  setOpenModalCreateProduct,
+const ProductModalUpdate = ({
+  openModalUpdateProduct,
+  setOpenModalUpdateProduct,
+  setProductDataUpdate,
+  productDataUpdate,
   fetchProduct,
 }) => {
   const [form] = Form.useForm();
+
   const [isSubmit, setIsSubmit] = useState(false);
   const [listCategory, setListCategory] = useState([]);
-
+  const [initForm, setInitForm] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewTitle, setPreviewTitle] = useState("");
   const [previewImage, setPreviewImage] = useState("");
-
   const [dataImg, setDataImg] = useState([]);
 
-  const [previewTitle, setPreviewTitle] = useState("");
+  useEffect(() => {
+    const fetchCategory = async () => {
+      const res = await callFetchAllCategory();
+      if (res && res.data) {
+        const lst = res.data.results;
+        const cate = lst.map((item) => {
+          return { label: item.name, value: item.name };
+        });
 
-  const [loading, setLoading] = useState(false);
+        setListCategory(cate);
+      }
+    };
+    fetchCategory();
+  }, []);
+
+  //   init data form
+  useEffect(() => {
+    if (productDataUpdate?.id) {
+      const imgs = productDataUpdate?.lstImg.map((item) => {
+        return {
+          uid: uuidv4(),
+          name: item.name,
+          status: "done",
+          url: `${import.meta.env.VITE_BACKEND_URL}/upload/${item.name}`,
+        };
+      });
+
+      const initData = {
+        id: productDataUpdate?.id,
+        name: productDataUpdate?.name,
+        price: productDataUpdate?.price,
+        updatedAt: productDataUpdate?.updatedAt,
+        description: productDataUpdate?.description,
+        quantity: productDataUpdate?.quantity,
+        lstImg: { fileList: imgs },
+        categoryName: productDataUpdate?.productCate?.name,
+      };
+      setInitForm(initData);
+
+      setDataImg(imgs);
+      form.setFieldsValue(initData);
+    }
+    return () => {
+      form.resetFields();
+    };
+  }, [productDataUpdate]);
+  const handleCancel = () => {
+    setOpenModalUpdateProduct(false);
+    setProductDataUpdate(null);
+  };
+
   const getBase64 = (img, callback) => {
     const reader = new FileReader();
     reader.addEventListener("load", () => callback(reader.result));
     reader.readAsDataURL(img);
   };
-  const handlePreview = async (file) => {
-    getBase64(file.originFileObj, (url) => {
-      setPreviewImage(url);
-      setPreviewOpen(true);
-      setPreviewTitle(
-        file.name || file.url.substring(file.url.lastIndexOf("/") + 1),
-      );
-    });
+  const handleChange = (info) => {
+    if (info.file.status === "uploading") {
+      setLoading(true);
+      return;
+    }
+    if (info.file.status === "done") {
+      setLoading(false);
+    }
   };
   const beforeUpload = (file) => {
     const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
@@ -61,41 +114,30 @@ const ProductModalCreate = ({
     }
     return isJpgOrPng && isLt2M;
   };
-  const handleChange = (info) => {
-    if (info.file.status === "uploading") {
-      setLoading(true);
+  const handlePreview = async (file) => {
+    if (file.url && !file.originFileObj) {
+      setPreviewImage(file.url);
+      setPreviewOpen(true);
+      setPreviewTitle(
+        file.name || file.url.substring(file.url.lastIndexOf("/") + 1),
+      );
       return;
     }
-    if (info.file.status === "done") {
-      setLoading(false);
-    }
+    getBase64(file.originFileObj, (url) => {
+      setPreviewImage(url);
+      setPreviewOpen(true);
+      setPreviewTitle(
+        file.name || file.url.substring(file.url.lastIndexOf("/") + 1),
+      );
+    });
   };
 
-  const handleCancel = () => {
-    form.resetFields();
-    setOpenModalCreateProduct(false);
-  };
-
-  useEffect(() => {
-    const fetchCategory = async () => {
-      const res = await callFetchAllCategory();
-      if (res && res.data) {
-        const lst = res.data.results;
-        const cate = lst.map((item) => {
-          return { lable: item.name, value: item.name };
-        });
-
-        setListCategory(cate);
-      }
-    };
-    fetchCategory();
-  }, []);
   const handleUploadFile = async ({ file, onSuccess, onError }) => {
     const res = await callUploadProductImg(file);
     if (res && res.data) {
       //copy previous state => upload multiple images
-      setDataImg((img) => [
-        ...img,
+      setDataImg((dataImg) => [
+        ...dataImg,
         {
           name: res.data.fileName,
           uid: file.uid,
@@ -107,30 +149,26 @@ const ProductModalCreate = ({
     }
   };
   const onFinish = async (values) => {
-    if (dataImg.length === 0) {
-      notification.error({
-        message: "Lỗi validate",
-        description: "Vui lòng upload ảnh slider",
-      });
-      return;
-    }
-    setIsSubmit(true);
-    const { name, price, quantity, categoryName, description } = values;
+    const { id, name, price, quantity, categoryName, description } = values;
+    const fileNameImg = dataImg.map((item) => item.name);
 
-    const fileNamImg = dataImg.map((item) => item.name);
-
-    const res = await callCreateProduct(
+    const res = await calUpdateProduct(
+      id,
       name,
       price,
       quantity,
-      fileNamImg,
+      fileNameImg,
       categoryName,
       description,
     );
+    setIsSubmit(true);
+
     if (res && res.data) {
+      message.success("Cập nhật book thành công");
       form.resetFields();
       setDataImg([]);
-      setOpenModalCreateProduct(false);
+      setInitForm(null);
+      setOpenModalUpdateProduct(false);
       await fetchProduct();
     } else {
       notification.error({
@@ -145,7 +183,7 @@ const ProductModalCreate = ({
       <Modal
         title="Basic Modal"
         closable={{ "aria-label": "Custom Close Button" }}
-        open={openModalCreateProduct}
+        open={openModalUpdateProduct}
         onOk={() => {
           form.submit();
         }}
@@ -154,6 +192,9 @@ const ProductModalCreate = ({
       >
         <Divider />
         <Form form={form} onFinish={onFinish} autoComplete="off" name="basic">
+          <Form.Item name="id" label="Id" hidden>
+            <Input />
+          </Form.Item>
           <Form.Item
             name="name"
             label="Name"
@@ -195,9 +236,8 @@ const ProductModalCreate = ({
             rules={[{ required: true, message: "Vui lòng chọn thể loại!" }]}
           >
             <Select
-              showSearch={{
-                optionFilterProp: ["label", "otherField"],
-              }}
+              showSearch
+              optionFilterProp="label"
               placeholder="Select a category"
               options={listCategory}
             />
@@ -224,6 +264,7 @@ const ProductModalCreate = ({
                 );
               }}
               listType="picture-card"
+              defaultFileList={initForm?.lstImg?.fileList ?? []}
             >
               <div>
                 {loading ? <LoadingOutlined /> : <PlusOutlined />}
@@ -245,4 +286,4 @@ const ProductModalCreate = ({
     </>
   );
 };
-export default ProductModalCreate;
+export default ProductModalUpdate;
