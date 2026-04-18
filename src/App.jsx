@@ -6,7 +6,6 @@ import {
   RouterProvider,
   Outlet,
 } from "react-router-dom";
-import Home from "./pages/Home";
 import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import Contact from "./pages/contact";
@@ -24,6 +23,7 @@ import AppHeader from "./components/Header/AppHeader";
 import LayoutAdmin from "./components/Admin/LayoutAdmin";
 import ManageUserPage from "./pages/admin/user";
 import ManageProductPage from "./pages/admin/product";
+import Home from "./components/Home";
 const Layout = () => {
   return (
     <div className="layout">

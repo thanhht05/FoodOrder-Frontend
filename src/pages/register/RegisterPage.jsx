@@ -10,192 +10,193 @@ import {
   message,
   notification,
   Row,
+  Typography,
 } from "antd";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { callRegister } from "../../services/api";
+import { ArrowLeftOutlined } from "@ant-design/icons";
+
+const { Title, Text } = Typography;
+
 const RegisterPage = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [isSubmit, setIsSubmit] = useState(false);
+
   const onFinish = async (values) => {
     const { email, fullName, phone, password } = values;
-
     setIsSubmit(true);
-
     try {
       const res = await callRegister(email, fullName, phone, password);
-      console.log(res);
-
       if (res.data) {
-        message.success("Create account success!");
+        message.success("Tạo tài khoản thành công!");
         navigate("/login");
       } else {
         notification.error({
-          message: "Has an error while create new account",
+          message: "Có lỗi xảy ra",
           description: res.message,
-          duration: 5,
         });
       }
     } catch (error) {
-      console.log("API ERROR:", error);
-
       notification.error({
-        message: "Register failed",
+        message: "Đăng ký thất bại",
         description: error?.response?.data?.message || error.message,
-        duration: 5,
       });
     } finally {
-      setIsSubmit(false); // 🔥 luôn chạy
+      setIsSubmit(false);
     }
   };
-  const onFinishFailed = (errorInfo) => {
-    console.log("Failed:", errorInfo);
-  };
-  return (
-    <>
-      {/* FORM antd */}
-      <Row className="register-container" style={{ minHeight: "100vh" }}>
-        {/* LEFT - HERO */}
-        <Col xs={0} md={12} className="hero-section">
-          <div className="overlay">
-            <div className="hero-header">
-              <div className="logo">AMU</div>
 
-              <Link className="back-link" to="/">
-                Back to website →
+  return (
+    <div className="register-page">
+      <Row className="register-container">
+        {/* LEFT - HERO SECTION (Hidden on Mobile) */}
+        <Col xs={0} lg={12} className="hero-section">
+          <div className="hero-content">
+            <div className="hero-top">
+              <div className="brand-logo">AMU</div>
+              <Link to="/" className="back-btn">
+                <ArrowLeftOutlined /> Quay lại trang chủ
               </Link>
             </div>
 
-            <div className="hero-footer">
-              <h1>
-                Capturing Moments,
-                <br />
-                Creating Memories
-              </h1>
+            <div className="hero-main">
+              <Title level={1} className="hero-title">
+                Khám phá thế giới <br />
+                <span>ẩm thực</span> tuyệt vời.
+              </Title>
+              <Text className="hero-subtitle">
+                Gia nhập cộng đồng 10,000+ người sành ăn ngay hôm nay.
+              </Text>
+            </div>
 
-              <div className="pagination">
-                <span className="dot"></span>
+            <div className="hero-footer">
+              <div className="step-dots">
                 <span className="dot"></span>
                 <span className="dot active"></span>
+                <span className="dot"></span>
               </div>
+              <Text className="copyright">
+                © 2026 AMU Team. All rights reserved.
+              </Text>
             </div>
           </div>
         </Col>
 
-        {/* RIGHT - FORM */}
-        <Col xs={24} md={12} className="form-section">
-          <div className="form-wrapper">
-            <h2>Create an account</h2>
-
-            <p className="subtitle">
-              Already have an account?
-              <Link to="/login">Log in</Link>
-            </p>
+        {/* RIGHT - FORM SECTION */}
+        <Col xs={24} lg={12} className="form-section">
+          <div className="form-card">
+            <div className="form-header">
+              <Title level={2}>Tạo tài khoản</Title>
+              <Text type="secondary">
+                Đã có tài khoản? <Link to="/login">Đăng nhập ngay</Link>
+              </Text>
+            </div>
 
             <Form
-              className="form"
               form={form}
-              name="basic"
-              onFinish={onFinish}
-              onFinishFailed={onFinishFailed}
-              autoComplete="off"
               layout="vertical"
+              onFinish={onFinish}
+              autoComplete="off"
+              requiredMark={false}
+              className="main-form"
             >
-              <Row gutter={10}>
-                <Col xs={24}>
+              <Row gutter={16}>
+                <Col span={24}>
+                  <Form.Item
+                    label="Họ và tên"
+                    name="fullName"
+                    rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
+                  >
+                    <Input placeholder="Nguyễn Văn A" size="large" />
+                  </Form.Item>
+                </Col>
+
+                <Col span={24}>
                   <Form.Item
                     label="Email"
                     name="email"
                     rules={[
-                      { required: true, message: "Please input your email!" },
+                      { required: true, message: "Vui lòng nhập Email!" },
+                      { type: "email", message: "Email không hợp lệ!" },
                     ]}
                   >
-                    <Input className="input" />
+                    <Input placeholder="example@mail.com" size="large" />
                   </Form.Item>
                 </Col>
 
-                <Col xs={24}>
+                <Col span={24}>
                   <Form.Item
-                    label="FullName"
-                    name="fullName"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your fullName!",
-                      },
-                    ]}
-                  >
-                    <Input className="input" />
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24}>
-                  <Form.Item
-                    label="Phone"
+                    label="Số điện thoại"
                     name="phone"
                     rules={[
-                      { required: true, message: "Please input your phone!" },
-                    ]}
-                  >
-                    <Input className="input" />
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24}>
-                  <Form.Item
-                    label="Password"
-                    name="password"
-                    rules={[
+                      { required: true, message: "Vui lòng nhập SĐT!" },
                       {
-                        required: true,
-                        message: "Please input your password!",
+                        pattern: /^[0-9]{10}$/,
+                        message: "SĐT phải có 10 chữ số!",
                       },
                     ]}
                   >
-                    <Input.Password className="input" />
+                    <Input placeholder="09xx xxx xxx" size="large" />
                   </Form.Item>
                 </Col>
 
-                <Col xs={24}>
+                <Col span={24}>
+                  <Form.Item
+                    label="Mật khẩu"
+                    name="password"
+                    rules={[
+                      { required: true, message: "Vui lòng nhập mật khẩu!" },
+                    ]}
+                  >
+                    <Input.Password placeholder="••••••••" size="large" />
+                  </Form.Item>
+                </Col>
+
+                <Col span={24}>
                   <Form.Item name="remember" valuePropName="checked">
-                    <Checkbox>Remember me</Checkbox>
+                    <Checkbox>Tôi đồng ý với điều khoản dịch vụ</Checkbox>
                   </Form.Item>
                 </Col>
 
-                <Col xs={24}>
-                  <Form.Item label={null}>
-                    <Button
-                      loading={isSubmit}
-                      className="btn-primary"
-                      htmlType="submit"
-                    >
-                      Submit
-                    </Button>
-                  </Form.Item>
+                <Col span={24}>
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    size="large"
+                    block
+                    loading={isSubmit}
+                    className="submit-btn"
+                  >
+                    Đăng ký ngay
+                  </Button>
                 </Col>
               </Row>
 
-              <div className="separator">
-                <span>Or register with</span>
+              <div className="divider-text">
+                <span>Hoặc đăng ký bằng</span>
               </div>
 
-              <div className="social-row">
-                <button type="button" className="btn-social">
-                  <img src={googleIcon} alt="Google" />
+              <div className="social-login">
+                <Button
+                  className="social-btn"
+                  icon={<img src={googleIcon} width={20} alt="G" />}
+                >
                   Google
-                </button>
-
-                <button type="button" className="btn-social">
-                  <img src={facebookIcon} alt="Facebook" />
+                </Button>
+                <Button
+                  className="social-btn"
+                  icon={<img src={facebookIcon} width={20} alt="F" />}
+                >
                   Facebook
-                </button>
+                </Button>
               </div>
             </Form>
           </div>
         </Col>
       </Row>
-    </>
+    </div>
   );
 };
 

@@ -1,193 +1,185 @@
-// --- Variables ---
-$bg-body: #1a1625;
-$bg-card: #2b2738;
-$bg-input: #3b364d;
-$primary-purple: #7c5dfa;
-$primary-hover: #6a4ee0;
-$text-main: #ffffff;
-$text-muted: #a099b0;
-$border-color: #4a4458;
-$radius-md: 8px;
-$transition: all 0.3s ease;
+$primary-color: #ff4d4f;
+$bg-light: #f5f5f5;
 
-@mixin flex-center {
+.login-page {
+  min-height: 100vh;
+  background-color: #fff;
   display: flex;
-  justify-content: center;
-  align-items: center;
+
+  .login-container {
+    width: 100%;
+  }
 }
 
-.login-container {
-  width: 100%;
-  min-height: 100vh; // Thay vì fix 750px để full màn hình
-  background-color: $bg-body;
-  color: $text-main;
+// --- SHARED HERO SECTION ---
+.hero-section {
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1000&q=80");
+  background-size: cover;
+  background-position: center;
+  color: white;
+  padding: 40px;
 
-  .hero-section {
-    flex: 1;
-    background-image: url("../../assets/images/auth/authImg.png");
-    background-position: center;
-    background-size: cover;
-    background-repeat: no-repeat;
-    position: relative;
-    padding: 40px;
+  .hero-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
 
-    .overlay {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .logo {
-      font-size: 24px;
-      font-weight: 800;
-    }
-
-    .back-link {
-      color: white;
-      text-decoration: none;
-      background: rgba(255, 255, 255, 0.15);
-      padding: 8px 18px;
-      border-radius: 20px;
-      backdrop-filter: blur(8px);
-      &:hover {
-        background: rgba(255, 255, 255, 0.25);
-      }
-    }
-
-    .hero-footer h1 {
-      font-size: 2.6rem;
-      margin-bottom: 20px;
+  .brand-logo {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 2px;
+  }
+  .back-btn {
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    &:hover {
+      color: #fff;
     }
   }
 
-  .form-section {
-    @include flex-center;
-    background-color: $bg-card;
-    padding: 40px;
+  .hero-title {
+    color: white !important;
+    font-size: 48px !important;
+    margin-bottom: 16px !important;
+    span {
+      color: $primary-color;
+    }
+  }
 
-    .form-wrapper {
-      width: 100%;
-      max-width: 400px;
+  .hero-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 18px;
+    max-width: 420px;
+    display: block;
+  }
 
-      h2 {
-        font-size: 2.2rem;
-        margin-bottom: 8px;
-        color: $text-main;
-      }
-      .subtitle {
-        color: $text-muted;
-        margin-bottom: 32px;
-        a {
-          color: $primary-purple;
-          font-weight: 600;
-          text-decoration: none;
-          margin-left: 5px;
-        }
+  .step-dots {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      &.active {
+        width: 24px;
+        border-radius: 10px;
+        background: $primary-color;
       }
     }
+  }
+  .copyright {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+  }
+}
 
-    .ant-form-item-label > label {
-      color: $text-muted !important;
-      font-size: 0.9rem;
+// --- FORM SECTION ---
+.form-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+
+  .form-card {
+    width: 100%;
+    max-width: 420px;
+  }
+
+  .form-header {
+    margin-bottom: 32px;
+    h2 {
+      font-weight: 700;
+      margin-bottom: 8px !important;
     }
+  }
 
-    .input {
-      background: $bg-input !important;
-      border: 1px solid $border-color !important;
-      border-radius: $radius-md;
-      color: $text-main !important;
-      padding: 10px;
-
-      &::placeholder {
-        color: #666;
-      }
-      &:focus,
-      &-focused {
-        border-color: $primary-purple !important;
-        box-shadow: 0 0 0 2px rgba($primary-purple, 0.2) !important;
-      }
-
-      input {
-        background: transparent !important;
-        color: white !important;
-      }
+  .main-form {
+    .ant-form-item-label label {
+      font-weight: 600;
+      color: #595959;
+    }
+    .ant-input,
+    .ant-input-password {
+      border-radius: 8px;
     }
 
     .form-options {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 10px;
-
-      .ant-checkbox-wrapper {
-        color: $text-muted;
-      }
-      .forgot-password {
-        color: $primary-purple;
-        font-size: 0.85rem;
-        text-decoration: none;
-        &:hover {
-          text-decoration: underline;
-        }
+      margin-top: -10px;
+      .forgot-link {
+        color: $primary-color;
+        font-size: 14px;
+        font-weight: 500;
       }
     }
 
-    .btn-primary {
-      width: 100%;
+    .submit-btn {
       height: 48px;
-      background: $primary-purple;
-      border: none;
-      border-radius: $radius-md;
+      border-radius: 8px;
       font-weight: 600;
-      font-size: 1rem;
+      background: $primary-color;
+      border-color: $primary-color;
       &:hover {
-        background: $primary-hover !important;
-        transform: translateY(-1px);
+        background: darken($primary-color, 5%) !important;
       }
     }
+  }
 
-    .separator {
-      text-align: center;
-      margin: 24px 0;
-      position: relative;
-      color: $text-muted;
-      font-size: 0.8rem;
-      &::before,
-      &::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        width: 30%;
-        height: 1px;
-        background: $border-color;
-      }
-      &::before {
-        left: 0;
-      }
-      &::after {
-        right: 0;
-      }
+  .divider-text {
+    text-align: center;
+    margin: 24px 0;
+    position: relative;
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 30%;
+      height: 1px;
+      background: #f0f0f0;
     }
+    &::before {
+      left: 0;
+    }
+    &::after {
+      right: 0;
+    }
+    span {
+      font-size: 13px;
+      color: #bfbfbf;
+      background: #fff;
+      padding: 0 10px;
+    }
+  }
 
-    .social-row {
+  .social-login {
+    display: flex;
+    gap: 12px;
+    .social-btn {
+      flex: 1;
+      height: 44px;
+      border-radius: 8px;
+      font-weight: 500;
       display: flex;
-      gap: 12px;
-      .btn-social {
-        flex: 1;
-        @include flex-center;
-        gap: 10px;
-        padding: 10px;
-        background: transparent;
-        border: 1px solid $border-color;
-        border-radius: $radius-md;
-        color: white;
-        cursor: pointer;
-        transition: $transition;
-        &:hover {
-          background: $bg-input;
-        }
-      }
+      align-items: center;
+      justify-content: center;
     }
+  }
+}
+
+// Responsive
+@media (max-width: 992px) {
+  .form-section {
+    padding: 60px 24px;
   }
 }

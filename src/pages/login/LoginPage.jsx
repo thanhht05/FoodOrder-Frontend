@@ -7,13 +7,21 @@ import {
   message,
   notification,
   Row,
+  Typography,
 } from "antd";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "./loginPage.scss";
-import { callLogin } from "../../services/api";
+import {
+  ArrowLeftOutlined,
+  GoogleOutlined,
+  FacebookFilled,
+} from "@ant-design/icons";
 import { useDispatch } from "react-redux";
 import { doLoginAction } from "../../redux/slices/account/accountSlice";
+import { callLogin } from "../../services/api";
+import "./loginPage.scss";
+
+const { Title, Text } = Typography;
 
 const LoginPage = () => {
   const [form] = Form.useForm();
@@ -26,11 +34,10 @@ const LoginPage = () => {
     setIsSubmit(true);
     try {
       const res = await callLogin(username, password);
-      console.log("res.data", res.data);
-      if (res.data) {
+      if (res?.data) {
         localStorage.setItem("access_token", res.data.accessToken);
         dispatch(doLoginAction(res.data));
-        message.success("Login successfully!");
+        message.success("Đăng nhập thành công!");
 
         if (res.data.userLogin.role.name === "ADMIN") {
           navigate("/admin");
@@ -39,132 +46,140 @@ const LoginPage = () => {
         }
       } else {
         notification.error({
-          message: "Occur error",
-          description: res.message,
-          duration: 5,
+          message: "Lỗi đăng nhập",
+          description:
+            res.message || "Tên đăng nhập hoặc mật khẩu không chính xác",
         });
       }
     } catch (error) {
       notification.error({
-        message: "Login  faile d",
+        message: "Đăng nhập thất bại",
         description: error?.response?.data?.message || error.message,
-        duration: 5,
       });
     } finally {
       setIsSubmit(false);
     }
   };
+
   return (
-    <>
+    <div className="login-page">
       <Row className="login-container">
-        {/* LEFT - HERO (Giữ nguyên phong cách trang Register) */}
-        <Col xs={0} md={12} className="hero-section">
-          <div className="overlay">
-            <div className="hero-header">
-              <div className="logo">AMU</div>
-              <Link className="back-link" to="/">
-                Back to website →
+        {/* LEFT - HERO SECTION */}
+        <Col xs={0} lg={12} className="hero-section">
+          <div className="hero-content">
+            <div className="hero-top">
+              <div className="brand-logo">AMU</div>
+              <Link to="/" className="back-btn">
+                <ArrowLeftOutlined /> Quay lại trang chủ
               </Link>
             </div>
 
+            <div className="hero-main">
+              <Title level={1} className="hero-title">
+                Chào mừng bạn <br />
+                <span>trở lại.</span>
+              </Title>
+              <Text className="hero-subtitle">
+                Đăng nhập để tiếp tục khám phá những món ngon tuyệt vời nhất
+                cùng chúng tôi.
+              </Text>
+            </div>
+
             <div className="hero-footer">
-              <h1>
-                Welcome Back,
-                <br />
-                Please Login
-              </h1>
-              <div className="pagination">
+              <div className="step-dots">
                 <span className="dot active"></span>
                 <span className="dot"></span>
                 <span className="dot"></span>
               </div>
+              <Text className="copyright">
+                © 2026 AMU Team. All rights reserved.
+              </Text>
             </div>
           </div>
         </Col>
 
-        {/* RIGHT - LOGIN FORM */}
-        <Col xs={24} md={12} className="form-section">
-          <div className="form-wrapper">
-            <h2>Login</h2>
-            <p className="subtitle">
-              Don't have an account?
-              <Link to="/register"> Register</Link>
-            </p>
+        {/* RIGHT - LOGIN FORM SECTION */}
+        <Col xs={24} lg={12} className="form-section">
+          <div className="form-card">
+            <div className="form-header">
+              <Title level={2}>Đăng nhập</Title>
+              <Text type="secondary">
+                Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
+              </Text>
+            </div>
 
             <Form
-              className="form"
               form={form}
-              name="login_form"
-              onFinish={onFinish}
               layout="vertical"
+              onFinish={onFinish}
+              autoComplete="off"
               requiredMark={false}
+              className="main-form"
             >
               <Form.Item
-                label="Username"
+                label="Tên đăng nhập / Email"
                 name="username"
                 rules={[
-                  { required: true, message: "Please input your username!" },
-                  {
-                    type: "username",
-                    message: "Please enter a valid username!",
-                  },
+                  { required: true, message: "Vui lòng nhập tên đăng nhập!" },
                 ]}
               >
-                <Input className="input" placeholder="Enter your username" />
+                <Input placeholder="username@example.com" size="large" />
               </Form.Item>
 
               <Form.Item
-                label="Password"
+                label="Mật khẩu"
                 name="password"
-                rules={[
-                  { required: true, message: "Please input your password!" },
-                ]}
+                rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
               >
-                <Input.Password
-                  className="input"
-                  placeholder="Enter your password"
-                />
+                <Input.Password placeholder="••••••••" size="large" />
               </Form.Item>
 
               <div className="form-options">
                 <Form.Item name="remember" valuePropName="checked" noStyle>
-                  <Checkbox>Remember me</Checkbox>
+                  <Checkbox>Ghi nhớ đăng nhập</Checkbox>
                 </Form.Item>
-                <Link className="forgot-password" to="/forgot-password">
-                  Forgot password?
+                <Link className="forgot-link" to="/forgot-password">
+                  Quên mật khẩu?
                 </Link>
               </div>
 
-              <Form.Item style={{ marginTop: "24px" }}>
+              <Form.Item style={{ marginTop: 24 }}>
                 <Button
-                  loading={isSubmit}
-                  className="btn-primary"
+                  type="primary"
                   htmlType="submit"
+                  size="large"
                   block
+                  loading={isSubmit}
+                  className="submit-btn"
                 >
-                  Sign In
+                  Đăng nhập
                 </Button>
               </Form.Item>
 
-              <div className="separator">
-                <span>Or login with</span>
+              <div className="divider-text">
+                <span>Hoặc đăng nhập với</span>
               </div>
 
-              <div className="social-row">
-                <button type="button" className="btn-social">
-                  {/* <img src={googleIcon} alt="Google" /> */}
+              <div className="social-login">
+                <Button
+                  className="social-btn"
+                  icon={<GoogleOutlined style={{ color: "#EA4335" }} />}
+                >
                   Google
-                </button>
-                <button type="button" className="btn-social">
-                  {/* <img src={facebookIcon} alt="Facebook" /> */}
+                </Button>
+                <Button
+                  className="social-btn"
+                  icon={<FacebookFilled style={{ color: "#1877F2" }} />}
+                >
                   Facebook
-                </button>
+                </Button>
               </div>
             </Form>
           </div>
         </Col>
       </Row>
-    </>
+    </div>
   );
 };
+
 export default LoginPage;

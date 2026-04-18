@@ -1,105 +1,112 @@
-// Variables
-$primary-color: #ff4d4f; // Đỏ cam đặc trưng ngành thực phẩm
-$secondary-color: #ffa940;
-$text-color: #333;
-$white: #ffffff;
-$breakpoint-md: 768px;
-$breakpoint-sm: 576px;
-
-.food-header {
-  background-color: $white;
-  padding: 0 20px;
+.food-header-container {
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(10px);
   position: sticky;
   top: 0;
   z-index: 1000;
-  width: 100%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  height: 70px;
-  display: flex;
-  align-items: center;
+  height: 70px !important;
+  line-height: 70px !important;
+  padding: 0 !important;
+  border-bottom: 1px solid #f0f0f0;
 
   .header-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    gap: 20px;
+    padding: 0 15px; // Smaller padding for mobile
+  }
 
-    // 1. Logo
-    .logo {
-      flex-shrink: 0;
-      cursor: pointer;
-      font-size: 24px;
-      font-weight: bold;
-
-      img {
-        width: 80px;
-      }
-    }
-
-    // 2. Search Box
-    .search-container {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      max-width: 500px;
-
-      .search-input {
-        width: 100%;
-
-        :global(.ant-btn-primary) {
-          background-color: $primary-color;
-          border-color: $primary-color;
-        }
-      }
-    }
-
-    // 3. Actions (Cart & Account)
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      flex-shrink: 0;
-
-      .cart-icon {
-        font-size: 22px;
-        color: $text-color;
-        cursor: pointer;
-        transition: color 0.3s;
-
-        &:hover {
-          color: $primary-color;
-        }
-      }
-
-      .account-dropdown {
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        .user-name {
-          font-weight: 600;
-          color: $text-color;
-        }
-
-        // Ẩn tên trên Mobile
-        @media (max-width: $breakpoint-sm) {
-          .user-name {
-            display: none;
-          }
-        }
-      }
+  // --- Search Bar ---
+  .search-col {
+    padding: 0 20px;
+    .custom-input {
+      border-radius: 10px;
+      background: #f5f5f5;
     }
   }
 
-  // Responsive cho màn hình nhỏ (Search thu hẹp)
-  @media (max-width: $breakpoint-md) {
-    padding: 0 10px;
-    .header-wrapper {
-      gap: 10px;
+  // --- Actions ---
+  .header-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 15px; // Smaller gap for mobile space
+
+    .mobile-search-icon {
+      display: none; // Hidden on desktop
+      font-size: 20px;
+      cursor: pointer;
     }
+
+    .icon-wrapper {
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f9f9f9;
+      border-radius: 50%;
+      font-size: 18px;
+    }
+  }
+
+  .profile-trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .user-meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      .welcome {
+        // font-size: 10px;
+        color: #8c8c8c;
+      }
+      .name {
+        font-size: 18px;
+        max-width: 80px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+}
+
+// --- RESPONSIVE BREAKPOINTS ---
+
+@media (max-width: 768px) {
+  .food-header-container {
+    height: 60px !important;
+    line-height: 60px !important;
+
+    .header-wrapper {
+      padding: 0 10px;
+    }
+
+    // 1. Hide the "Xin chào, Name" text to save space
+    .hide-on-mobile {
+      display: none !important;
+    }
+
+    // 2. Show a search icon instead of a full bar
+    .mobile-search-icon {
+      display: block;
+    }
+
+    // 3. Make logo brand text smaller or hidden if needed
+    .logo-container .brand-main {
+      font-size: 14px !important;
+    }
+    .logo-container .brand-sub {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .header-actions {
+    gap: 10px; // Even tighter gap for small phones
   }
 }
