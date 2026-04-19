@@ -75,12 +75,8 @@ const Home = () => {
     { key: "price,desc", label: "Giá cao đến thấp" },
   ];
 
-  const onFinishFilter = (values) => {
-    console.log("Filter values:", values);
-    // Trigger your API call with filters here
-  };
-
-  const onValuesChange = (changedValues, values) => {
+  const handleChangeFilter = (changedValues, values) => {
+    console.log("changedValues.category", changedValues.category);
     if (changedValues.category) {
       const cate = values.category;
       if (cate && cate.length > 0) {
@@ -90,6 +86,22 @@ const Home = () => {
         //reset data -> fetch all
         setFilter("");
       }
+    }
+  };
+
+  const onFinish = (values) => {
+    console.log(values);
+    if (values?.price?.from >= 0 && values?.price?.to >= 0) {
+      let f = `from=${values?.price?.from}&to=${values?.price?.to}`;
+      if (values?.category?.length) {
+        const cate = values?.category?.join(",");
+        f += `&category=${cate}`;
+      }
+
+      // if(values?.category?.length){
+      //   f+=`&`
+      // }
+      setFilter(f);
     }
   };
   return (
@@ -107,22 +119,27 @@ const Home = () => {
                 <ReloadOutlined
                   className="reset-btn"
                   title="Làm mới"
-                  onClick={() => form.resetFields()}
+                  onClick={() => {
+                    form.resetFields();
+                    setFilter("");
+                  }}
                 />
               </div>
               <Divider />
 
               <Form
                 form={form}
-                onFinish={onFinishFilter}
-                onValuesChange={onValuesChange}
+                onFinish={onFinish}
+                onValuesChange={(changedValues, values) =>
+                  handleChangeFilter(changedValues, values)
+                }
                 layout="vertical"
               >
                 <Form.Item name="category" label="Danh mục sản phẩm">
                   <Checkbox.Group className="custom-checkbox-group">
                     <Row style={{ marginBottom: 8 }}>
                       {categoryData.map((i) => (
-                        <Col span={24} style={{ padding: "6px" }}>
+                        <Col key={i.id} span={24} style={{ padding: "6px" }}>
                           <Checkbox value={i.name}>{i.name}</Checkbox>
                         </Col>
                       ))}
@@ -153,6 +170,7 @@ const Home = () => {
                     </Form.Item>
                   </div>
                   <Button
+                    onClick={() => form.submit()}
                     type="primary"
                     htmlType="submit"
                     block
