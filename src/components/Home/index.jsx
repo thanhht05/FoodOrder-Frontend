@@ -35,6 +35,7 @@ const Home = () => {
   const pageSize = 8;
 
   const [sortQuery, setSortQuery] = useState("");
+  const [filter, setFilter] = useState("");
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -48,22 +49,30 @@ const Home = () => {
 
   useEffect(() => {
     let query = `page=${currentPage}&size=${pageSize}`;
+    if (sortQuery) {
+      query += `&sort=${sortQuery}`;
+    }
+    if (filter) {
+      query += `&${filter}`;
+    }
 
     const fetchProduct = async () => {
+      setIsLoading(true);
       const res = await callFetchAllProcut(query);
       if (res && res.data) {
         setProductData(res.data.results);
         setTotal(res.data.meta.totalElements);
       }
+      setIsLoading(false);
     };
     fetchProduct();
-  }, [currentPage, total, sortQuery]);
+  }, [currentPage, sortQuery, filter]);
 
   const tabItems = [
-    { key: "1", label: "Phổ biến" },
-    { key: "2", label: "Hàng mới" },
-    { key: "3", label: "Giá thấp đến cao" },
-    { key: "4", label: "Giá cao đến thấp" },
+    { key: "sold,desc", label: "Phổ biến" },
+    { key: "updatedAt,desc", label: "Hàng mới" },
+    { key: "price,asc", label: "Giá thấp đến cao" },
+    { key: "price,desc", label: "Giá cao đến thấp" },
   ];
 
   const onFinishFilter = (values) => {
@@ -71,6 +80,18 @@ const Home = () => {
     // Trigger your API call with filters here
   };
 
+  const onValuesChange = (changedValues, values) => {
+    if (changedValues.category) {
+      const cate = values.category;
+      if (cate && cate.length > 0) {
+        const f = cate.join(",");
+        setFilter(`category=${f}`);
+      } else {
+        //reset data -> fetch all
+        setFilter("");
+      }
+    }
+  };
   return (
     <div className="home-container">
       <div className="container-layout">
@@ -91,13 +112,18 @@ const Home = () => {
               </div>
               <Divider />
 
-              <Form form={form} onFinish={onFinishFilter} layout="vertical">
+              <Form
+                form={form}
+                onFinish={onFinishFilter}
+                onValuesChange={onValuesChange}
+                layout="vertical"
+              >
                 <Form.Item name="category" label="Danh mục sản phẩm">
                   <Checkbox.Group className="custom-checkbox-group">
                     <Row style={{ marginBottom: 8 }}>
                       {categoryData.map((i) => (
                         <Col span={24} style={{ padding: "6px" }}>
-                          <Checkbox value={i.id}>{i.name}</Checkbox>
+                          <Checkbox value={i.name}>{i.name}</Checkbox>
                         </Col>
                       ))}
                     </Row>
@@ -141,16 +167,16 @@ const Home = () => {
 
           {/* Product Listing Area */}
           <Col xs={24} lg={19}>
-            <div className="product-content-area">
-              <div className="sorting-tabs">
-                <Tabs
-                  defaultActiveKey="1"
-                  items={tabItems}
-                  onChange={(key) => console.log(key)}
-                />
-              </div>
+            <Spin size="large" spinning={isLoading}>
+              <div className="product-content-area">
+                <div className="sorting-tabs">
+                  <Tabs
+                    defaultActiveKey="1"
+                    items={tabItems}
+                    onChange={(key) => setSortQuery(key)}
+                  />
+                </div>
 
-              <Spin spinning={isLoading}>
                 <Row gutter={[16, 16]}>
                   {productData.map((p) => (
                     <Col key={p.id} xs={12} sm={8} md={8} lg={6} key={p.id}>
@@ -192,18 +218,18 @@ const Home = () => {
                     </Col>
                   ))}
                 </Row>
-              </Spin>
 
-              <div className="pagination-wrapper">
-                <Pagination
-                  current={currentPage}
-                  total={total}
-                  pageSize={pageSize}
-                  onChange={(page) => setCurrentPage(page)}
-                  showSizeChanger={false}
-                />
+                <div className="pagination-wrapper">
+                  <Pagination
+                    current={currentPage}
+                    total={total}
+                    pageSize={pageSize}
+                    onChange={(page) => setCurrentPage(page)}
+                    showSizeChanger={false}
+                  />
+                </div>
               </div>
-            </div>
+            </Spin>
           </Col>
         </Row>
       </div>
