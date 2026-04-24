@@ -23,6 +23,8 @@ import { Link, useNavigate } from "react-router-dom";
 import Logo from "../Logo/Logo";
 import { callLogout } from "../../services/api";
 import { doLogoutAction } from "../../redux/slices/account/accountSlice";
+import { useState } from "react";
+// import { useEffect, useState } from "react";
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -40,6 +42,31 @@ const AppHeader = () => {
       navigate("/");
     }
   };
+
+  const [value, setValue] = useState("");
+  // const [debouncedValue, setDebouncedValue] = useState("");
+  const handleSearch = () => {
+    if (value) {
+      navigate(`/?search=${value}`);
+    } else {
+      navigate("/");
+    }
+  };
+  // ⏳ debounce 5 giây
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setDebouncedValue(value);
+  //   }, 3000);
+
+  //   return () => clearTimeout(timer); // cleanup
+  // }, [value]);
+
+  // // 🎯 gọi search khi debounce xong
+  // useEffect(() => {
+  //   if (debouncedValue) {
+  //     handleSearch(debouncedValue);
+  //   }
+  // }, [debouncedValue]);
 
   const userMenuItems = [
     {
@@ -76,12 +103,17 @@ const AppHeader = () => {
 
           {/* Search: Hidden on mobile (xs=0), shows on desktop (md=12) */}
           <Col xs={0} md={12} lg={13} className="search-col">
-            <Input
-              placeholder="Tìm món ngon..."
-              prefix={<SearchOutlined />}
-              size="large"
-              className="custom-input"
-            />
+            <div style={{ display: "flex" }}>
+              <Input
+                onChange={(e) => setValue(e.target.value)}
+                placeholder="Tìm món ngon..."
+                suffix={<SearchOutlined />}
+                size="large"
+                onPressEnter={handleSearch}
+                className="custom-input"
+              />
+              <Button onClick={handleSearch}>Search</Button>
+            </div>
           </Col>
 
           {/* Actions: Takes 18/24 on mobile to fit cart + avatar */}

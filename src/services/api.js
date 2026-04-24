@@ -135,3 +135,8 @@ export const calUpdateProduct = (
   };
   return axios.put(URL, data);
 };
+
+export const callFetchProductId = (id) => {
+  const URL = `/api/v1/products/${id}`;
+  return axios.get(URL);
+};

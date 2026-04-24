@@ -9,7 +9,7 @@ import {
 import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import Contact from "./pages/contact";
-import BookPage from "./pages/book";
+import BookPage from "./pages/product";
 import Footer from "./components/Footer/footer";
 import { useDispatch, useSelector } from "react-redux";
 import { callGetAccount } from "./services/api";
@@ -24,6 +24,7 @@ import LayoutAdmin from "./components/Admin/LayoutAdmin";
 import ManageUserPage from "./pages/admin/user";
 import ManageProductPage from "./pages/admin/product";
 import Home from "./components/Home";
+import ProductPage from "./pages/product";
 const Layout = () => {
   return (
     <div className="layout">
@@ -68,8 +69,8 @@ function App() {
           element: <Contact />,
         },
         {
-          path: "book",
-          element: <BookPage />,
+          path: "product/:slug",
+          element: <ProductPage />,
         },
       ],
     },

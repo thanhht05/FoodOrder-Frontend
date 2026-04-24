@@ -26,12 +26,12 @@ import dayjs from "dayjs";
 
 const UserTable = () => {
   const [listUser, setListUser] = useState([]);
-  const [filter, setFilter] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const pageSize = 5;
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
 
+  const [filter, setFilter] = useState("");
   const [sortQuery, setSortQuery] = useState("");
 
   const [openViewDetail, setOpenViewDetail] = useState(false);
