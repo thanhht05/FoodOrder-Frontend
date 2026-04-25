@@ -30,20 +30,16 @@ const ProductPage = () => {
         let raw = res.data;
 
         raw.items = getImages(raw);
-        setProductData(raw);
+        // test Skeleton
+        setTimeout(() => {
+          setProductData(raw);
+        }, 3000);
       }
     };
     fetchProductById(id);
   }, [id]);
   return (
     <>
-      {/* {productData && (
-        <ViewDetail
-          productData={productData}
-          isOpenModalGallery={isOpenModalGallery}
-          setIsOpenModalGallery={setIsOpenModalGallery}
-        />
-      )} */}
       <ViewDetail productData={productData} />
     </>
   );

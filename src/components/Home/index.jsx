@@ -87,7 +87,6 @@ const Home = () => {
   ];
 
   const handleChangeFilter = (changedValues, values) => {
-    console.log("changedValues.category", changedValues.category);
     if (changedValues.category) {
       const cate = values.category;
       if (cate && cate.length > 0) {
@@ -162,8 +161,14 @@ const Home = () => {
   };
   return (
     <>
-      {productData?.length === 0 ? (
-        <h1>Ko co sp</h1>
+      {isLoading ? (
+        <Row gutter={[16, 16]}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Col xs={12} sm={8} md={8} lg={6} key={i}>
+              <Card loading={true} />
+            </Col>
+          ))}
+        </Row>
       ) : (
         <div className="home-container">
           <div className="container-layout">
@@ -248,6 +253,7 @@ const Home = () => {
               </Col>
 
               {/* Product Listing Area */}
+
               <Col xs={24} lg={19}>
                 <Spin size="large" spinning={isLoading}>
                   <div className="product-content-area">

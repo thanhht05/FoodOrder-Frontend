@@ -7,6 +7,7 @@ import {
   ThunderboltOutlined,
 } from "@ant-design/icons";
 import "./product.scss";
+import ProductSkeleton from "./ProductSkeleton";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -24,7 +25,9 @@ const ModalGallery = ({ images = [], productData }) => {
 
   const variants = ["Nhỏ", "Vừa", "Lớn"]; // Mock data
 
-  return (
+  return !productData ? (
+    <ProductSkeleton />
+  ) : (
     <div className="premium-product-container">
       <Row className="gallery-wrapper">
         {/* BÊN TRÁI: HIỂN THỊ HÌNH ẢNH */}
@@ -39,7 +42,6 @@ const ModalGallery = ({ images = [], productData }) => {
               showThumbnails={false}
               showNav={false} // Ẩn mũi tên để dùng thumbnail nhìn sang hơn
               onSlide={(index) => setCurrentIndex(index)}
-              slideDuration={400}
             />
           </div>
 
