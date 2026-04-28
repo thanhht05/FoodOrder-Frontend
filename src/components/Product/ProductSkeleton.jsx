@@ -1,6 +1,5 @@
 import { DotChartOutlined } from "@ant-design/icons";
 import { Col, Row, Skeleton, Space } from "antd";
-import { act } from "react";
 
 const ProductSkeleton = () => {
   const active = true;

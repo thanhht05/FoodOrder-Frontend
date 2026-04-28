@@ -1,9 +1,49 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import counterReducer from "./slices/counterSlice";
+import storage from "redux-persist/lib/storage";
+
 import accountReducer from "../redux/slices/account/accountSlice";
-export const store = configureStore({
-  reducer: {
-    counter: counterReducer,
-    account: accountReducer,
-  },
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from "redux-persist";
+
+const persistConfig = {
+  key: "root",
+  version: 1,
+  storage: storage.default,
+  blacklist: ["account"], // account will not be persisted
+};
+
+const rootReducer = combineReducers({
+  counter: counterReducer,
+  account: accountReducer,
 });
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+const store = configureStore({
+  reducer: persistedReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+    }),
+});
+const persistor = persistStore(store);
+
+export { store, persistor };
+
+// export const store = configureStore({
+//   reducer: {
+//     counter: counterReducer,
+//     account: accountReducer,
+//   },
+// });
