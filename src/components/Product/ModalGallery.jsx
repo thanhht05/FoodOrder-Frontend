@@ -1,6 +1,17 @@
 import React, { useRef, useState } from "react";
 import ImageGallery from "react-image-gallery";
-import { Col, Row, Typography, Tag, Button, Divider, Space, Rate } from "antd";
+import {
+  Col,
+  Row,
+  Typography,
+  Tag,
+  Button,
+  Divider,
+  Space,
+  Rate,
+  InputNumber,
+  message,
+} from "antd";
 import {
   ShoppingCartOutlined,
   SafetyOutlined,
@@ -8,14 +19,17 @@ import {
 } from "@ant-design/icons";
 import "./product.scss";
 import ProductSkeleton from "./ProductSkeleton";
-
+import { useDispatch } from "react-redux";
+import { doAddProductAction } from "../../redux/slices/order/OrderSlice";
 const { Title, Text, Paragraph } = Typography;
 
 const ModalGallery = ({ images = [], productData }) => {
   const galleryRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeVariant, setActiveVariant] = useState(0); // Giả lập chọn màu/size
-
+  const dispatch = useDispatch();
+  const maxQuantityProduct = productData?.quantity;
+  const [currentQuantity, setCurrentQuantity] = useState(1);
   const handleThumbnailClick = (index) => {
     setCurrentIndex(index);
     if (galleryRef.current) {
@@ -24,7 +38,18 @@ const ModalGallery = ({ images = [], productData }) => {
   };
 
   const variants = ["Nhỏ", "Vừa", "Lớn"]; // Mock data
-
+  const handleAddProductToCart = (quantity, product) => {
+    dispatch(
+      doAddProductAction({
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        img: product.lstImg?.[0]?.name,
+        quantity: currentQuantity,
+      }),
+    );
+    message.success("Add product successsully");
+  };
   return !productData ? (
     <ProductSkeleton />
   ) : (
@@ -107,11 +132,20 @@ const ModalGallery = ({ images = [], productData }) => {
                 <Text delete className="old-price">
                   900.000
                 </Text>
-                <Tag color="#ff4d4f" className="discount-tag">
-                  -20%
-                </Tag>
               </div>
 
+              <Tag color="#ff4d4f" className="discount-tag">
+                -20%
+              </Tag>
+              <div style={{ marginTop: "20px" }}>
+                Số lượng: &nbsp;
+                <InputNumber
+                  min={1}
+                  max={maxQuantityProduct}
+                  defaultValue={1}
+                  onChange={(value) => setCurrentQuantity(value)}
+                />
+              </div>
               {/* Phân loại giả lập */}
               <div className="variant-selection">
                 <Text strong>Lựa chọn size : &nbsp;</Text>
@@ -153,15 +187,29 @@ const ModalGallery = ({ images = [], productData }) => {
           </div>
 
           <div className="info-footer">
-            <Button
-              type="primary"
-              size="large"
-              block
-              icon={<ShoppingCartOutlined style={{ fontSize: "20px" }} />}
-              className="btn-add-cart"
-            >
-              THÊM VÀO GIỎ HÀNG
-            </Button>
+            <div style={{ display: "flex", gap: "20px" }}>
+              <Button
+                onClick={() =>
+                  handleAddProductToCart(currentQuantity, productData)
+                }
+                type="primary"
+                size="large"
+                block
+                icon={<ShoppingCartOutlined style={{ fontSize: "20px" }} />}
+                className="btn-add-cart"
+              >
+                THÊM VÀO GIỎ HÀNG
+              </Button>
+              <Button
+                type="primary"
+                size="large"
+                block
+                icon={<ShoppingCartOutlined style={{ fontSize: "20px" }} />}
+                className="btn-add-cart"
+              >
+                MUA NGAY
+              </Button>
+            </div>
             <Text type="secondary" className="ship-note">
               * Miễn phí vận chuyển cho đơn hàng từ 500k
             </Text>

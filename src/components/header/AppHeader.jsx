@@ -31,6 +31,7 @@ const { Text } = Typography;
 
 const AppHeader = () => {
   const user = useSelector((state) => state.account.user);
+  const cart = useSelector((state) => state.order.carts);
   const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -124,7 +125,7 @@ const AppHeader = () => {
                 <SearchOutlined />
               </div>
 
-              <Badge count={5} size="small" color="#ff4d4f">
+              <Badge count={cart.length} size="small" color="#ff4d4f">
                 <div className="icon-wrapper" onClick={() => navigate("/cart")}>
                   <ShoppingCartOutlined />
                 </div>
