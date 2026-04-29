@@ -8,7 +8,7 @@ export const callRegister = (email, fullName, phone, password) => {
     password: password,
     phone: phone,
     role: {
-      id: 1,
+      id: 2,
     },
   };
   return axios.post(URL, data);

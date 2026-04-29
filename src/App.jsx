@@ -25,6 +25,7 @@ import ManageUserPage from "./pages/admin/user";
 import ManageProductPage from "./pages/admin/product";
 import Home from "./components/Home";
 import ProductPage from "./pages/product";
+import { getCartAPI } from "./redux/thunk/getCartThunk";
 const Layout = () => {
   return (
     <div className="layout">

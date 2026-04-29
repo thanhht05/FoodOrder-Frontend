@@ -22,7 +22,6 @@ import {
 } from "@ant-design/icons";
 import { callFetchAllCategory, callFetchAllProcut } from "../../services/api";
 import { useLocation, useNavigate } from "react-router-dom";
-
 const { Text, Title } = Typography;
 
 const Home = () => {
@@ -35,10 +34,8 @@ const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const pageSize = 8;
-
   const [sortQuery, setSortQuery] = useState("");
   const [filter, setFilter] = useState("");
-
   useEffect(() => {
     const fetchCategories = async () => {
       const res = await callFetchAllCategory();

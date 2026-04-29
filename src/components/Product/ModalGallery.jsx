@@ -19,8 +19,9 @@ import {
 } from "@ant-design/icons";
 import "./product.scss";
 import ProductSkeleton from "./ProductSkeleton";
-import { useDispatch } from "react-redux";
-import { doAddProductAction } from "../../redux/slices/order/OrderSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { addToCart } from "../../redux/slices/cart/CartSlice";
+import { addToCartAPI } from "../../redux/thunk/addToCartAPI";
 const { Title, Text, Paragraph } = Typography;
 
 const ModalGallery = ({ images = [], productData }) => {
@@ -29,6 +30,8 @@ const ModalGallery = ({ images = [], productData }) => {
   const [activeVariant, setActiveVariant] = useState(0); // Giả lập chọn màu/size
   const dispatch = useDispatch();
   const maxQuantityProduct = productData?.quantity;
+  const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
+
   const [currentQuantity, setCurrentQuantity] = useState(1);
   const handleThumbnailClick = (index) => {
     setCurrentIndex(index);
@@ -38,17 +41,28 @@ const ModalGallery = ({ images = [], productData }) => {
   };
 
   const variants = ["Nhỏ", "Vừa", "Lớn"]; // Mock data
+
   const handleAddProductToCart = (quantity, product) => {
-    dispatch(
-      doAddProductAction({
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        img: product.lstImg?.[0]?.name,
-        quantity: currentQuantity,
-      }),
-    );
-    message.success("Add product successsully");
+    if (isAuthenticated) {
+      dispatch(
+        addToCartAPI({
+          productId: product.id,
+          quantity: currentQuantity,
+        }),
+      );
+    } else {
+      dispatch(
+        addToCart({
+          productId: product.id,
+          name: product.name,
+          price: product.price,
+          img: product.lstImg?.[0]?.name,
+          quantity: currentQuantity,
+        }),
+      );
+    }
+
+    message.success("Add product successfully");
   };
   return !productData ? (
     <ProductSkeleton />

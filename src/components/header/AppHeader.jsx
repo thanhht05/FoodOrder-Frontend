@@ -24,6 +24,7 @@ import Logo from "../Logo/Logo";
 import { callLogout } from "../../services/api";
 import { doLogoutAction } from "../../redux/slices/account/accountSlice";
 import { useState } from "react";
+import { clearCart } from "../../redux/slices/cart/CartSlice";
 // import { useEffect, useState } from "react";
 
 const { Header: AntHeader } = Layout;
@@ -31,7 +32,7 @@ const { Text } = Typography;
 
 const AppHeader = () => {
   const user = useSelector((state) => state.account.user);
-  const cart = useSelector((state) => state.order.carts);
+  const cart = useSelector((state) => state.cart.items);
   const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -40,6 +41,8 @@ const AppHeader = () => {
     const res = await callLogout();
     if (res?.data) {
       dispatch(doLogoutAction());
+      dispatch(clearCart());
+
       navigate("/");
     }
   };
@@ -125,7 +128,7 @@ const AppHeader = () => {
                 <SearchOutlined />
               </div>
 
-              <Badge count={cart.length} size="small" color="#ff4d4f">
+              <Badge count={cart?.length || 0} size="small" color="#ff4d4f">
                 <div className="icon-wrapper" onClick={() => navigate("/cart")}>
                   <ShoppingCartOutlined />
                 </div>

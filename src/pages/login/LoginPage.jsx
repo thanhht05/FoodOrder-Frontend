@@ -16,10 +16,12 @@ import {
   GoogleOutlined,
   FacebookFilled,
 } from "@ant-design/icons";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { doLoginAction } from "../../redux/slices/account/accountSlice";
 import { callLogin } from "../../services/api";
 import "./loginPage.scss";
+import { mergeCart } from "../../redux/thunk/cartThunk";
+import { getCartAPI } from "../../redux/thunk/getCartThunk";
 
 const { Title, Text } = Typography;
 
@@ -28,6 +30,7 @@ const LoginPage = () => {
   const [isSubmit, setIsSubmit] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const localCart = useSelector((state) => state.cart.items);
 
   const onFinish = async (values) => {
     const { username, password } = values;
@@ -37,6 +40,10 @@ const LoginPage = () => {
       if (res?.data) {
         localStorage.setItem("access_token", res.data.accessToken);
         dispatch(doLoginAction(res.data));
+        if (localCart.length > 0) {
+          await dispatch(mergeCart()).unwrap();
+        }
+        await dispatch(getCartAPI()).unwrap();
         message.success("Đăng nhập thành công!");
 
         if (res.data.userLogin.role.name === "ADMIN") {

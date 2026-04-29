@@ -33,7 +33,7 @@ const ProductPage = () => {
         // test Skeleton
         setTimeout(() => {
           setProductData(raw);
-        }, 3000);
+        }, 200);
       }
     };
     fetchProductById(id);
