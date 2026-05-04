@@ -13,7 +13,6 @@ export const getCartAPI = createAsyncThunk("cart/getCartAPI", async () => {
     return {
       productsInnerCartDetail: res.data?.productsInnerCartDetail || [],
       quantity: res.data?.quantity || 0,
-      totalPrice: res.data?.totalPrice || 0,
     };
   } catch (error) {
     return null;

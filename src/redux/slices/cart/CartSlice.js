@@ -6,7 +6,6 @@ import { getCartAPI } from "../../thunk/getCartThunk";
 const initialState = {
   items: [],
   totalQuantity: 0,
-  totalPrice: 0,
   isMerged: false,
 };
 export const cartSlice = createSlice({
@@ -35,6 +34,18 @@ export const cartSlice = createSlice({
       state.items = [];
       state.isMerged = false;
     },
+    updateQuantity: (state, action) => {
+      const { productId, quantity } = action.payload;
+
+      const item = state.items.find((i) => i.productId === productId);
+      if (item) {
+        item.quantity = quantity;
+      }
+    },
+    removeItem: (state, action) => {
+      const productId = action.payload.id;
+      state.items = state.items.filter((item) => item.id !== productId);
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -44,8 +55,6 @@ export const cartSlice = createSlice({
 
         state.items = data.productsInnerCartDetail || [];
         state.totalQuantity = data.quantity || 0;
-        state.totalPrice = data.totalPrice || 0;
-
         state.isMerged = true;
       })
 
@@ -55,21 +64,20 @@ export const cartSlice = createSlice({
 
         state.items = data.productsInnerCartDetail || [];
         state.totalQuantity = data.quantity || 0;
-        state.totalPrice = data.totalPrice || 0;
       })
 
       // get cart detail. load data from db to redux
       .addCase(getCartAPI.fulfilled, (state, action) => {
+        debugger;
         const data = action.payload;
         console.log("Data get cart detail", data.productsInnerCartDetail);
 
         state.items = data.productsInnerCartDetail || [];
         state.totalQuantity = data.quantity || 0;
-        state.totalPrice = data.totalPrice || 0;
-
         state.loading = false;
       });
   },
 });
-export const { addToCart, setCart, clearCart } = cartSlice.actions;
+export const { addToCart, setCart, clearCart, updateQuantity, removeItem } =
+  cartSlice.actions;
 export default cartSlice.reducer;

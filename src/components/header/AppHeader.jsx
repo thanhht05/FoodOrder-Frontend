@@ -25,6 +25,7 @@ import { callLogout } from "../../services/api";
 import { doLogoutAction } from "../../redux/slices/account/accountSlice";
 import { useState } from "react";
 import { clearCart } from "../../redux/slices/cart/CartSlice";
+import CartDropdown from "../Product/CartDropdown";
 // import { useEffect, useState } from "react";
 
 const { Header: AntHeader } = Layout;
@@ -128,11 +129,17 @@ const AppHeader = () => {
                 <SearchOutlined />
               </div>
 
-              <Badge count={cart?.length || 0} size="small" color="#ff4d4f">
-                <div className="icon-wrapper" onClick={() => navigate("/cart")}>
-                  <ShoppingCartOutlined />
-                </div>
-              </Badge>
+              <Dropdown
+                trigger={["hover"]}
+                placement="bottom"
+                dropdownRender={() => <CartDropdown />}
+              >
+                <Badge count={cart?.length || 0} size="small" color="#ff4d4f">
+                  <div className="icon-wrapper">
+                    <ShoppingCartOutlined />
+                  </div>
+                </Badge>
+              </Dropdown>
 
               <div className="user-control">
                 {isAuthenticated ? (

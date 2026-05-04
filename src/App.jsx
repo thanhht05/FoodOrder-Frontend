@@ -25,7 +25,7 @@ import ManageUserPage from "./pages/admin/user";
 import ManageProductPage from "./pages/admin/product";
 import Home from "./components/Home";
 import ProductPage from "./pages/product";
-import { getCartAPI } from "./redux/thunk/getCartThunk";
+import CartPage from "./pages/Cart/CartPage";
 const Layout = () => {
   return (
     <div className="layout">
@@ -72,6 +72,10 @@ function App() {
         {
           path: "product/:slug",
           element: <ProductPage />,
+        },
+        {
+          path: "cart",
+          element: <CartPage />,
         },
       ],
     },
