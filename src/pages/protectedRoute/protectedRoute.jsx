@@ -9,12 +9,16 @@ const RoleBaseRoute = ({ children }) => {
 
   if (isAdminRoute && userRole === "ADMIN") {
     return <>{children}</>;
+  } else if (!isAdminRoute && userRole === "USER") {
+    return <>{children}</>;
   } else {
+    console.log("userRole", userRole);
     return <NotPermitted />;
   }
 };
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
+  console.log("isAuthenticated", isAuthenticated);
 
   return (
     <>

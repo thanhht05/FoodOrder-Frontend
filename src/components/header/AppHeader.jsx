@@ -43,7 +43,7 @@ const AppHeader = () => {
     if (res?.data) {
       dispatch(doLogoutAction());
       dispatch(clearCart());
-
+      localStorage.removeItem("access_token");
       navigate("/");
     }
   };

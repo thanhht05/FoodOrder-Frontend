@@ -2,6 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import { mergeCart } from "../../thunk/cartThunk";
 import { addToCartAPI } from "../../thunk/addToCartAPI";
 import { getCartAPI } from "../../thunk/getCartThunk";
+import { IdcardFilled } from "@ant-design/icons";
+import { updateCartAPI } from "../../thunk/updateCartAPI";
 
 const initialState = {
   items: [],
@@ -35,16 +37,16 @@ export const cartSlice = createSlice({
       state.isMerged = false;
     },
     updateQuantity: (state, action) => {
-      const { productId, quantity } = action.payload;
+      const { id, quantity } = action.payload;
 
-      const item = state.items.find((i) => i.productId === productId);
+      const item = state.items.find((i) => i.id === id);
       if (item) {
         item.quantity = quantity;
       }
     },
     removeItem: (state, action) => {
-      const productId = action.payload.id;
-      state.items = state.items.filter((item) => item.id !== productId);
+      const id = action.payload.id;
+      state.items = state.items.filter((item) => item.id !== id);
     },
   },
   extraReducers: (builder) => {
@@ -54,7 +56,6 @@ export const cartSlice = createSlice({
         const data = action.payload.data;
 
         state.items = data.productsInnerCartDetail || [];
-        state.totalQuantity = data.quantity || 0;
         state.isMerged = true;
       })
 
@@ -63,14 +64,14 @@ export const cartSlice = createSlice({
         const data = action.payload.data;
 
         state.items = data.productsInnerCartDetail || [];
-        state.totalQuantity = data.quantity || 0;
+      })
+      .addCase(updateCartAPI.fulfilled, (state, action) => {
+        state.items = action.payload.data.productsInnerCartDetail || [];
       })
 
       // get cart detail. load data from db to redux
       .addCase(getCartAPI.fulfilled, (state, action) => {
-        debugger;
         const data = action.payload;
-        console.log("Data get cart detail", data.productsInnerCartDetail);
 
         state.items = data.productsInnerCartDetail || [];
         state.totalQuantity = data.quantity || 0;

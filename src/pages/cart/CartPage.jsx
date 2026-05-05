@@ -20,12 +20,15 @@ import { useNavigate } from "react-router-dom";
 import "./cartPage.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { removeItem, updateQuantity } from "../../redux/slices/cart/CartSlice";
+import CartSteps from "../../components/Cart/CartSteps";
+import { updateCartAPI } from "../../redux/thunk/updateCartAPI";
 
 const { Title, Text } = Typography;
 
 const CartPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
 
   const cartItems = useSelector((state) => state.cart.items);
   const total = cartItems.reduce(
@@ -33,26 +36,55 @@ const CartPage = () => {
     0,
   );
   const handleIncrease = (item) => {
-    dispatch(
-      updateQuantity({
-        productId: item.productId,
-        quantity: item.quantity + 1,
-      }),
-    );
+    if (isAuthenticated) {
+      dispatch(
+        updateCartAPI({
+          productId: item.id,
+          quantity: item.quantity + 1,
+        }),
+      );
+    } else {
+      dispatch(
+        updateQuantity({
+          id: item.id,
+          quantity: item.quantity + 1,
+        }),
+      );
+    }
   };
 
   const handleDecrease = (item) => {
-    if (item.quantity > 1) {
+    if (item.quantity <= 0) {
+      return;
+    }
+
+    if (isAuthenticated) {
+      dispatch(
+        updateCartAPI({
+          productId: item.id,
+          quantity: item.quantity - 1,
+        }),
+      );
+    } else {
       dispatch(
         updateQuantity({
-          productId: item.productId,
+          id: item.id,
           quantity: item.quantity - 1,
         }),
       );
     }
   };
   const handleRemoveItem = (item) => {
-    dispatch(removeItem(item));
+    if (isAuthenticated) {
+      dispatch(
+        updateCartAPI({
+          productId: item.id,
+          quantity: 0,
+        }),
+      );
+    } else {
+      dispatch(removeItem(item));
+    }
     message.success("Delte success");
   };
 
@@ -76,15 +108,7 @@ const CartPage = () => {
       <div className="cart-wrapper">
         {/* Bước thanh toán */}
         <div className="cart-steps">
-          <Steps
-            size="small"
-            current={0}
-            items={[
-              { title: "Giỏ hàng", icon: <ShoppingCartOutlined /> },
-              { title: "Thanh toán", icon: <CreditCardOutlined /> },
-              { title: "Hoàn tất", icon: <CheckCircleOutlined /> },
-            ]}
-          />
+          <CartSteps />
         </div>
 
         <Title level={3} className="page-title">
@@ -206,7 +230,11 @@ const CartPage = () => {
               </Button>
 
               <div className="secure-info">
-                <Text type="secondary" size="small">
+                <Text
+                  onClick={() => navigate("/checkout")}
+                  type="secondary"
+                  size="small"
+                >
                   🔒 Thanh toán an toàn và bảo mật
                 </Text>
               </div>

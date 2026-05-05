@@ -26,6 +26,7 @@ import ManageProductPage from "./pages/admin/product";
 import Home from "./components/Home";
 import ProductPage from "./pages/product";
 import CartPage from "./pages/Cart/CartPage";
+import CheckoutPage from "./pages/checkout/CheckoutPage";
 const Layout = () => {
   return (
     <div className="layout">
@@ -75,7 +76,19 @@ function App() {
         },
         {
           path: "cart",
-          element: <CartPage />,
+          element: (
+            <ProtectedRoute>
+              <CartPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "checkout",
+          element: (
+            <ProtectedRoute>
+              <CheckoutPage />
+            </ProtectedRoute>
+          ),
         },
       ],
     },
