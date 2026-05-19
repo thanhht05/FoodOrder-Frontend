@@ -65,7 +65,7 @@ instance.interceptors.response.use(
       error.config &&
       error.response &&
       +error.response.status === 400 &&
-      error.config.url === "/api/v1/auth/refreshToken"
+      error.config.url === "/api/v1/auth/refreshToken" // nếu refresh token hết hạn thì đá qua login
     ) {
       if (window.location.pathname !== "/") {
         window.location.href = "/login";

@@ -22,6 +22,7 @@ import ProductSkeleton from "./ProductSkeleton";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../redux/slices/cart/CartSlice";
 import { addToCartAPI } from "../../redux/thunk/addToCartAPI";
+import { useNavigate } from "react-router-dom";
 const { Title, Text, Paragraph } = Typography;
 
 const ModalGallery = ({ images = [], productData }) => {
@@ -31,7 +32,7 @@ const ModalGallery = ({ images = [], productData }) => {
   const dispatch = useDispatch();
   const maxQuantityProduct = productData?.quantity;
   const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
-
+  const navigate = useNavigate();
   const [currentQuantity, setCurrentQuantity] = useState(1);
   const handleThumbnailClick = (index) => {
     setCurrentIndex(index);
@@ -41,7 +42,7 @@ const ModalGallery = ({ images = [], productData }) => {
   };
 
   const variants = ["Nhỏ", "Vừa", "Lớn"]; // Mock data
-
+  debugger;
   const handleAddProductToCart = (quantity, product) => {
     if (isAuthenticated) {
       dispatch(
@@ -220,6 +221,16 @@ const ModalGallery = ({ images = [], productData }) => {
                 block
                 icon={<ShoppingCartOutlined style={{ fontSize: "20px" }} />}
                 className="btn-add-cart"
+                onClick={() =>
+                  navigate("/checkout", {
+                    state: {
+                      buyNowItem: {
+                        productData,
+                        quantity: 1,
+                      },
+                    },
+                  })
+                }
               >
                 MUA NGAY
               </Button>

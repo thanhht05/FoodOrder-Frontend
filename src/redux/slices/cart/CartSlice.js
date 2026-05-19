@@ -31,10 +31,9 @@ export const cartSlice = createSlice({
     //   state.items = action.payload;
     // },
 
-    // when user logout
+    // when user place an order
     clearCart: (state) => {
       state.items = [];
-      state.isMerged = false;
     },
     updateQuantity: (state, action) => {
       const { id, quantity } = action.payload;

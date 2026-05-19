@@ -12,6 +12,7 @@ import {
   Radio,
   Card,
   Badge,
+  message,
 } from "antd";
 import {
   UserOutlined,
@@ -23,30 +24,84 @@ import {
 } from "@ant-design/icons";
 import "./checkoutPage.scss";
 import CartSteps from "../../components/Cart/CartSteps";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  // callFetchCardetails,
+  callFetchTableByName,
+  callPlaceAnOrder,
+} from "../../services/api";
+import { clearCart } from "../../redux/slices/cart/CartSlice";
+import { useLocation } from "react-router-dom";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const CheckoutPage = () => {
+  const dispatch = useDispatch();
+  const location = useLocation();
   const [form] = Form.useForm();
   const [paymentMethod, setPaymentMethod] = useState("qr");
   const cartItems = useSelector((state) => state.cart.items);
-  const total = cartItems.reduce(
+  let buyNowItem = location.state?.buyNowItem;
+
+  // convert object buynowitem to json seem to cartItem
+  if (buyNowItem) {
+    buyNowItem = {
+      id: buyNowItem.productData.id,
+      name: buyNowItem.productData.name,
+      price: buyNowItem.productData.price,
+      categoryName: buyNowItem.productData.productCate.name,
+      img: buyNowItem.productData.lstImg?.[0]?.name,
+      quantity: buyNowItem.quantity,
+    };
+  }
+
+  console.log("Cart item", cartItems);
+  // const [cartDetai, setCartDetai] = useState([]);
+  const checkoutItems = buyNowItem ? [buyNowItem] : cartItems;
+  const total = checkoutItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
+
+  // no longer fetch cartDetail from db
+  // useEffect(() => {
+  //   const fetchCartDetail = async () => {
+  //     const res = await callFetchCardetails();
+  //     if (res && res.data) {
+  //       setCartDetai(res.data);
+  //     }
+  //   };
+  //   fetchCartDetail();
+  // }, []);
+  const cartItemId = checkoutItems?.map((item) => item.cartDetailId);
   // Giả lập dữ liệu đơn hàng
   const bankInfo = "089817004 - NGUYEN HUU  THANH - MB Bank";
   // Dữ liệu tạo mã QR (Theo chuẩn VietQR hoặc chuỗi bất kỳ)
 
   const orderTotal = 1250000;
   const qrData = `Chuyen khoan: ${bankInfo} - So tien: ${orderTotal}`;
+  const onFinish = async (values) => {
+    let table;
 
-  const onFinish = (values) => {
-    console.log("Thông tin đặt hàng:", values);
-    console.log("Phương thức thanh toán:", paymentMethod);
-    // Xử lý API đặt hàng ở đây
+    if (values.table) {
+      const res = await callFetchTableByName(values.table.trim());
+
+      if (res && res.data) {
+        table = res.data;
+      }
+    }
+    const resOrder = await callPlaceAnOrder(
+      cartItemId,
+      table.id,
+      values.note,
+      paymentMethod,
+    );
+
+    if (resOrder && resOrder.data) {
+      message.success("Place an order successfully");
+      dispatch(clearCart());
+    }
   };
 
   return (
@@ -82,7 +137,7 @@ const CheckoutPage = () => {
                 </Col>
                 <Col xs={24} md={12}>
                   <Form.Item
-                    name="tabe"
+                    name="table"
                     label="Số bàn"
                     rules={[
                       {
@@ -143,7 +198,7 @@ const CheckoutPage = () => {
               </Title>
 
               <div className="order-items">
-                {cartItems.map((item, index) => (
+                {checkoutItems.map((item, index) => (
                   // Đưa item-row vào trong vòng lặp và thêm key
                   <div
                     className="item-row"

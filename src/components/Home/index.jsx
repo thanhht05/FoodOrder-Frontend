@@ -257,6 +257,7 @@ const Home = () => {
                     <div className="sorting-tabs">
                       <Tabs
                         defaultActiveKey="1"
+                        activeKey={sortQuery}
                         items={tabItems}
                         onChange={(key) => setSortQuery(key)}
                       />

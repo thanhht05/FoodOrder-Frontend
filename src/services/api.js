@@ -140,3 +140,32 @@ export const callFetchProductId = (id) => {
   const URL = `/api/v1/products/${id}`;
   return axios.get(URL);
 };
+
+export const callFetchTable = (query) => {
+  const URL = `/api/v1/bookingTables?${query}`;
+  return axios.get(URL);
+};
+export const callFetchTableByName = (tableName) => {
+  const URL = `/api/v1/bookingTables/search?tableName=${tableName}`;
+  return axios.get(URL);
+};
+
+export const callPlaceAnOrder = (
+  cartDetailIds,
+  tableId,
+  paymentMethod,
+  note,
+) => {
+  const URL = "/api/v1/orders/placeOrder";
+  const data = {
+    cartDetailIds,
+    tableId,
+    note,
+    paymentMethod,
+  };
+  return axios.post(URL, data);
+};
+
+export const callFetchCardetails = () => {
+  return axios.get("/api/v1/cartDetailUser");
+};

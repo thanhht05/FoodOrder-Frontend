@@ -1,36 +1,25 @@
 import { useSelector } from "react-redux";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import NotPermitted from "./notPermitted";
 
-const RoleBaseRoute = ({ children }) => {
-  const isAdminRoute = window.location.pathname.startsWith("/admin");
+const ProtectedRoute = ({ children, roles }) => {
+  const location = useLocation();
+  const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
   const user = useSelector((state) => state.account.user);
   const userRole = user?.role?.name;
 
-  if (isAdminRoute && userRole === "ADMIN") {
-    return <>{children}</>;
-  } else if (!isAdminRoute && userRole === "USER") {
-    return <>{children}</>;
-  } else {
-    console.log("userRole", userRole);
+  // chưa login → đá về login
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
+  //  có yêu cầu role nhưng không đủ quyền
+  if (roles && !roles.includes(userRole)) {
     return <NotPermitted />;
   }
-};
-const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
-  console.log("isAuthenticated", isAuthenticated);
 
-  return (
-    <>
-      {isAuthenticated === true ? (
-        <>
-          <RoleBaseRoute>{children}</RoleBaseRoute>
-        </>
-      ) : (
-        <Navigate to="/login" replace />
-      )}
-    </>
-  );
+  //  hợp lệ
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

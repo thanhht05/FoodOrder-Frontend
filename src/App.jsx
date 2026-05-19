@@ -27,6 +27,7 @@ import Home from "./components/Home";
 import ProductPage from "./pages/product";
 import CartPage from "./pages/Cart/CartPage";
 import CheckoutPage from "./pages/checkout/CheckoutPage";
+import ManageTablePage from "./pages/admin/table";
 const Layout = () => {
   return (
     <div className="layout">
@@ -76,11 +77,7 @@ function App() {
         },
         {
           path: "cart",
-          element: (
-            <ProtectedRoute>
-              <CartPage />
-            </ProtectedRoute>
-          ),
+          element: <CartPage />,
         },
         {
           path: "checkout",
@@ -100,7 +97,7 @@ function App() {
         {
           index: true,
           element: (
-            <ProtectedRoute>
+            <ProtectedRoute roles={["ADMIN"]}>
               <AdminPage />
             </ProtectedRoute>
           ),
@@ -109,7 +106,7 @@ function App() {
         {
           path: "user",
           element: (
-            <ProtectedRoute>
+            <ProtectedRoute roles={["ADMIN"]}>
               <ManageUserPage />,
             </ProtectedRoute>
           ),
@@ -117,8 +114,16 @@ function App() {
         {
           path: "product",
           element: (
-            <ProtectedRoute>
+            <ProtectedRoute roles={["ADMIN"]}>
               <ManageProductPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "table",
+          element: (
+            <ProtectedRoute roles={["ADMIN"]}>
+              <ManageTablePage />
             </ProtectedRoute>
           ),
         },

@@ -16,6 +16,7 @@ import {
   LogoutOutlined,
   BellOutlined,
   HomeOutlined,
+  TableOutlined,
 } from "@ant-design/icons";
 import "./layoutAdmin.scss";
 import { useState } from "react";
@@ -30,6 +31,7 @@ const AdminLayout = () => {
     if (location.pathname === "/admin") return "1";
     if (location.pathname.startsWith("/admin/user")) return "2";
     if (location.pathname.startsWith("/admin/product")) return "3";
+    if (location.pathname.startsWith("/admin/table")) return "4";
     return "1";
   };
   const [collapsed, setCollapsed] = useState(false);
@@ -65,7 +67,12 @@ const AdminLayout = () => {
               icon: <UserOutlined />,
               label: <Link to="/admin/product">Product</Link>,
             },
-            { key: "4", icon: <SettingOutlined />, label: "Configuration" },
+            {
+              key: "4",
+              icon: <TableOutlined />,
+              label: <Link to="/admin/table">Table</Link>,
+            },
+            { key: "5", icon: <SettingOutlined />, label: "Configuration" },
           ]}
         />
       </Sider>
