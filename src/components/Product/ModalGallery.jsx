@@ -42,7 +42,6 @@ const ModalGallery = ({ images = [], productData }) => {
   };
 
   const variants = ["Nhỏ", "Vừa", "Lớn"]; // Mock data
-  debugger;
   const handleAddProductToCart = (quantity, product) => {
     if (isAuthenticated) {
       dispatch(

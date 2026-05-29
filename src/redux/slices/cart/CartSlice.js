@@ -7,8 +7,7 @@ import { updateCartAPI } from "../../thunk/updateCartAPI";
 
 const initialState = {
   items: [],
-  totalQuantity: 0,
-  isMerged: false,
+  loading: false,
 };
 export const cartSlice = createSlice({
   name: "cart",
@@ -34,6 +33,7 @@ export const cartSlice = createSlice({
     // when user place an order
     clearCart: (state) => {
       state.items = [];
+      state.isGuestCart = true;
     },
     updateQuantity: (state, action) => {
       const { id, quantity } = action.payload;
@@ -56,6 +56,10 @@ export const cartSlice = createSlice({
 
         state.items = data.productsInnerCartDetail || [];
         state.isMerged = true;
+      })
+      .addCase(mergeCart.rejected, (state) => {
+        state.items = [];
+        state.isGuestCart = true;
       })
 
       // add procut to cart API when user have already login

@@ -22,6 +22,7 @@ import { callLogin } from "../../services/api";
 import "./loginPage.scss";
 import { mergeCart } from "../../redux/thunk/cartThunk";
 import { getCartAPI } from "../../redux/thunk/getCartThunk";
+import { clearCart } from "../../redux/slices/cart/CartSlice";
 
 const { Title, Text } = Typography;
 
@@ -31,19 +32,35 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const localCart = useSelector((state) => state.cart.items);
-
   const onFinish = async (values) => {
-    const { username, password } = values;
-    setIsSubmit(true);
     try {
+      setIsSubmit(true); // Bật loading khi bắt đầu submit
+      const { username, password } = values;
+
       const res = await callLogin(username, password);
+
+      // TRƯỜNG HỢP 1: API trả về data thành công
       if (res?.data) {
         localStorage.setItem("access_token", res.data.accessToken);
         dispatch(doLoginAction(res.data));
-        if (localCart.length > 0) {
-          await dispatch(mergeCart()).unwrap();
+
+        // ---- KHU VỰC XỬ LÝ GIỎ HÀNG (CÔ LẬP) ----
+        if (localCart && localCart.length > 0) {
+          try {
+            await dispatch(mergeCart()).unwrap();
+          } catch (cartError) {
+            console.error("Lỗi merge giỏ hàng (khác tài khoản):", cartError);
+            dispatch(clearCart()); // Giải cứu: Xóa giỏ hàng xung đột của người cũ
+          }
         }
+
+        // Luôn gọi lấy giỏ hàng mới từ DB về sau khi đã login (bất kể giỏ trống hay có đồ)
+
         await dispatch(getCartAPI()).unwrap();
+
+        // ----------------------------------------
+
+        // THÔNG BÁO & CHUYỂN TRANG (Nằm ngoài khối if giỏ hàng)
         message.success("Đăng nhập thành công!");
 
         if (res.data.userLogin.role.name === "ADMIN") {
@@ -51,6 +68,8 @@ const LoginPage = () => {
         } else {
           navigate("/");
         }
+
+        // TRƯỜNG HỢP 2: API chạy thành công nhưng không có data (Sai mật khẩu/tài khoản do Backend trả về)
       } else {
         notification.error({
           message: "Lỗi đăng nhập",
@@ -59,15 +78,15 @@ const LoginPage = () => {
         });
       }
     } catch (error) {
+      // TRƯỜNG HỢP 3: Lỗi kết nối, lỗi 400/500 từ axios/fetch khi gọi callLogin
       notification.error({
         message: "Đăng nhập thất bại",
         description: error?.response?.data?.message || error.message,
       });
     } finally {
-      setIsSubmit(false);
+      setIsSubmit(false); // SỬA: Tắt loading sau khi mọi thứ đã chạy xong
     }
   };
-
   return (
     <div className="login-page">
       <Row className="login-container">
