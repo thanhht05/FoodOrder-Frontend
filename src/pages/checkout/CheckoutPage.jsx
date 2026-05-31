@@ -13,6 +13,7 @@ import {
   Card,
   Badge,
   message,
+  notification,
 } from "antd";
 import {
   UserOutlined,
@@ -56,8 +57,6 @@ const CheckoutPage = () => {
     };
   }
 
-  console.log("Cart item", cartItems);
-  // const [cartDetai, setCartDetai] = useState([]);
   const checkoutItems = buyNowItem ? [buyNowItem] : cartItems;
   const total = checkoutItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -74,7 +73,7 @@ const CheckoutPage = () => {
   //   };
   //   fetchCartDetail();
   // }, []);
-  const cartItemId = checkoutItems?.map((item) => item.cartDetailId);
+  const cartDetailIds = checkoutItems?.map((item) => item.cartDetailId);
   // Giả lập dữ liệu đơn hàng
   const bankInfo = "089817004 - NGUYEN HUU  THANH - MB Bank";
   // Dữ liệu tạo mã QR (Theo chuẩn VietQR hoặc chuỗi bất kỳ)
@@ -87,20 +86,28 @@ const CheckoutPage = () => {
     if (values.table) {
       const res = await callFetchTableByName(values.table.trim());
 
-      if (res && res.data) {
+      if (res?.data) {
         table = res.data;
       }
     }
-    const resOrder = await callPlaceAnOrder(
-      cartItemId,
-      table.id,
-      values.note,
-      paymentMethod,
-    );
 
-    if (resOrder && resOrder.data) {
-      message.success("Place an order successfully");
-      dispatch(clearCart());
+    try {
+      const resOrder = await callPlaceAnOrder(
+        cartDetailIds,
+        table?.id,
+        values.note,
+        paymentMethod,
+      );
+
+      if (resOrder?.data) {
+        message.success("Place an order successfully");
+        dispatch(clearCart());
+      }
+    } catch (e) {
+      notification.error({
+        message:
+          e?.response?.data?.message || e?.message || "Place order failed",
+      });
     }
   };
 

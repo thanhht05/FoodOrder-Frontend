@@ -1,0 +1,219 @@
+// --- Design Tokens & Variables ---
+$bg-gradient: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+$card-bg: #ffffff;
+$text-main: #0f172a; // Deep slate for extreme readability
+$text-muted: #64748b; // Perfect cool gray for secondary details
+$border-color: #e2e8f0; // Soft borders
+$radius-lg: 16px;
+$radius-md: 12px;
+$transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// --- Layout Wrapper ---
+.order-history-container {
+  margin: 0 auto;
+  padding: 48px 24px;
+  background: $bg-gradient;
+  min-height: 100vh;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  // --- 1. Profile Header Card ---
+  .profile-header-card {
+    background: $card-bg;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    box-shadow: 0 4px 20px -2px rgba(148, 163, 184, 0.12);
+    margin-bottom: 40px;
+    padding: 8px;
+
+    .stat-item {
+      text-align: center;
+      padding: 0 24px;
+
+      .ant-typography-secondary {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: 600;
+      }
+    }
+  }
+
+  // --- Section Title ---
+  .section-title {
+    color: $text-main;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px !important;
+    position: relative;
+    padding-left: 14px;
+
+    // Elegant vertical accent bar next to "Order History"
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 4px;
+      bottom: 4px;
+      width: 4px;
+      background: #1677ff; // Dynamic AntD primary color fallback
+      border-radius: 2px;
+    }
+  }
+
+  // --- 2. Order Main Card ---
+  .order-card {
+    background: $card-bg;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    box-shadow: 0 10px 30px -10px rgba(148, 163, 184, 0.15);
+    margin-bottom: 28px;
+    overflow: hidden;
+    transition: $transition-smooth;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -15px rgba(148, 163, 184, 0.25);
+      border-color: cbd5e1;
+    }
+
+    // AntD Card sub-body reset
+    :global(.ant-card-body) {
+      padding: 0 !important;
+    }
+
+    // --- Order Card Header ---
+    .order-card-header {
+      background: #f8fafc;
+      padding: 20px 28px;
+      border-bottom: 1px solid $border-color;
+
+      .order-id {
+        color: $text-main;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
+      .order-date,
+      .table-id {
+        color: $text-muted;
+        font-size: 13.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #ffffff;
+        padding: 4px 10px;
+        border-radius: 6px;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+      }
+
+      .status-tag {
+        font-weight: 600;
+        padding: 4px 14px;
+        border-radius: 8px;
+        border: none;
+        letter-spacing: 0.02em;
+      }
+    }
+
+    // --- 3. Products AntD Table Style Overrides ---
+    .products-table {
+      padding: 12px 28px;
+
+      :global(.ant-table) {
+        background: transparent !important;
+      }
+
+      :global(.ant-table-thead > tr > th) {
+        background: transparent !important;
+        color: $text-muted;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        border-bottom: 1px solid $border-color;
+      }
+
+      :global(.ant-table-tbody > tr > td) {
+        border-bottom: 1px solid rgba(228, 235, 243, 0.6);
+        padding: 16px 0;
+      }
+
+      :global(.ant-table-tbody > tr:last-child > td) {
+        border-bottom: none; // Removes ugly trailing bottom line
+      }
+
+      .product-name {
+        color: $text-main;
+        font-size: 15px;
+        font-weight: 600;
+        transition: $transition-smooth;
+      }
+
+      // Smooth rendering for square product images
+      :global(.ant-avatar) {
+        border-radius: $radius-md;
+        border: 1px solid $border-color;
+        background-color: #f1f5f9;
+        img {
+          object-fit: cover;
+        }
+      }
+    }
+
+    // --- Order Card Footer ---
+    .order-card-footer {
+      padding: 20px 28px;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border-top: 1px solid $border-color;
+
+      .grand-total-price {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+    }
+  }
+
+  // --- Loading State ---
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 16px;
+    font-weight: 500;
+    color: $text-muted;
+    background: $bg-gradient;
+  }
+}
+
+// --- Responsive Rules for Mobile viewports ---
+@media (max-width: 768px) {
+  .order-history-container {
+    padding: 24px 12px;
+
+    .profile-header-card {
+      padding: 4px;
+
+      .stat-item {
+        text-align: left;
+        padding: 4px 0;
+      }
+    }
+
+    .order-card {
+      .order-card-header {
+        padding: 16px;
+      }
+
+      .products-table {
+        padding: 8px 16px;
+      }
+
+      .order-card-footer {
+        padding: 16px;
+      }
+    }
+  }
+}

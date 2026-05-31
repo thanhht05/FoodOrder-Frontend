@@ -169,3 +169,7 @@ export const callPlaceAnOrder = (
 export const callFetchCardetails = () => {
   return axios.get("/api/v1/cartDetailUser");
 };
+
+export const callFetchOrderHistory = () => {
+  return axios.get("/api/v1/orderHistory");
+};

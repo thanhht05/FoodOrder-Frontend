@@ -28,6 +28,7 @@ import ProductPage from "./pages/product";
 import CartPage from "./pages/Cart/CartPage";
 import CheckoutPage from "./pages/checkout/CheckoutPage";
 import ManageTablePage from "./pages/admin/table";
+import OrderHistory from "./pages/history/OrderHistoryPage";
 const Layout = () => {
   return (
     <div className="layout">
@@ -84,6 +85,14 @@ function App() {
           element: (
             <ProtectedRoute>
               <CheckoutPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "order-history",
+          element: (
+            <ProtectedRoute>
+              <OrderHistory />
             </ProtectedRoute>
           ),
         },
