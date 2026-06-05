@@ -75,8 +75,18 @@ export const cartSlice = createSlice({
       // get cart detail. load data from db to redux
       .addCase(getCartAPI.fulfilled, (state, action) => {
         const data = action.payload;
+        console.log("data after call getting carrtApi", data);
+        state.items =
+          data.results?.map((item) => ({
+            cartDetailId: item.cartDetailId,
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            categoryName: item.categoryName,
+            img: item.img,
+            quantity: item.quantity,
+          })) || [];
 
-        state.items = data.productsInnerCartDetail || [];
         state.totalQuantity = data.quantity || 0;
         state.loading = false;
       });

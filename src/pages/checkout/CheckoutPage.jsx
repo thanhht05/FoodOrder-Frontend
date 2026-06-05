@@ -27,6 +27,7 @@ import "./checkoutPage.scss";
 import CartSteps from "../../components/Cart/CartSteps";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  callBuyNowItem,
   // callFetchCardetails,
   callFetchTableByName,
   callPlaceAnOrder,
@@ -45,19 +46,34 @@ const CheckoutPage = () => {
   const cartItems = useSelector((state) => state.cart.items);
   let buyNowItem = location.state?.buyNowItem;
 
-  // convert object buynowitem to json seem to cartItem
-  if (buyNowItem) {
-    buyNowItem = {
-      id: buyNowItem.productData.id,
-      name: buyNowItem.productData.name,
-      price: buyNowItem.productData.price,
-      categoryName: buyNowItem.productData.productCate.name,
-      img: buyNowItem.productData.lstImg?.[0]?.name,
-      quantity: buyNowItem.quantity,
-    };
-  }
+  // // convert object buynowitem to json seem to cartItem
+  // if (buyNowItem) {
+  //   buyNowItem = {
+  //     id: buyNowItem.productData.id,
+  //     name: buyNowItem.productData.name,
+  //     price: buyNowItem.productData.price,
+  //     categoryName: buyNowItem.productData.productCate.name,
+  //     img: buyNowItem.productData.lstImg?.[0]?.name,
+  //     quantity: buyNowItem.quantity,
+  //   };
 
-  const checkoutItems = buyNowItem ? [buyNowItem] : cartItems;
+  // }
+  // console.log("Buy now item", buyNowItem);
+
+  // const checkoutItems = buyNowItem ? [buyNowItem] : cartItems;
+  const checkoutItems = buyNowItem
+    ? [
+        {
+          id: buyNowItem.productData.id,
+          name: buyNowItem.productData.name,
+          price: buyNowItem.productData.price,
+          categoryName: buyNowItem.productData.productCate.name,
+          img: buyNowItem.productData.lstImg?.[0]?.name,
+          quantity: buyNowItem.quantity,
+        },
+      ]
+    : cartItems;
+
   const total = checkoutItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
@@ -73,7 +89,9 @@ const CheckoutPage = () => {
   //   };
   //   fetchCartDetail();
   // }, []);
-  const cartDetailIds = checkoutItems?.map((item) => item.cartDetailId);
+  const cartDetailIds = buyNowItem
+    ? []
+    : checkoutItems.map((item) => item.cartDetailId);
   // Giả lập dữ liệu đơn hàng
   const bankInfo = "089817004 - NGUYEN HUU  THANH - MB Bank";
   // Dữ liệu tạo mã QR (Theo chuẩn VietQR hoặc chuỗi bất kỳ)
@@ -85,28 +103,45 @@ const CheckoutPage = () => {
 
     if (values.table) {
       const res = await callFetchTableByName(values.table.trim());
-
       if (res?.data) {
         table = res.data;
       }
     }
 
     try {
-      const resOrder = await callPlaceAnOrder(
-        cartDetailIds,
-        table?.id,
-        values.note,
-        paymentMethod,
-      );
+      let resOrder;
+
+      if (buyNowItem) {
+        // API BUY NOW
+        resOrder = await callBuyNowItem(
+          buyNowItem.productData.id,
+          buyNowItem.quantity,
+          buyNowItem.productData.price,
+          paymentMethod,
+          table?.id,
+        );
+      } else {
+        // API CART CHECKOUT
+        resOrder = await callPlaceAnOrder(
+          cartDetailIds,
+          table?.id,
+          values.note,
+          paymentMethod,
+        );
+      }
 
       if (resOrder?.data) {
         message.success("Place an order successfully");
-        dispatch(clearCart());
+
+        // chỉ clear cart khi mua từ giỏ
+        if (!buyNowItem) {
+          dispatch(clearCart());
+        }
       }
     } catch (e) {
       notification.error({
         message:
-          e?.response?.data?.message || e?.message || "Place order failed",
+          e?.response?.data?.message || e.message || "Place order failed",
       });
     }
   };

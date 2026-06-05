@@ -31,6 +31,8 @@ const CartPage = () => {
   const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
 
   const cartItems = useSelector((state) => state.cart.items);
+
+  // console.log("cartNotPreview", cartItems);
   const total = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,

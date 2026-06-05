@@ -3,17 +3,24 @@ import axios from "../../utils/axiosCumtome";
 
 export const getCartAPI = createAsyncThunk("cart/getCartAPI", async () => {
   try {
-    const res = await axios.get("/api/v1/cartDetails");
+    const res = await axios.get("/api/v1/cartDetailUser");
 
-    // giả sử backend trả:
-    // { data: { productsInnerCartDetail, quantity, totalPrice } }
-    // return res.data;
-    console.log(res);
+    const rs = {
+      results:
+        res.data?.map((item) => ({
+          cartDetailId: item.cartDetailId,
+          quantity: item.quantity,
+          id: item.productsInnerCartDetail.id,
+          name: item.productsInnerCartDetail.name,
+          price: item.productsInnerCartDetail.price,
+          categoryName: item.productsInnerCartDetail.categoryName,
+          img: item.productsInnerCartDetail.img,
+        })) || [],
 
-    return {
-      productsInnerCartDetail: res.data?.productsInnerCartDetail || [],
-      quantity: res.data?.quantity || 0,
+      totalQuantity:
+        res.data?.reduce((sum, item) => sum + item.quantity, 0) || 0,
     };
+    return rs;
   } catch (error) {
     return null;
   }

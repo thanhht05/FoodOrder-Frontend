@@ -173,3 +173,22 @@ export const callFetchCardetails = () => {
 export const callFetchOrderHistory = () => {
   return axios.get("/api/v1/orderHistory");
 };
+
+export const callBuyNowItem = (
+  productId,
+  quantity,
+  price,
+  paymentMethod,
+  tableId,
+) => {
+  const URL = "/api/v1/orders/buy-now";
+
+  const data = {
+    productId,
+    quantity,
+    price,
+    paymentMethod,
+    tableId,
+  };
+  return axios.post(URL, data);
+};
