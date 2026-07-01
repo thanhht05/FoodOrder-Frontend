@@ -58,8 +58,6 @@ const LoginPage = () => {
 
         await dispatch(getCartAPI()).unwrap();
 
-        // ----------------------------------------
-
         // THÔNG BÁO & CHUYỂN TRANG (Nằm ngoài khối if giỏ hàng)
         message.success("Đăng nhập thành công!");
 

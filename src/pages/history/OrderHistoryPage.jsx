@@ -3,68 +3,11 @@ import { Typography, Empty, Spin } from "antd";
 import "./OrderHistory.scss";
 import OrderCard from "../../components/Order/OrderCard";
 import { callFetchOrderHistory } from "../../services/api";
+import { isAllOf } from "@reduxjs/toolkit";
 
 const { Title } = Typography;
 
 // Mock API response
-const mockApiResponse = {
-  statusCode: 200,
-  error: null,
-  message: "Call api success",
-  data: {
-    userId: 5,
-    fullName: "Thanh",
-    cartId: 1,
-    orderInfo: [
-      {
-        orderId: 2,
-        orderDate: "2026-05-19T14:28:12.866618Z",
-        orderStatus: "PENDING",
-        tableId: 6,
-        totalPrice: 30000.0,
-        products: [
-          {
-            productId: 9,
-            productName: "Matchalate 3",
-            price: 30000.0,
-            quantity: 1,
-            img: "36ff2e95-7027-4ff1-949b-9515ef21382e.jpg",
-          },
-        ],
-      },
-      {
-        orderId: 1,
-        orderDate: "2026-05-07T16:51:01.023881Z",
-        orderStatus: "PENDING",
-        tableId: 1,
-        totalPrice: 84000.0,
-        products: [
-          {
-            productId: 9,
-            productName: "Matchalate 3",
-            price: 30000.0,
-            quantity: 2,
-            img: "36ff2e95-7027-4ff1-949b-9515ef21382e.jpg",
-          },
-          {
-            productId: 10,
-            productName: "Coffe1",
-            price: 12000.0,
-            quantity: 2,
-            img: "9d76710a-61ad-4150-90d7-82310d18cd45.jpg",
-          },
-          {
-            productId: 10,
-            productName: "Coffe1",
-            price: 12000.0,
-            quantity: 2,
-            img: "212ea450-37b7-4784-801f-893780dc7cd6.jpg",
-          },
-        ],
-      },
-    ],
-  },
-};
 
 const OrderHistory = () => {
   const [orderData, setOrderData] = useState(null);
@@ -73,16 +16,20 @@ const OrderHistory = () => {
   useEffect(() => {
     const getOrderHistory = async () => {
       setIsLoading(true);
-      const res = await callFetchOrderHistory();
-      if (res && res.data) {
-        setOrderData(res.data);
+      try {
+        const res = await callFetchOrderHistory();
+        if (res && res.data) {
+          setOrderData(res.data);
+        }
+      } catch (error) {
+        console.error("Lỗi khi lấy lịch sử đơn hàng:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
     getOrderHistory();
   }, []);
-
-  console.log("Order data", orderData);
+  console.log("isLoading", loading);
   return (
     <>
       {loading ? (

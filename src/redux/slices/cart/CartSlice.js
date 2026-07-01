@@ -80,7 +80,7 @@ export const cartSlice = createSlice({
         const data = action.payload;
 
         state.items =
-          data.results?.map((item) => ({
+          data?.results?.map((item) => ({
             cartDetailId: item.cartDetailId,
             id: item.id,
             name: item.name,

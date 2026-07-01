@@ -81,7 +81,7 @@ const AppHeader = () => {
     },
     {
       key: "2",
-      label: <Link to="/orders">Đơn hàng</Link>,
+      label: <Link to="/order-history">Đơn hàng</Link>,
       icon: <HistoryOutlined />,
     },
     { key: "3", label: "Cài đặt", icon: <SettingOutlined /> },
