@@ -20,7 +20,7 @@ export const mergeCart = createAsyncThunk(
           withCredentials: true, // nếu dùng cookie
         },
       );
-
+      console.log("res form merge cart", res);
       return res;
     } catch (err) {
       return rejectWithValue(err.response?.data || "Merge failed");

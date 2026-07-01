@@ -44,23 +44,9 @@ const CheckoutPage = () => {
   const [form] = Form.useForm();
   const [paymentMethod, setPaymentMethod] = useState("qr");
   const cartItems = useSelector((state) => state.cart.items);
+
   let buyNowItem = location.state?.buyNowItem;
 
-  // // convert object buynowitem to json seem to cartItem
-  // if (buyNowItem) {
-  //   buyNowItem = {
-  //     id: buyNowItem.productData.id,
-  //     name: buyNowItem.productData.name,
-  //     price: buyNowItem.productData.price,
-  //     categoryName: buyNowItem.productData.productCate.name,
-  //     img: buyNowItem.productData.lstImg?.[0]?.name,
-  //     quantity: buyNowItem.quantity,
-  //   };
-
-  // }
-  // console.log("Buy now item", buyNowItem);
-
-  // const checkoutItems = buyNowItem ? [buyNowItem] : cartItems;
   const checkoutItems = buyNowItem
     ? [
         {
@@ -73,22 +59,13 @@ const CheckoutPage = () => {
         },
       ]
     : cartItems;
+  console.log("checkoutItems", checkoutItems);
 
   const total = checkoutItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
 
-  // no longer fetch cartDetail from db
-  // useEffect(() => {
-  //   const fetchCartDetail = async () => {
-  //     const res = await callFetchCardetails();
-  //     if (res && res.data) {
-  //       setCartDetai(res.data);
-  //     }
-  //   };
-  //   fetchCartDetail();
-  // }, []);
   const cartDetailIds = buyNowItem
     ? []
     : checkoutItems.map((item) => item.cartDetailId);
@@ -98,6 +75,7 @@ const CheckoutPage = () => {
 
   const orderTotal = 1250000;
   const qrData = `Chuyen khoan: ${bankInfo} - So tien: ${orderTotal}`;
+  console.log("cartDetailIds", cartDetailIds);
   const onFinish = async (values) => {
     let table;
 

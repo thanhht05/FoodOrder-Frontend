@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../redux/slices/cart/CartSlice";
 import { addToCartAPI } from "../../redux/thunk/addToCartAPI";
 import { useNavigate } from "react-router-dom";
+import { getCartAPI } from "../../redux/thunk/getCartThunk";
 const { Title, Text, Paragraph } = Typography;
 
 const ModalGallery = ({ images = [], productData }) => {
@@ -42,14 +43,15 @@ const ModalGallery = ({ images = [], productData }) => {
   };
 
   const variants = ["Nhỏ", "Vừa", "Lớn"]; // Mock data
-  const handleAddProductToCart = (quantity, product) => {
+  const handleAddProductToCart = async (quantity, product) => {
     if (isAuthenticated) {
-      dispatch(
+      await dispatch(
         addToCartAPI({
           productId: product.id,
           quantity: currentQuantity,
         }),
       );
+      dispatch(getCartAPI());
     } else {
       dispatch(
         addToCart({

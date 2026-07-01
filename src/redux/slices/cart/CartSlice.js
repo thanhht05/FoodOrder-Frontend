@@ -53,7 +53,6 @@ export const cartSlice = createSlice({
 
       .addCase(mergeCart.fulfilled, (state, action) => {
         const data = action.payload.data;
-
         state.items = data.productsInnerCartDetail || [];
         state.isMerged = true;
       })
@@ -67,6 +66,10 @@ export const cartSlice = createSlice({
         const data = action.payload.data;
 
         state.items = data.productsInnerCartDetail || [];
+        console.log(
+          "data.productsInnerCartDetail",
+          data.productsInnerCartDetail,
+        );
       })
       .addCase(updateCartAPI.fulfilled, (state, action) => {
         state.items = action.payload.data.productsInnerCartDetail || [];
@@ -75,7 +78,7 @@ export const cartSlice = createSlice({
       // get cart detail. load data from db to redux
       .addCase(getCartAPI.fulfilled, (state, action) => {
         const data = action.payload;
-        console.log("data after call getting carrtApi", data);
+
         state.items =
           data.results?.map((item) => ({
             cartDetailId: item.cartDetailId,
@@ -87,7 +90,6 @@ export const cartSlice = createSlice({
             quantity: item.quantity,
           })) || [];
 
-        state.totalQuantity = data.quantity || 0;
         state.loading = false;
       });
   },

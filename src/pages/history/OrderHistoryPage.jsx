@@ -15,7 +15,7 @@ const mockApiResponse = {
     userId: 5,
     fullName: "Thanh",
     cartId: 1,
-    infoOrders: [
+    orderInfo: [
       {
         orderId: 2,
         orderDate: "2026-05-19T14:28:12.866618Z",
@@ -81,6 +81,8 @@ const OrderHistory = () => {
     };
     getOrderHistory();
   }, []);
+
+  console.log("Order data", orderData);
   return (
     <>
       {loading ? (
@@ -92,8 +94,8 @@ const OrderHistory = () => {
           </Title>
 
           {/* Orders Map list section */}
-          {orderData?.infoOrders && orderData.infoOrders.length > 0 ? (
-            orderData.infoOrders.map((order) => (
+          {orderData?.orderInfo && orderData.orderInfo.length > 0 ? (
+            orderData.orderInfo.map((order) => (
               <OrderCard key={order.orderId} order={order} />
             ))
           ) : (
