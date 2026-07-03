@@ -248,6 +248,11 @@ $primary-color: #ff4d4f;
       box-shadow: 0 -10px 20px rgba(255, 255, 255, 0.9);
       z-index: 2;
 
+      .btn-group {
+        display: flex;
+        gap: 20px;
+      }
+
       .btn-add-cart {
         height: 56px;
         border-radius: $border-radius-md;
@@ -282,36 +287,40 @@ $primary-color: #ff4d4f;
 // LÊN RESPONSIVE CHO ĐIỆN THOẠI
 @media (max-width: 768px) {
   .premium-product-container {
-    height: auto;
-    max-height: 85vh;
-    overflow-y: auto; // Cho phép cuộn toàn bộ trên mobile
+    height: auto !important;
+    min-height: auto;
+    max-height: none;
+    overflow-y: visible;
 
     .gallery-wrapper {
-      flex-direction: column;
+      display: block;
     }
 
     .image-section {
-      height: 400px; // Chiều cao cố định cho ảnh trên mobile
+      height: auto;
       border-right: none;
       border-bottom: 1px solid #f0f0f0;
       padding: 20px 10px;
 
       .main-display .image-gallery-image {
-        max-height: 250px;
+        max-height: 280px;
+        width: 100%;
+        object-fit: contain;
       }
 
       .thumbnail-strip .custom-thumb {
-        width: 50px;
-        height: 50px;
+        width: 55px;
+        height: 55px;
       }
     }
 
     .info-section {
       height: auto;
+      overflow: visible;
 
       .info-scroll-area {
-        padding: 20px;
-        overflow: visible; // Bỏ scroll cục bộ trên mobile
+        padding: 20px 15px;
+        overflow: visible;
       }
 
       .info-header .product-title {
@@ -319,15 +328,33 @@ $primary-color: #ff4d4f;
       }
 
       .info-body .price-box {
+        flex-wrap: wrap;
         .amount {
           font-size: 28px;
         }
       }
 
+      .benefits-list .ant-space {
+        flex-wrap: wrap;
+      }
+
       .info-footer {
-        padding: 15px 20px 20px;
-        position: sticky; // Giữ nút Mua hàng dính dưới đáy màn hình
+        padding: 15px;
+        position: sticky;
         bottom: 0;
+        z-index: 999;
+        box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+        border-top: 1px solid #f0f0f0;
+
+        .btn-group {
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .btn-add-cart {
+          height: 48px;
+          font-size: 14px;
+        }
       }
     }
   }

@@ -191,7 +191,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 // --- Responsive Rules for Mobile viewports ---
 @media (max-width: 768px) {
   .order-history-container {
-    padding: 24px 12px;
+    padding: 16px 8px;
 
     .profile-header-card {
       padding: 4px;
@@ -203,16 +203,64 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .order-card {
+      margin-bottom: 16px;
+      border-radius: 12px;
+
       .order-card-header {
-        padding: 16px;
+        padding: 16px 12px;
+        
+        .order-id {
+          font-size: 14px;
+        }
+
+        .order-date, .table-id {
+          font-size: 12px;
+          padding: 2px 6px;
+        }
+        
+        // Ensure status tag doesn't get pushed off-screen and is aligned left on mobile
+        .ant-row {
+          .ant-col:last-child {
+            margin-top: 8px;
+          }
+        }
       }
 
       .products-table {
-        padding: 8px 16px;
+        padding: 0;
+
+        :global(.ant-table-thead > tr > th),
+        :global(.ant-table-tbody > tr > td) {
+          padding-left: 12px !important;
+          padding-right: 12px !important;
+        }
+
+        :global(.ant-space) {
+          gap: 8px !important;
+        }
+
+        :global(.ant-avatar) {
+          width: 40px !important;
+          height: 40px !important;
+          line-height: 40px !important;
+        }
+
+        .product-name {
+          font-size: 13px;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+          white-space: normal;
+        }
       }
 
       .order-card-footer {
-        padding: 16px;
+        padding: 16px 12px;
+        
+        .grand-total-price {
+          font-size: 18px;
+        }
       }
     }
   }

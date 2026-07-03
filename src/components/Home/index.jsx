@@ -12,6 +12,7 @@ import {
   Pagination,
   Rate,
   Typography,
+  Drawer,
 } from "antd";
 import "./home.scss";
 import { useEffect, useState } from "react";
@@ -36,6 +37,8 @@ const Home = () => {
   const pageSize = 8;
   const [sortQuery, setSortQuery] = useState("");
   const [filter, setFilter] = useState("");
+  const [openDrawer, setOpenDrawer] = useState(false);
+
   useEffect(() => {
     const fetchCategories = async () => {
       const res = await callFetchAllCategory();
@@ -156,6 +159,85 @@ const Home = () => {
     const slug = convertSlug(product.name);
     navigate(`/product/${slug}?id=${product.id}`);
   };
+
+  const FilterContent = (
+    <div className="filter-sidebar">
+      <div className="filter-header">
+        <span>
+          <FilterOutlined className="icon-green" />
+          <span className="filter-title">BỘ LỌC TÌM KIẾM</span>
+        </span>
+        <ReloadOutlined
+          className="reset-btn"
+          title="Làm mới"
+          onClick={() => {
+            form.resetFields();
+            setFilter("");
+          }}
+        />
+      </div>
+      <Divider />
+
+      <Form
+        form={form}
+        onFinish={onFinish}
+        onValuesChange={(changedValues, values) =>
+          handleChangeFilter(changedValues, values)
+        }
+        layout="vertical"
+      >
+        <Form.Item name="category" label="Danh mục sản phẩm">
+          <Checkbox.Group className="custom-checkbox-group">
+            <Row style={{ marginBottom: 8 }}>
+              {categoryData.map((i) => (
+                <Col
+                  key={i.id}
+                  span={24}
+                  style={{ padding: "6px" }}
+                >
+                  <Checkbox value={i.name}>{i.name}</Checkbox>
+                </Col>
+              ))}
+            </Row>
+          </Checkbox.Group>
+        </Form.Item>
+
+        <Divider />
+
+        <Form.Item label="Khoảng giá">
+          <div className="price-range-inputs">
+            <Form.Item name={["price", "from"]} noStyle>
+              <InputNumber
+                placeholder="Từ đ"
+                formatter={(val) =>
+                  `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+              />
+            </Form.Item>
+            <span className="separator">-</span>
+            <Form.Item name={["price", "to"]} noStyle>
+              <InputNumber
+                placeholder="Đến đ"
+                formatter={(val) =>
+                  `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+              />
+            </Form.Item>
+          </div>
+          <Button
+            onClick={() => form.submit()}
+            type="primary"
+            htmlType="submit"
+            block
+            className="apply-btn"
+          >
+            Áp dụng
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
+  );
+
   return (
     <>
       {isLoading ? (
@@ -170,83 +252,9 @@ const Home = () => {
         <div className="home-container">
           <div className="container-layout">
             <Row gutter={[24, 24]}>
-              {/* Sidebar Filter */}
+              {/* Sidebar Filter - Desktop only */}
               <Col xs={0} lg={5}>
-                <div className="filter-sidebar">
-                  <div className="filter-header">
-                    <span>
-                      <FilterOutlined className="icon-green" />
-                      <span className="filter-title">BỘ LỌC TÌM KIẾM</span>
-                    </span>
-                    <ReloadOutlined
-                      className="reset-btn"
-                      title="Làm mới"
-                      onClick={() => {
-                        form.resetFields();
-                        setFilter("");
-                      }}
-                    />
-                  </div>
-                  <Divider />
-
-                  <Form
-                    form={form}
-                    onFinish={onFinish}
-                    onValuesChange={(changedValues, values) =>
-                      handleChangeFilter(changedValues, values)
-                    }
-                    layout="vertical"
-                  >
-                    <Form.Item name="category" label="Danh mục sản phẩm">
-                      <Checkbox.Group className="custom-checkbox-group">
-                        <Row style={{ marginBottom: 8 }}>
-                          {categoryData.map((i) => (
-                            <Col
-                              key={i.id}
-                              span={24}
-                              style={{ padding: "6px" }}
-                            >
-                              <Checkbox value={i.name}>{i.name}</Checkbox>
-                            </Col>
-                          ))}
-                        </Row>
-                      </Checkbox.Group>
-                    </Form.Item>
-
-                    <Divider />
-
-                    <Form.Item label="Khoảng giá">
-                      <div className="price-range-inputs">
-                        <Form.Item name={["price", "from"]} noStyle>
-                          <InputNumber
-                            placeholder="Từ đ"
-                            formatter={(val) =>
-                              `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                            }
-                          />
-                        </Form.Item>
-                        <span className="separator">-</span>
-                        <Form.Item name={["price", "to"]} noStyle>
-                          <InputNumber
-                            placeholder="Đến đ"
-                            formatter={(val) =>
-                              `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                            }
-                          />
-                        </Form.Item>
-                      </div>
-                      <Button
-                        onClick={() => form.submit()}
-                        type="primary"
-                        htmlType="submit"
-                        block
-                        className="apply-btn"
-                      >
-                        Áp dụng
-                      </Button>
-                    </Form.Item>
-                  </Form>
-                </div>
+                {FilterContent}
               </Col>
 
               {/* Product Listing Area */}
@@ -254,6 +262,16 @@ const Home = () => {
               <Col xs={24} lg={19}>
                 <Spin size="large" spinning={isLoading}>
                   <div className="product-content-area">
+                    <div className="mobile-filter-container">
+                      <Button
+                        className="mobile-filter-btn"
+                        icon={<FilterOutlined />}
+                        onClick={() => setOpenDrawer(true)}
+                      >
+                        Lọc Sản Phẩm
+                      </Button>
+                    </div>
+
                     <div className="sorting-tabs">
                       <Tabs
                         defaultActiveKey="1"
@@ -271,14 +289,14 @@ const Home = () => {
                           sm={8}
                           md={8}
                           lg={6}
-                          key={p.id}
                           onClick={() => {
                             handleRedirectBook(p);
                           }}
                         >
                           <Card
                             hoverable
-                            className="product-card"
+                            bordered={false}
+                            className="product-card premium-card"
                             cover={
                               <div className="image-wrapper">
                                 <img
@@ -289,12 +307,14 @@ const Home = () => {
                             }
                           >
                             <div className="product-info">
-                              <Text
-                                ellipsis={{ tooltip: p.name }}
-                                className="product-name"
-                              >
-                                {p.name}
-                              </Text>
+                              <div className="product-name-wrapper">
+                                <Text
+                                  title={p.name}
+                                  className="product-name"
+                                >
+                                  {p.name}
+                                </Text>
+                              </div>
                               <div className="product-price">
                                 {new Intl.NumberFormat("vi-VN", {
                                   style: "currency",
@@ -302,12 +322,12 @@ const Home = () => {
                                 }).format(p.price)}
                               </div>
                               <div className="product-footer">
-                                <Text type="secondary" size="small">
+                                <span>
+                                  <Rate disabled defaultValue={5} style={{ fontSize: '12px', color: '#fadb14' }} />
+                                </span>
+                                <Text type="secondary" className="sold-count">
                                   Đã bán 1.2k
                                 </Text>
-                                <span>
-                                  <Rate disabled defaultValue={5} />
-                                </span>
                               </div>
                             </div>
                           </Card>
@@ -331,6 +351,16 @@ const Home = () => {
           </div>
         </div>
       )}
+      <Drawer
+        title="Bộ lọc tìm kiếm"
+        placement="left"
+        onClose={() => setOpenDrawer(false)}
+        open={openDrawer}
+        width={300}
+        className="mobile-filter-drawer"
+      >
+        {FilterContent}
+      </Drawer>
     </>
   );
 };

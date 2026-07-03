@@ -29,12 +29,15 @@ import CartPage from "./pages/Cart/CartPage";
 import CheckoutPage from "./pages/checkout/CheckoutPage";
 import ManageTablePage from "./pages/admin/table";
 import OrderHistory from "./pages/history/OrderHistoryPage";
+import ChatWidget from "./components/ChatWidget";
+
 const Layout = () => {
   return (
     <div className="layout">
       <AppHeader />
       <Outlet />
       <Footer />
+      <ChatWidget />
     </div>
   );
 };

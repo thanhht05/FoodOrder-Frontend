@@ -203,7 +203,7 @@ const ModalGallery = ({ images = [], productData }) => {
           </div>
 
           <div className="info-footer">
-            <div style={{ display: "flex", gap: "20px" }}>
+            <div className="btn-group">
               <Button
                 onClick={() =>
                   handleAddProductToCart(currentQuantity, productData)
@@ -221,7 +221,7 @@ const ModalGallery = ({ images = [], productData }) => {
                 size="large"
                 block
                 icon={<ShoppingCartOutlined style={{ fontSize: "20px" }} />}
-                className="btn-add-cart"
+                className="btn-add-cart buy-now-btn"
                 onClick={() =>
                   navigate("/checkout", {
                     state: {
