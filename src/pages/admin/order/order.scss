@@ -1,0 +1,185 @@
+.manage-order-page {
+  padding: 24px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+
+  .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #1f2937;
+    }
+  }
+
+  .tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+  }
+
+  .table-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    aspect-ratio: 1; /* Makes the card square */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid #f3f4f6;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+
+      .table-info {
+        h3 {
+          margin: 0 0 8px 0;
+          font-size: 20px;
+          font-weight: 700;
+          color: #111827;
+        }
+
+        .status-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 4px 10px;
+          border-radius: 9999px;
+          font-size: 13px;
+          font-weight: 600;
+          
+          .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+          }
+        }
+      }
+
+      .action-menu {
+        cursor: pointer;
+        color: #6b7280;
+        font-size: 20px;
+        padding: 4px;
+        border-radius: 50%;
+        transition: background-color 0.2s ease;
+        
+        &:hover {
+          background-color: #f3f4f6;
+          color: #111827;
+        }
+      }
+    }
+
+    .card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+      margin: 16px 0;
+      color: #4b5563;
+      font-size: 14px;
+
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .label {
+          color: #6b7280;
+        }
+        
+        .value {
+          font-weight: 600;
+          color: #1f2937;
+        }
+      }
+
+      .total-amount {
+        margin-top: 8px;
+        padding-top: 12px;
+        border-top: 1px dashed #e5e7eb;
+        
+        .info-row {
+          .amount-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: #10b981;
+          }
+        }
+      }
+    }
+
+    .card-footer {
+      .progress-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        
+        .ant-progress {
+          margin: 0;
+          flex: 1;
+        }
+        
+        .progress-text {
+          font-size: 12px;
+          color: #6b7280;
+          white-space: nowrap;
+          min-width: 45px;
+        }
+      }
+    }
+  }
+}
+
+/* Status Colors */
+.status-available {
+  background-color: #ecfdf5;
+  color: #059669;
+  .dot { background-color: #10b981; }
+}
+
+.status-ordering {
+  background-color: #fef3c7;
+  color: #d97706;
+  .dot { background-color: #f59e0b; }
+}
+
+.status-preparing {
+  background-color: #eff6ff;
+  color: #2563eb;
+  .dot { background-color: #3b82f6; }
+}
+
+.status-ready {
+  background-color: #fff7ed;
+  color: #ea580c;
+  .dot { background-color: #f97316; }
+}
+
+.status-occupied {
+  background-color: #fef2f2;
+  color: #dc2626;
+  .dot { background-color: #ef4444; }
+}
+
+.status-paid {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  .dot { background-color: #6b7280; }
+}

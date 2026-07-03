@@ -192,3 +192,22 @@ export const callBuyNowItem = (
   };
   return axios.post(URL, data);
 };
+
+export const callFetchOrders = (query = "") => {
+  return axios.get(`/api/v1/orders${query}`);
+};
+
+export const callFetchOrderDetails = (orderId) => {
+  return axios.get(`/api/v1/orderDetails/${orderId}`);
+};
+
+export const callUpdateOrderStatus = (id, orderStatus) => {
+  const URL = "/api/v1/orders";
+  const data = {
+    id,
+    orderStatus
+  };
+  return axios.put(URL, data);
+};
+
+

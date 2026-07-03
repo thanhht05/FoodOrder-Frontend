@@ -17,6 +17,7 @@ import {
   BellOutlined,
   HomeOutlined,
   TableOutlined,
+  ShoppingCartOutlined,
 } from "@ant-design/icons";
 import "./layoutAdmin.scss";
 import { useState } from "react";
@@ -32,6 +33,9 @@ const AdminLayout = () => {
     if (location.pathname.startsWith("/admin/user")) return "2";
     if (location.pathname.startsWith("/admin/product")) return "3";
     if (location.pathname.startsWith("/admin/table")) return "4";
+    if (location.pathname === "/admin/order") return "5";
+    if (location.pathname === "/admin/order-confirm") return "5-confirm";
+    if (location.pathname === "/admin/order-cancel") return "5-cancel";
     return "1";
   };
   const [collapsed, setCollapsed] = useState(false);
@@ -72,7 +76,26 @@ const AdminLayout = () => {
               icon: <TableOutlined />,
               label: <Link to="/admin/table">Table</Link>,
             },
-            { key: "5", icon: <SettingOutlined />, label: "Configuration" },
+            {
+              key: "5-group",
+              icon: <ShoppingCartOutlined />,
+              label: "Orders",
+              children: [
+                {
+                  key: "5",
+                  label: <Link to="/admin/order">Active Orders</Link>,
+                },
+                {
+                  key: "5-confirm",
+                  label: <Link to="/admin/order-confirm">Confirmed Orders</Link>,
+                },
+                {
+                  key: "5-cancel",
+                  label: <Link to="/admin/order-cancel">Cancelled Orders</Link>,
+                }
+              ]
+            },
+            { key: "6", icon: <SettingOutlined />, label: "Configuration" },
           ]}
         />
       </Sider>

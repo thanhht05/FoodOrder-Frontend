@@ -28,6 +28,9 @@ import ProductPage from "./pages/product";
 import CartPage from "./pages/Cart/CartPage";
 import CheckoutPage from "./pages/checkout/CheckoutPage";
 import ManageTablePage from "./pages/admin/table";
+import ManageOrderPage from "./pages/admin/order";
+import OrderCancelPage from "./pages/admin/order/OrderCancelPage";
+import OrderConfirmPage from "./pages/admin/order/OrderConfirmPage";
 import OrderHistory from "./pages/history/OrderHistoryPage";
 import ChatWidget from "./components/ChatWidget";
 
@@ -136,6 +139,30 @@ function App() {
           element: (
             <ProtectedRoute roles={["ADMIN"]}>
               <ManageTablePage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "order",
+          element: (
+            <ProtectedRoute roles={["ADMIN"]}>
+              <ManageOrderPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "order-cancel",
+          element: (
+            <ProtectedRoute roles={["ADMIN"]}>
+              <OrderCancelPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "order-confirm",
+          element: (
+            <ProtectedRoute roles={["ADMIN"]}>
+              <OrderConfirmPage />
             </ProtectedRoute>
           ),
         },
