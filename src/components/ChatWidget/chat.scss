@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  pointer-events: none; // Let clicks pass through the container's bounding box
 
   .chat-window {
     width: 350px;
@@ -163,6 +164,7 @@
   }
 
   .chat-fab {
+    pointer-events: auto; // Make the fab button clickable
     width: 60px;
     height: 60px;
     border-radius: 50%;

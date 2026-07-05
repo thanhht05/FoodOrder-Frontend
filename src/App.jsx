@@ -27,6 +27,7 @@ import Home from "./components/Home";
 import ProductPage from "./pages/product";
 import CartPage from "./pages/Cart/CartPage";
 import CheckoutPage from "./pages/checkout/CheckoutPage";
+import PaymentPage from "./pages/payment/PaymentPage";
 import ManageTablePage from "./pages/admin/table";
 import ManageOrderPage from "./pages/admin/order";
 import OrderCancelPage from "./pages/admin/order/OrderCancelPage";
@@ -91,6 +92,14 @@ function App() {
           element: (
             <ProtectedRoute>
               <CheckoutPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "payment/:orderId",
+          element: (
+            <ProtectedRoute>
+              <PaymentPage />
             </ProtectedRoute>
           ),
         },

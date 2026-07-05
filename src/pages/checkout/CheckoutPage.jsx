@@ -8,7 +8,6 @@ import {
   Typography,
   Divider,
   Space,
-  QRCode,
   Radio,
   Card,
   Badge,
@@ -20,7 +19,6 @@ import {
   PhoneOutlined,
   EnvironmentOutlined,
   MailOutlined,
-  SafetyCertificateOutlined,
   TabletOutlined,
 } from "@ant-design/icons";
 import "./checkoutPage.scss";
@@ -33,7 +31,7 @@ import {
   callPlaceAnOrder,
 } from "../../services/api";
 import { clearCart } from "../../redux/slices/cart/CartSlice";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -41,23 +39,25 @@ const { TextArea } = Input;
 const CheckoutPage = () => {
   const dispatch = useDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
   const [form] = Form.useForm();
   const [paymentMethod, setPaymentMethod] = useState("qr");
+  const [loading, setLoading] = useState(false);
   const cartItems = useSelector((state) => state.cart.items);
 
   let buyNowItem = location.state?.buyNowItem;
 
   const checkoutItems = buyNowItem
     ? [
-        {
-          id: buyNowItem.productData.id,
-          name: buyNowItem.productData.name,
-          price: buyNowItem.productData.price,
-          categoryName: buyNowItem.productData.productCate.name,
-          img: buyNowItem.productData.lstImg?.[0]?.name,
-          quantity: buyNowItem.quantity,
-        },
-      ]
+      {
+        id: buyNowItem.productData.id,
+        name: buyNowItem.productData.name,
+        price: buyNowItem.productData.price,
+        categoryName: buyNowItem.productData.productCate.name,
+        img: buyNowItem.productData.lstImg?.[0]?.name,
+        quantity: buyNowItem.quantity,
+      },
+    ]
     : cartItems;
   console.log("checkoutItems", checkoutItems);
 
@@ -69,14 +69,11 @@ const CheckoutPage = () => {
   const cartDetailIds = buyNowItem
     ? []
     : checkoutItems.map((item) => item.cartDetailId);
-  // Giả lập dữ liệu đơn hàng
-  const bankInfo = "089817004 - NGUYEN HUU  THANH - MB Bank";
-  // Dữ liệu tạo mã QR (Theo chuẩn VietQR hoặc chuỗi bất kỳ)
 
-  const orderTotal = 1250000;
-  const qrData = `Chuyen khoan: ${bankInfo} - So tien: ${orderTotal}`;
-  console.log("cartDetailIds", cartDetailIds);
+
   const onFinish = async (values) => {
+    if (loading) return;
+    setLoading(true);
     let table;
 
     if (values.table) {
@@ -107,7 +104,7 @@ const CheckoutPage = () => {
           paymentMethod,
         );
       }
-
+      console.log("Res order", resOrder)
       if (resOrder?.data) {
         message.success("Place an order successfully");
 
@@ -115,12 +112,21 @@ const CheckoutPage = () => {
         if (!buyNowItem) {
           dispatch(clearCart());
         }
+
+        const newOrderId = resOrder.data?.orderId;
+        if (paymentMethod === "qr") {
+          navigate(`/payment/${newOrderId}`, { state: { total } });
+        } else {
+          navigate("/order-history");
+        }
       }
     } catch (e) {
       notification.error({
         message:
           e?.response?.data?.message || e.message || "Place order failed",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -246,8 +252,8 @@ const CheckoutPage = () => {
                     <Text strong>
                       {item.price
                         ? (item.price * (item.quantity || 1)).toLocaleString(
-                            "vi-VN",
-                          ) + "₫"
+                          "vi-VN",
+                        ) + "₫"
                         : "1.250.000₫"}
                     </Text>
                   </div>
@@ -282,34 +288,7 @@ const CheckoutPage = () => {
                 </Text>
               </div>
 
-              {/* KHU VỰC HIỂN THỊ MÃ QR - CHỈ HIỆN KHI CHỌN THANH TOÁN QR */}
-              {paymentMethod === "qr" && (
-                <div className="qr-payment-box">
-                  <div className="qr-header">
-                    <SafetyCertificateOutlined className="qr-icon" />
-                    <Text strong>Quét mã để thanh toán</Text>
-                  </div>
-                  <div className="qr-code-wrapper">
-                    <QRCode value={qrData} size={180} color="#1f1f1f" />
-                  </div>
-                  <div className="bank-info">
-                    <Text type="secondary">Ngân hàng:</Text>{" "}
-                    <Text strong>Vietcombank</Text>
-                    <br />
-                    <Text type="secondary">Chủ TK:</Text>{" "}
-                    <Text strong>NGUYEN VAN A</Text>
-                    <br />
-                    <Text type="secondary">Số TK:</Text>{" "}
-                    <Text strong className="highlight">
-                      0123456789
-                    </Text>
-                  </div>
-                  <Text className="qr-instruction">
-                    Mở ứng dụng ngân hàng và quét mã QR. Đơn hàng sẽ được tự
-                    động xác nhận sau khi thanh toán thành công.
-                  </Text>
-                </div>
-              )}
+              {/* KHU VỰC HIỂN THỊ MÃ QR ĐÃ ĐƯỢC CHUYỂN SANG TRANG PAYMENT */}
 
               <Button
                 type="primary"
@@ -317,10 +296,9 @@ const CheckoutPage = () => {
                 block
                 className="btn-submit-order"
                 htmlType="submit"
+                loading={loading}
               >
-                {paymentMethod === "qr"
-                  ? "TÔI ĐÃ THANH TOÁN"
-                  : "HOÀN TẤT ĐẶT HÀNG"}
+                HOÀN TẤT ĐẶT HÀNG
               </Button>
             </Card>
           </Col>

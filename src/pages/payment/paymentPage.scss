@@ -1,0 +1,80 @@
+.premium-payment-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+
+  .payment-card {
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+
+    .section-title {
+      font-weight: 600;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .qr-payment-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      margin-top: 20px;
+
+      .qr-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 20px;
+        font-size: 16px;
+
+        .qr-icon {
+          color: #1890ff;
+          font-size: 20px;
+        }
+      }
+
+      .qr-code-wrapper {
+        background: white;
+        padding: 16px;
+        border-radius: 12px;
+        display: inline-block;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      }
+
+      .bank-info {
+        background: white;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        text-align: left;
+        max-width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+        border: 1px solid #e2e8f0;
+        
+        .highlight {
+          color: #1890ff;
+          font-size: 16px;
+        }
+      }
+
+      .qr-instruction {
+        display: block;
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 24px;
+      }
+    }
+
+    .btn-submit-payment {
+      height: 48px;
+      font-weight: 600;
+      font-size: 16px;
+      border-radius: 8px;
+      margin-top: 24px;
+    }
+  }
+}

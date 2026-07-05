@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   Row,
   Col,
@@ -28,6 +29,7 @@ const { Title, Text } = Typography;
 const CartPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [loading, setLoading] = useState(false);
   const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
 
   const cartItems = useSelector((state) => state.cart.items);
@@ -89,6 +91,14 @@ const CartPage = () => {
       dispatch(removeItem(item));
     }
     message.success("Delte success");
+  };
+
+  const handleCheckout = () => {
+    setLoading(true);
+    setTimeout(() => {
+      navigate("/checkout");
+      setLoading(false);
+    }, 500); // Add a small delay to show the spinner
   };
 
   if (cartItems.length === 0) {
@@ -227,7 +237,8 @@ const CartPage = () => {
                 block
                 size="large"
                 className="checkout-btn"
-                onClick={() => navigate("/checkout")}
+                onClick={handleCheckout}
+                loading={loading}
               >
                 Tiến hành đặt hàng
               </Button>

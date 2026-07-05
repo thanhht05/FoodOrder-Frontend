@@ -7,7 +7,7 @@ import './order.scss';
 const OrderCancelPage = () => {
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -27,7 +27,6 @@ const OrderCancelPage = () => {
           id: order.orderId,
           tableNo: `Table ${order.tableId < 10 ? '0' + order.tableId : order.tableId}`,
           status: order.status,
-          customers: 0,
           orderTime: formatTime(order.orderDate),
           total: order.totalPrice,
           paymentStatus: order.paymentStatus
@@ -91,10 +90,10 @@ const OrderCancelPage = () => {
       ) : (
         <div className="tables-grid">
           {tables.map(table => (
-            <div 
-              key={table.id} 
-              className="table-card" 
-              style={{ cursor: 'pointer' }} 
+            <div
+              key={table.id}
+              className="table-card"
+              style={{ cursor: 'pointer' }}
               onClick={() => handleCardClick(table.id)}
             >
               <div className="card-header">
@@ -105,11 +104,11 @@ const OrderCancelPage = () => {
                     {getStatusLabel(table.status)}
                   </div>
                 </div>
-                <Dropdown 
-                  menu={getActionMenu(table)} 
-                  trigger={['click']} 
-                  placement="bottomRight" 
-                  onClick={(e) => e.stopPropagation()} 
+                <Dropdown
+                  menu={getActionMenu(table)}
+                  trigger={['click']}
+                  placement="bottomRight"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <div className="action-menu">
                     <MoreOutlined />
@@ -118,10 +117,6 @@ const OrderCancelPage = () => {
               </div>
 
               <div className="card-body">
-                <div className="info-row">
-                  <span className="label">Customers:</span>
-                  <span className="value">{table.customers > 0 ? table.customers : '-'}</span>
-                </div>
                 <div className="info-row">
                   <span className="label">Order Time:</span>
                   <span className="value">{table.orderTime}</span>
@@ -170,7 +165,7 @@ const OrderCancelPage = () => {
                 </p>
               </div>
             </div>
-            
+
             <Table
               dataSource={selectedOrder.items || []}
               rowKey="productId"

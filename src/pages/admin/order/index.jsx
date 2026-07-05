@@ -24,6 +24,7 @@ const ManageOrderPage = () => {
       if (res && res.data) {
         // If custom interceptor returns payload, res.data is the actual array
         const orderData = Array.isArray(res.data) ? res.data : (res.data.data || res.data);
+        // Get orders is peding
         const activeOrders = orderData.filter(
           order => order.status !== 'CONFIRMED' && order.status !== 'CANCELLED'
         );
@@ -31,7 +32,6 @@ const ManageOrderPage = () => {
           id: order.orderId,
           tableNo: `Table ${order.tableId < 10 ? '0' + order.tableId : order.tableId}`,
           status: order.status,
-          customers: 0,
           orderTime: formatTime(order.orderDate),
           total: order.totalPrice,
           paymentStatus: order.paymentStatus
@@ -169,10 +169,7 @@ const ManageOrderPage = () => {
               </div>
 
               <div className="card-body">
-                <div className="info-row">
-                  <span className="label">Customers:</span>
-                  <span className="value">{table.customers > 0 ? table.customers : '-'}</span>
-                </div>
+
                 <div className="info-row">
                   <span className="label">Order Time:</span>
                   <span className="value">{table.orderTime}</span>
