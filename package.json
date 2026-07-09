@@ -12,6 +12,7 @@
   "dependencies": {
     "@ant-design/icons": "^6.1.1",
     "@reduxjs/toolkit": "^2.11.2",
+    "@stomp/stompjs": "^7.3.0",
     "antd": "^6.3.5",
     "axios": "^1.13.6",
     "react": "^19.2.4",
@@ -22,6 +23,7 @@
     "react-spinners": "^0.17.0",
     "redux-persist": "^6.0.0",
     "sass": "^1.98.0",
+    "sockjs-client": "^1.6.1",
     "uuid": "^13.0.0",
     "xlsx": "^0.18.5"
   },

@@ -3,8 +3,11 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Card, Typography, Button, message, notification, Skeleton, Alert } from "antd";
 import { SafetyCertificateOutlined } from "@ant-design/icons";
 import { callPayOrder, callFetchOrderDetails } from "../../services/api";
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 import "./paymentPage.scss";
-
+import { clearCart } from "../../redux/slices/cart/CartSlice";
+import { useDispatch } from "react-redux";
 const { Title, Text } = Typography;
 
 const PaymentPage = () => {
@@ -13,6 +16,7 @@ const PaymentPage = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [orderTotal, setOrderTotal] = useState(location.state?.total || 1250000);
+  const dispatch = useDispatch()
 
   useEffect(() => {
     // If we want to fetch order details to get the exact total amount in case it's not passed via state
@@ -41,19 +45,65 @@ const PaymentPage = () => {
   const [qrLoading, setQrLoading] = useState(true);
   const [qrError, setQrError] = useState(false);
 
+  // WebSocket connection for payment status
+  useEffect(() => {
+    if (!orderId) return;
+
+    const token = window.localStorage.getItem("access_token") || "";
+    const socketUrl = import.meta.env.VITE_BACKEND_URL + "/ws" + (token ? `?token=${token}&access_token=${token}` : "");
+    console.log("Socket URL:", socketUrl);
+    const stompClient = new Client({
+      webSocketFactory: () => new SockJS(socketUrl),
+      connectHeaders: {
+        Authorization: `Bearer ${token}`
+      },
+      reconnectDelay: 5000,
+      onConnect: () => {
+        console.log("Connected to WebSocket for order:", orderId);
+        stompClient.subscribe(`/topic/order/${orderId}`, (msg) => {
+          console.log("Websocket message:", msg)
+          if (msg.body) {
+            try {
+              const data = JSON.parse(msg.body);
+              console.log(" JSON.parse(msg.body);", data)
+              if (data.status === "PAID") {
+                message.success("Thanh toán thành công");
+                dispatch(clearCart())
+                navigate("/order-history");
+              }
+            } catch (error) {
+              console.error("Failed to parse websocket message", error);
+            }
+          }
+        });
+      },
+      onStompError: (frame) => {
+        console.error("Broker reported error: " + frame.headers["message"]);
+        console.error("Additional details: " + frame.body);
+      },
+    });
+
+    stompClient.activate();
+
+    return () => {
+      stompClient.deactivate();
+    };
+  }, [orderId, navigate]);
+
   // Use the VietQR API for dynamic QR code generation
   const qrUrl = `https://vietqr.app/img?acc=0898173004&bank=MBBank&amount=${Math.round(orderTotal)}&des=order${orderId}&holder=NGUYEN+HUU+THANH&template=compact&showinfo=true`;
 
   const handlePayment = async () => {
     setLoading(true);
     try {
-      const res = await callPayOrder(orderId);
+      const res = await callPayOrder();
       if (res?.data) {
         message.success("Thanh toán thành công");
         navigate("/order-history");
       } else {
         // Handle case where API might succeed but no data returned
         message.success("Thanh toán thành công");
+
         navigate("/order-history");
       }
     } catch (error) {
@@ -138,7 +188,7 @@ const PaymentPage = () => {
           onClick={handlePayment}
           loading={loading}
         >
-          TÔI ĐÃ THANH TOÁN
+          ĐANG CHỜ THANH TOÁN
         </Button>
       </Card>
     </div>

@@ -108,10 +108,7 @@ const CheckoutPage = () => {
       if (resOrder?.data) {
         message.success("Place an order successfully");
 
-        // chỉ clear cart khi mua từ giỏ
-        if (!buyNowItem) {
-          dispatch(clearCart());
-        }
+
 
         const newOrderId = resOrder.data?.orderId;
         if (paymentMethod === "qr") {

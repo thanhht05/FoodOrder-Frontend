@@ -1,12 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Dropdown, message, Spin, Modal, Table, Button } from 'antd';
-import { MoreOutlined, FileTextOutlined, EditOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import React, { useState, useEffect, useRef } from 'react';
+import { Dropdown, message, Spin, Modal, Table, Button, Switch } from 'antd';
+import { MoreOutlined, FileTextOutlined, EditOutlined, CheckCircleOutlined, SoundOutlined } from '@ant-design/icons';
 import { callFetchOrders, callFetchOrderDetails, callUpdateOrderStatus } from '../../../services/api';
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 import './order.scss';
-
 const ManageOrderPage = () => {
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const isSoundEnabledRef = useRef(true);
+
+  const handleToggleSound = (checked) => {
+    setIsSoundEnabled(checked);
+    isSoundEnabledRef.current = checked;
+    if (checked) {
+      // Play a short sound to test and request interaction permission
+      new Audio('/notification.mp3').play().catch(e => console.log("Audio play blocked", e));
+    }
+  };
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,6 +28,54 @@ const ManageOrderPage = () => {
 
   useEffect(() => {
     fetchOrders();
+  }, []);
+
+  // WebSocket connection for admin order updates
+  useEffect(() => {
+    const token = window.localStorage.getItem("access_token") || "";
+    const socketUrl = import.meta.env.VITE_BACKEND_URL + "/ws" + (token ? `?token=${token}&access_token=${token}` : "");
+
+    const stompClient = new Client({
+      webSocketFactory: () => new SockJS(socketUrl),
+      connectHeaders: {
+        Authorization: `Bearer ${token}`
+      },
+      reconnectDelay: 5000,
+      onConnect: () => {
+        console.log("Connected to WebSocket for admin orders");
+        stompClient.subscribe('/topic/admin/orders', (msg) => {
+          console.log("Admin orders websocket message:", msg);
+          if (msg.body) {
+            try {
+              const data = JSON.parse(msg.body);
+              if (data.status === "PAID" || data.paymentStatus === "PAID" || data.message) {
+                message.info(`Có cập nhật đơn hàng mới!`);
+                if (isSoundEnabledRef.current) {
+                  const audio = new Audio('/notification.mp3');
+                  audio.play().catch(e => console.log("Audio play blocked", e));
+                }
+                fetchOrders();
+              } else {
+                fetchOrders();
+              }
+            } catch (error) {
+              fetchOrders();
+            }
+          } else {
+            fetchOrders();
+          }
+        });
+      },
+      onStompError: (frame) => {
+        console.error("Broker reported error: " + frame.headers["message"]);
+      },
+    });
+
+    stompClient.activate();
+
+    return () => {
+      stompClient.deactivate();
+    };
   }, []);
 
   const fetchOrders = async () => {
@@ -131,8 +192,17 @@ const ManageOrderPage = () => {
 
   return (
     <div className="manage-order-page">
-      <div className="header-actions">
+      <div className="header-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2>Order Management</h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <SoundOutlined style={{ fontSize: '18px', color: isSoundEnabled ? '#1890ff' : '#999' }} />
+          <Switch 
+             checked={isSoundEnabled} 
+             onChange={handleToggleSound} 
+             checkedChildren="Bật âm báo" 
+             unCheckedChildren="Tắt âm báo"
+          />
+        </div>
       </div>
 
       {loading ? (

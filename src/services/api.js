@@ -210,8 +210,8 @@ export const callUpdateOrderStatus = (id, orderStatus) => {
   return axios.put(URL, data);
 };
 
-export const callPayOrder = (orderId) => {
-  return axios.post(`/api/v1/orders/${orderId}/pay`);
+export const callPayOrder = () => {
+  return axios.post(`/api/v1/orders/pay`);
 };
 
 
