@@ -34,6 +34,7 @@ import OrderCancelPage from "./pages/admin/order/OrderCancelPage";
 import OrderConfirmPage from "./pages/admin/order/OrderConfirmPage";
 import OrderHistory from "./pages/history/OrderHistoryPage";
 import ChatWidget from "./components/ChatWidget";
+import { getCartAPI } from "./redux/thunk/getCartThunk";
 
 const Layout = () => {
   return (
@@ -62,8 +63,13 @@ function App() {
       dispatch(doGetAccountAction(res.data));
     }
   };
+  const getCart = () => {
+    dispatch(getCartAPI())
+  }
   useEffect(() => {
     getAccount();
+    getCart()
+
   }, []);
   const router = createBrowserRouter([
     {
@@ -189,9 +195,9 @@ function App() {
   return (
     <>
       {isLoading == false ||
-      window.location.pathname === "/login" ||
-      window.location.pathname === "/register" ||
-      window.location.pathname === "/" ? (
+        window.location.pathname === "/login" ||
+        window.location.pathname === "/register" ||
+        window.location.pathname === "/" ? (
         <RouterProvider router={router} />
       ) : (
         <Loading />

@@ -20,7 +20,6 @@ import {
 import "./product.scss";
 import ProductSkeleton from "./ProductSkeleton";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "../../redux/slices/cart/CartSlice";
 import { addToCartAPI } from "../../redux/thunk/addToCartAPI";
 import { useNavigate } from "react-router-dom";
 import { getCartAPI } from "../../redux/thunk/getCartThunk";
@@ -41,31 +40,25 @@ const ModalGallery = ({ images = [], productData }) => {
       galleryRef.current.slideToIndex(index);
     }
   };
-
-  const variants = ["Nhỏ", "Vừa", "Lớn"]; // Mock data
   const handleAddProductToCart = async (quantity, product) => {
     if (isAuthenticated) {
       await dispatch(
         addToCartAPI({
           productId: product.id,
-          quantity: currentQuantity,
+          quantity: quantity,
         }),
       );
       dispatch(getCartAPI());
     } else {
-      dispatch(
-        addToCart({
-          productId: product.id,
-          name: product.name,
-          price: product.price,
-          img: product.lstImg?.[0]?.name,
-          quantity: currentQuantity,
-        }),
-      );
+      message.warning("Please login to add product to cart");
+      navigate("/login");
+      return;
     }
 
     message.success("Add product successfully");
   };
+  const variants = ["Nhỏ", "Vừa", "Lớn"]; // Mock data
+
   return !productData ? (
     <ProductSkeleton />
   ) : (

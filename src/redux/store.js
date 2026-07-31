@@ -17,7 +17,7 @@ const persistConfig = {
   key: "root",
   version: 1,
   storage: storage.default,
-  blacklist: ["account"], // account will not be persisted
+  blacklist: ["account"], // account will not be persisted in localstorage
 };
 
 const rootReducer = combineReducers({

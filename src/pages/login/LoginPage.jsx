@@ -20,9 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { doLoginAction } from "../../redux/slices/account/accountSlice";
 import { callLogin } from "../../services/api";
 import "./loginPage.scss";
-import { mergeCart } from "../../redux/thunk/cartThunk";
 import { getCartAPI } from "../../redux/thunk/getCartThunk";
-import { clearCart } from "../../redux/slices/cart/CartSlice";
 
 const { Title, Text } = Typography;
 
@@ -44,18 +42,7 @@ const LoginPage = () => {
         localStorage.setItem("access_token", res.data.accessToken);
         dispatch(doLoginAction(res.data));
 
-        // ---- KHU VỰC XỬ LÝ GIỎ HÀNG (CÔ LẬP) ----
-        if (localCart && localCart.length > 0) {
-          try {
-            await dispatch(mergeCart()).unwrap();
-          } catch (cartError) {
-            console.error("Lỗi merge giỏ hàng (khác tài khoản):", cartError);
-            dispatch(clearCart()); // Giải cứu: Xóa giỏ hàng xung đột của người cũ
-          }
-        }
-
         // Luôn gọi lấy giỏ hàng mới từ DB về sau khi đã login (bất kể giỏ trống hay có đồ)
-
         await dispatch(getCartAPI()).unwrap();
 
         // THÔNG BÁO & CHUYỂN TRANG (Nằm ngoài khối if giỏ hàng)

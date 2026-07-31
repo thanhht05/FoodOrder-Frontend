@@ -45,7 +45,6 @@ const TableList = () => {
 
   //   const [openModalUpload, setOpenMOdalUpload] = useState(false);
   const handlePaginationChange = (pagination, filters, sorter, extra) => {
-    debugger;
     if (pagination && pagination.current !== currentPage) {
       setCurrentPage(pagination.current);
     }

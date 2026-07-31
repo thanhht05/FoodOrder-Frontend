@@ -20,7 +20,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import "./cartPage.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { removeItem, updateQuantity } from "../../redux/slices/cart/CartSlice";
 import CartSteps from "../../components/Cart/CartSteps";
 import { updateCartAPI } from "../../redux/thunk/updateCartAPI";
 
@@ -30,66 +29,45 @@ const CartPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
-  const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
 
   const cartItems = useSelector((state) => state.cart.items);
-  console.log("Cart items", cartItems);
 
-  // console.log("cartNotPreview", cartItems);
   const total = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
   const handleIncrease = (item) => {
-    if (isAuthenticated) {
-      dispatch(
-        updateCartAPI({
-          productId: item.id,
-          quantity: item.quantity + 1,
-        }),
-      );
-    } else {
-      dispatch(
-        updateQuantity({
-          id: item.id,
-          quantity: item.quantity + 1,
-        }),
-      );
-    }
+
+    dispatch(
+      updateCartAPI({
+        productId: item.id,
+        quantity: item.quantity + 1,
+      }),
+    );
+
   };
 
   const handleDecrease = (item) => {
     if (item.quantity <= 0) {
       return;
     }
+    dispatch(
+      updateCartAPI({
+        productId: item.id,
+        quantity: item.quantity - 1,
+      }),
+    );
 
-    if (isAuthenticated) {
-      dispatch(
-        updateCartAPI({
-          productId: item.id,
-          quantity: item.quantity - 1,
-        }),
-      );
-    } else {
-      dispatch(
-        updateQuantity({
-          id: item.id,
-          quantity: item.quantity - 1,
-        }),
-      );
-    }
   };
   const handleRemoveItem = (item) => {
-    if (isAuthenticated) {
-      dispatch(
-        updateCartAPI({
-          productId: item.id,
-          quantity: 0,
-        }),
-      );
-    } else {
-      dispatch(removeItem(item));
-    }
+
+    dispatch(
+      updateCartAPI({
+        productId: item.id,
+        quantity: 0,
+      }),
+    );
+
     message.success("Delte success");
   };
 

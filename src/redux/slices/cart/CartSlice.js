@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { mergeCart } from "../../thunk/cartThunk";
 import { addToCartAPI } from "../../thunk/addToCartAPI";
 import { getCartAPI } from "../../thunk/getCartThunk";
 import { IdcardFilled } from "@ant-design/icons";
@@ -13,63 +12,22 @@ export const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    // add to cart when user do not login
-    addToCart: (state, action) => {
-      const item = action.payload;
 
-      const existing = state.items.find((c) => c.productId === item.productId);
-
-      if (existing) {
-        existing.quantity += item.quantity; // update quantity of existing product
-      } else {
-        state.items.push(item); // add new product into items
-      }
-    },
-
-    // setCart: (state, action) => {
-    //   state.items = action.payload;
-    // },
-
-    // when user place an order
     clearCart: (state) => {
       state.items = [];
       state.isGuestCart = true;
     },
-    updateQuantity: (state, action) => {
-      const { id, quantity } = action.payload;
 
-      const item = state.items.find((i) => i.id === id);
-      if (item) {
-        item.quantity = quantity;
-      }
-    },
-    removeItem: (state, action) => {
-      const id = action.payload.id;
-      state.items = state.items.filter((item) => item.id !== id);
-    },
+
   },
   extraReducers: (builder) => {
     builder
 
-      .addCase(mergeCart.fulfilled, (state, action) => {
-        const data = action.payload.data;
-        state.items = data.productsInnerCartDetail || [];
-        state.isMerged = true;
-      })
-      .addCase(mergeCart.rejected, (state) => {
-        state.items = [];
-        state.isGuestCart = true;
-      })
-
-      // add procut to cart API when user have already login
+      // add procut to cart API
       .addCase(addToCartAPI.fulfilled, (state, action) => {
         const data = action.payload.data;
-
         state.items = data.productsInnerCartDetail || [];
-        console.log(
-          "data.productsInnerCartDetail",
-          data.productsInnerCartDetail,
-        );
+
       })
       .addCase(updateCartAPI.fulfilled, (state, action) => {
         state.items = action.payload.data.productsInnerCartDetail || [];
@@ -94,6 +52,6 @@ export const cartSlice = createSlice({
       });
   },
 });
-export const { addToCart, setCart, clearCart, updateQuantity, removeItem } =
+export const { clearCart } =
   cartSlice.actions;
 export default cartSlice.reducer;
