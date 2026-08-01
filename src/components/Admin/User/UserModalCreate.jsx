@@ -32,15 +32,15 @@ const UserModalCreate = ({
       const res = await callCreateAUser(fullName, email, password, phone);
 
       if (res && res.data) {
-        message.success("Create a user successfully");
+        message.success("Tạo người dùng thành công");
         form.resetFields();
         setOpenModalCreateUser(false);
         await fetchUser();
       }
     } catch (error) {
       notification.error({
-        message: "Create user failed",
-        description: error?.response?.data?.message || "Server error",
+        message: "Tạo người dùng thất bại",
+        description: error?.response?.data?.message || "Lỗi máy chủ",
       });
     } finally {
       setIsSubmit(false);
@@ -49,10 +49,10 @@ const UserModalCreate = ({
   return (
     <>
       <Button type="primary" onClick={showModal}>
-        Open Modal
+        Thêm mới
       </Button>
       <Modal
-        title="Basic Modal"
+        title="Thêm mới người dùng"
         closable={{ "aria-label": "Custom Close Button" }}
         open={openModalCreateUser}
         onOk={() => {
@@ -66,28 +66,28 @@ const UserModalCreate = ({
           <Form.Item
             name="email"
             label="Email"
-            rules={[{ required: true, message: "Please input email!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập email!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="fullName"
-            label="FullName"
-            rules={[{ required: true, message: "Please input fullName!" }]}
+            label="Họ và tên"
+            rules={[{ required: true, message: "Vui lòng nhập họ và tên!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="password"
-            label="Password"
-            rules={[{ required: true, message: "Please input password!" }]}
+            label="Mật khẩu"
+            rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
           >
             <Input.Password />
           </Form.Item>
           <Form.Item
             name="phone"
-            label="Phone"
-            rules={[{ required: true, message: "Please input phone!" }]}
+            label="Số điện thoại"
+            rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}
           >
             <Input />
           </Form.Item>

@@ -25,7 +25,7 @@ const OrderCancelPage = () => {
         const orderData = Array.isArray(res.data) ? res.data : (res.data.data || res.data);
         const mappedTables = orderData.map(order => ({
           id: order.orderId,
-          tableNo: `Table ${order.tableId < 10 ? '0' + order.tableId : order.tableId}`,
+          tableNo: `Bàn ${order.tableId < 10 ? '0' + order.tableId : order.tableId}`,
           status: order.status,
           orderTime: formatTime(order.orderDate),
           total: order.totalPrice,
@@ -33,11 +33,11 @@ const OrderCancelPage = () => {
         }));
         setTables(mappedTables);
       } else {
-        message.error("Failed to fetch cancelled orders");
+        message.error("Không thể lấy danh sách đơn hàng đã hủy");
       }
     } catch (error) {
       console.error(error);
-      message.error("An error occurred while fetching cancelled orders");
+      message.error("Có lỗi xảy ra khi lấy danh sách đơn hàng đã hủy");
     } finally {
       setLoading(false);
     }
@@ -51,11 +51,11 @@ const OrderCancelPage = () => {
       if (res && res.data) {
         setSelectedOrder(res.data);
       } else {
-        message.error("Failed to fetch order details");
+        message.error("Không thể lấy chi tiết đơn hàng");
       }
     } catch (error) {
       console.error(error);
-      message.error("Error fetching order details");
+      message.error("Lỗi khi lấy chi tiết đơn hàng");
     } finally {
       setLoadingDetails(false);
     }
@@ -67,12 +67,12 @@ const OrderCancelPage = () => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const getStatusLabel = (status) => 'Cancelled';
+  const getStatusLabel = (status) => 'Đã hủy';
   const getStatusClass = (status) => 'status-occupied'; // Reusing red styling
 
   const getActionMenu = (table) => {
     const items = [
-      { key: '1', icon: <FileTextOutlined />, label: 'View Order' },
+      { key: '1', icon: <FileTextOutlined />, label: 'Xem đơn hàng' },
     ];
     return { items };
   };
@@ -80,7 +80,7 @@ const OrderCancelPage = () => {
   return (
     <div className="manage-order-page">
       <div className="header-actions">
-        <h2>Cancelled Orders</h2>
+        <h2>Đơn hàng đã hủy</h2>
       </div>
 
       {loading ? (
@@ -118,12 +118,12 @@ const OrderCancelPage = () => {
 
               <div className="card-body">
                 <div className="info-row">
-                  <span className="label">Order Time:</span>
+                  <span className="label">Giờ đặt:</span>
                   <span className="value">{table.orderTime}</span>
                 </div>
                 <div className="total-amount">
                   <div className="info-row">
-                    <span className="label">Total:</span>
+                    <span className="label">Tổng:</span>
                     <span className="amount-value">
                       {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(table.total)}
                     </span>
@@ -132,18 +132,18 @@ const OrderCancelPage = () => {
               </div>
             </div>
           ))}
-          {tables.length === 0 && <p style={{ gridColumn: '1 / -1', textAlign: 'center' }}>No cancelled orders found.</p>}
+          {tables.length === 0 && <p style={{ gridColumn: '1 / -1', textAlign: 'center' }}>Không có đơn hàng đã hủy.</p>}
         </div>
       )}
 
       {/* Order Details Modal */}
       <Modal
-        title={selectedOrder ? `Order Details - Table ${selectedOrder.tableId}` : 'Order Details'}
+        title={selectedOrder ? `Chi tiết đơn hàng - Bàn ${selectedOrder.tableId}` : 'Chi tiết đơn hàng'}
         open={isModalOpen}
         onCancel={() => setIsModalOpen(false)}
         footer={[
           <Button key="close" onClick={() => setIsModalOpen(false)}>
-            Close
+            Đóng
           </Button>
         ]}
         width={700}
@@ -154,12 +154,12 @@ const OrderCancelPage = () => {
           <div>
             <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between' }}>
               <div>
-                <p><strong>Order ID:</strong> #{selectedOrder.orderId}</p>
-                <p><strong>Status:</strong> <span className={`status-badge ${getStatusClass(selectedOrder.status)}`} style={{ padding: '2px 8px', borderRadius: '4px', border: '1px solid currentColor', fontSize: '12px' }}>{getStatusLabel(selectedOrder.status)}</span></p>
-                <p><strong>Payment Status:</strong> {selectedOrder.paymentStatus}</p>
+                <p><strong>Mã đơn:</strong> #{selectedOrder.orderId}</p>
+                <p><strong>Trạng thái:</strong> <span className={`status-badge ${getStatusClass(selectedOrder.status)}`} style={{ padding: '2px 8px', borderRadius: '4px', border: '1px solid currentColor', fontSize: '12px' }}>{getStatusLabel(selectedOrder.status)}</span></p>
+                <p><strong>TT Thanh toán:</strong> {selectedOrder.paymentStatus}</p>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: '14px', marginBottom: 4 }}><strong>Total Price:</strong></p>
+                <p style={{ fontSize: '14px', marginBottom: 4 }}><strong>Tổng cộng:</strong></p>
                 <p style={{ fontSize: '24px', color: '#10b981', fontWeight: 'bold', margin: 0 }}>
                   {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedOrder.totalPrice)}
                 </p>
@@ -172,15 +172,15 @@ const OrderCancelPage = () => {
               pagination={false}
               bordered
               columns={[
-                { title: 'Product Name', dataIndex: 'productName', key: 'productName' },
-                { title: 'Quantity', dataIndex: 'quantity', key: 'quantity', align: 'center' },
-                { title: 'Unit Price', dataIndex: 'price', key: 'price', align: 'right', render: (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price) },
-                { title: 'Total', key: 'total', align: 'right', render: (_, record) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.price * record.quantity) },
+                { title: 'Tên sản phẩm', dataIndex: 'productName', key: 'productName' },
+                { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity', align: 'center' },
+                { title: 'Đơn giá', dataIndex: 'price', key: 'price', align: 'right', render: (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price) },
+                { title: 'Tổng', key: 'total', align: 'right', render: (_, record) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.price * record.quantity) },
               ]}
             />
           </div>
         ) : (
-          <p>No details found.</p>
+          <p>Không có chi tiết.</p>
         )}
       </Modal>
     </div>

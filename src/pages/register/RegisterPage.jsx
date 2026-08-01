@@ -78,7 +78,7 @@ const RegisterPage = () => {
                 <span className="dot"></span>
               </div>
               <Text className="copyright">
-                © 2026 AMU Team. All rights reserved.
+                © 2026 AMU Team. Bảo lưu mọi quyền.
               </Text>
             </div>
           </div>

@@ -117,7 +117,7 @@ const AppHeader = () => {
                 onPressEnter={handleSearch}
                 className="custom-input"
               />
-              <Button onClick={handleSearch}>Search</Button>
+              <Button onClick={handleSearch}>Tìm kiếm</Button>
             </div>
           </Col>
 
@@ -169,7 +169,7 @@ const AppHeader = () => {
                     shape="round"
                     onClick={() => navigate("/login")}
                   >
-                    Login
+                    Đăng nhập
                   </Button>
                 )}
               </div>

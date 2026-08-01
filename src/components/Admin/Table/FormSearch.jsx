@@ -41,7 +41,7 @@ const FormSearch = ({ handleSearch, setFilter }) => {
           </Form.Item>
         </Col>
         <Col span={8}>
-          <Form.Item name="tableStatus" label="Status" labelCol={{ span: 24 }}>
+          <Form.Item name="tableStatus" label="Trạng thái" labelCol={{ span: 24 }}>
             <Select
               showSearch={{
                 optionFilterProp: ["label", "otherField"],
@@ -60,7 +60,7 @@ const FormSearch = ({ handleSearch, setFilter }) => {
       <Row>
         <Col span={24} style={{ textAlign: "right" }}>
           <Button type="primary" htmlType="submit">
-            Search
+            Tìm kiếm
           </Button>
           <Button
             style={{ margin: "0 8px" }}
@@ -69,7 +69,7 @@ const FormSearch = ({ handleSearch, setFilter }) => {
               setFilter("");
             }}
           >
-            Clear
+            Làm mới
           </Button>
           {/* <a
                         style={{ fontSize: 12 }}

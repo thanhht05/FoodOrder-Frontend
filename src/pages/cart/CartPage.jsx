@@ -68,7 +68,7 @@ const CartPage = () => {
       }),
     );
 
-    message.success("Delte success");
+    message.success("Xóa thành công");
   };
 
   const handleCheckout = () => {

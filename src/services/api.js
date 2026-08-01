@@ -214,4 +214,8 @@ export const callPayOrder = () => {
   return axios.post(`/api/v1/orders/pay`);
 };
 
+export const callChatAI = (message) => {
+  return axios.post('/api/v1/ai/chat', { message });
+};
+
 

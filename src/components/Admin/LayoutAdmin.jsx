@@ -42,16 +42,16 @@ const AdminLayout = () => {
   const user = useSelector((state) => state.account.user);
 
   const userMenuItems = [
-    { key: "1", icon: <UserOutlined />, label: "Profile" },
-    { key: "2", icon: <SettingOutlined />, label: "Settings" },
+    { key: "1", icon: <UserOutlined />, label: "Hồ sơ" },
+    { key: "2", icon: <SettingOutlined />, label: "Cài đặt" },
     { type: "divider" },
-    { key: "3", icon: <LogoutOutlined />, label: "Logout", danger: true },
+    { key: "3", icon: <LogoutOutlined />, label: "Đăng xuất", danger: true },
   ];
 
   return (
     <Layout className="admin-layout">
       <Sider trigger={null} collapsible collapsed={collapsed} width={260}>
-        <div className="logo">{collapsed ? "GA" : "ADMIN DASHBOARD"}</div>
+        <div className="logo">{collapsed ? "QT" : "BẢNG ĐIỀU KHIỂN"}</div>
         <Menu
           mode="inline"
           selectedKeys={[getSelectedKey()]}
@@ -59,43 +59,43 @@ const AdminLayout = () => {
             {
               key: "1",
               icon: <DashboardOutlined />,
-              label: <Link to="/admin">Dashboard</Link>,
+              label: <Link to="/admin">Bảng điều khiển</Link>,
             },
             {
               key: "2",
               icon: <UserOutlined />,
-              label: <Link to="/admin/user">User</Link>,
+              label: <Link to="/admin/user">Người dùng</Link>,
             },
             {
               key: "3",
               icon: <UserOutlined />,
-              label: <Link to="/admin/product">Product</Link>,
+              label: <Link to="/admin/product">Sản phẩm</Link>,
             },
             {
               key: "4",
               icon: <TableOutlined />,
-              label: <Link to="/admin/table">Table</Link>,
+              label: <Link to="/admin/table">Bàn</Link>,
             },
             {
               key: "5-group",
               icon: <ShoppingCartOutlined />,
-              label: "Orders",
+              label: "Đơn hàng",
               children: [
                 {
                   key: "5",
-                  label: <Link to="/admin/order">Active Orders</Link>,
+                  label: <Link to="/admin/order">Đơn hàng hiện tại</Link>,
                 },
                 {
                   key: "5-confirm",
-                  label: <Link to="/admin/order-confirm">Confirmed Orders</Link>,
+                  label: <Link to="/admin/order-confirm">Đơn đã xác nhận</Link>,
                 },
                 {
                   key: "5-cancel",
-                  label: <Link to="/admin/order-cancel">Cancelled Orders</Link>,
+                  label: <Link to="/admin/order-cancel">Đơn đã hủy</Link>,
                 }
               ]
             },
-            { key: "6", icon: <SettingOutlined />, label: "Configuration" },
+            { key: "6", icon: <SettingOutlined />, label: "Cấu hình" },
           ]}
         />
       </Sider>
@@ -136,12 +136,12 @@ const AdminLayout = () => {
                 title: (
                   <>
                     <UserOutlined />
-                    <span>Application List</span>
+                    <span>Danh sách ứng dụng</span>
                   </>
                 ),
               },
               {
-                title: "Application",
+                title: "Ứng dụng",
               },
             ]}
           />

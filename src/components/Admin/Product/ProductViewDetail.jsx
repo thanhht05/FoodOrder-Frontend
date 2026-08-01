@@ -58,35 +58,35 @@ const ProductViewDetail = ({
   return (
     <>
       <Drawer
-        title="User Detail"
+        title="Chi tiết sản phẩm"
         onClose={onClose}
         open={openProductViewDetail}
       >
         {/* Info */}
         <Descriptions bordered column={1} size="middle">
-          <Descriptions.Item label="Name">
+          <Descriptions.Item label="Tên sản phẩm">
             {productDataDetail?.name}
           </Descriptions.Item>
-          <Descriptions.Item label="Quanity">
+          <Descriptions.Item label="Số lượng">
             {productDataDetail?.quantity}
           </Descriptions.Item>
-          <Descriptions.Item label="Price">
+          <Descriptions.Item label="Giá">
             {productDataDetail?.price}
           </Descriptions.Item>
 
-          <Descriptions.Item label="Category">
+          <Descriptions.Item label="Danh mục">
             {productDataDetail?.productCate.name}
           </Descriptions.Item>
-          <Descriptions.Item label="Description">
+          <Descriptions.Item label="Mô tả">
             {productDataDetail?.description}
           </Descriptions.Item>
 
-          <Descriptions.Item label="Updated at">
+          <Descriptions.Item label="Cập nhật lúc">
             {dayjs(productDataDetail?.updatedAt).isValid()
               ? dayjs(productDataDetail?.updatedAt).format("DD/MM/YYYY HH:mm")
-              : "Product chưa được cập nhật"}
+              : "Sản phẩm chưa được cập nhật"}
           </Descriptions.Item>
-          <Descriptions.Item label="Created at">
+          <Descriptions.Item label="Tạo lúc">
             {dayjs(productDataDetail?.createdAt).format("DD/MM/YYYY HH:mm")}
           </Descriptions.Item>
         </Descriptions>

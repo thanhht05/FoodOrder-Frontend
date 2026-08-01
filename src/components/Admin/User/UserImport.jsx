@@ -110,9 +110,9 @@ const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
             if (json && json.length > 0) setDataExcel(json);
           };
         }
-        message.success(`${info.file.name} file uploaded successfully.`);
+        message.success(`${info.file.name} tải lên file thành công.`);
       } else if (status === "error") {
-        message.error(`${info.file.name} file upload failed.`);
+        message.error(`${info.file.name} tải lên file thất bại.`);
       }
     },
     onDrop(e) {
@@ -121,7 +121,7 @@ const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
   };
   const columns = [
     {
-      title: "FullName",
+      title: "Họ và tên",
       dataIndex: "fullName",
       key: "fullName",
     },
@@ -131,7 +131,7 @@ const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
       key: "email",
     },
     {
-      title: "Phone",
+      title: "Số điện thoại",
       dataIndex: "phone",
       key: "phone",
     },
@@ -139,11 +139,11 @@ const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
   return (
     <>
       <Modal
-        title="Import data user"
+        title="Nhập dữ liệu người dùng"
         closable={{ "aria-label": "Custom Close Button" }}
         open={openModalUpload}
         onOk={handleOk}
-        okText="Import"
+        okText="Nhập dữ liệu"
         onCancel={handleCancel}
       >
         <Dragger {...propsUserUpload}>
@@ -151,11 +151,10 @@ const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
             <InboxOutlined />
           </p>
           <p className="ant-upload-text">
-            Click or drag file to this area to upload
+            Nhấp hoặc kéo thả file vào khu vực này để tải lên
           </p>
           <p className="ant-upload-hint">
-            Support for a single or bulk upload. Strictly prohibited from
-            uploading company data or other banned files.
+            Hỗ trợ tải lên file đơn hoặc số lượng lớn. Nghiêm cấm tải lên dữ liệu công ty hoặc các tập tin bị cấm khác.
           </p>
         </Dragger>
 

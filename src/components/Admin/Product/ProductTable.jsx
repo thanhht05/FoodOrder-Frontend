@@ -60,7 +60,7 @@ const ProductTable = () => {
   const handleDeleteProduct = async (id) => {
     const res = await callDeleteProduct(id);
     if (res && res.data) {
-      message.success("delete product success");
+      message.success("Xóa sản phẩm thành công");
     } else {
       notification.error({
         message: "Có lỗi xảy ra",
@@ -86,25 +86,25 @@ const ProductTable = () => {
       ),
     },
     {
-      title: "Name",
+      title: "Tên sản phẩm",
       dataIndex: "name",
       key: "name",
       sorter: true,
     },
     {
-      title: "Price",
+      title: "Giá",
       dataIndex: "price",
       key: "price",
       sorter: true,
     },
     {
-      title: "Quantity",
+      title: "Số lượng",
       key: "quantity",
       dataIndex: "quantity",
       sorter: true,
     },
     {
-      title: "Updated day",
+      title: "Ngày cập nhật",
       dataIndex: "updatedAt",
       key: "updatedAt",
       sorter: true,
@@ -112,10 +112,10 @@ const ProductTable = () => {
       render: (updatedAt) =>
         dayjs(updatedAt).isValid()
           ? dayjs(updatedAt).format("DD/MM/YYYY HH:mm")
-          : "Product chưa được cập nhật",
+          : "Sản phẩm chưa được cập nhật",
     },
     {
-      title: "Action",
+      title: "Thao tác",
       key: "action",
       render: (_, record) => {
         return (
@@ -125,16 +125,16 @@ const ProductTable = () => {
                 (setOpenModalUpdateProduct(true), setProductDataUpdate(record));
               }}
             >
-              Update
+              Cập nhật
             </a>
             <Popconfirm
-              title="Delete the pproduct"
-              description="Are you sure to delete this pproduct?"
+              title="Xóa sản phẩm"
+              description="Bạn có chắc chắn muốn xóa sản phẩm này không?"
               onConfirm={() => handleDeleteProduct(record.id)}
-              okText="Yes"
-              cancelText="No"
+              okText="Có"
+              cancelText="Không"
             >
-              <a style={{ marginLeft: "8px" }}>Delete</a>
+              <a style={{ marginLeft: "8px" }}>Xóa</a>
             </Popconfirm>
           </>
         );
@@ -161,10 +161,10 @@ const ProductTable = () => {
   const renderHeader = () => {
     return (
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <span>Table List Products</span>
+        <span>Danh sách sản phẩm</span>
         <span style={{ display: "flex", gap: 15 }}>
           <Button icon={<ExportOutlined />} type="primary">
-            Export
+            Xuất file
           </Button>
 
           <Button
@@ -172,7 +172,7 @@ const ProductTable = () => {
             icon={<CloudUploadOutlined />}
             type="primary"
           >
-            Import
+            Nhập file
           </Button>
 
           <Button

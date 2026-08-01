@@ -30,7 +30,7 @@ const FormSearch = ({ handleSearch, setFilter }) => {
     >
       <Row gutter={24}>
         <Col span={8}>
-          <Form.Item labelCol={{ span: 24 }} name={`keyword`} label={`Keyword`}>
+          <Form.Item labelCol={{ span: 24 }} name={`keyword`} label={`Từ khóa`}>
             <Input />
           </Form.Item>
         </Col>
@@ -38,14 +38,14 @@ const FormSearch = ({ handleSearch, setFilter }) => {
           <Form.Item
             labelCol={{ span: 24 }}
             name={`category`}
-            label={`Category`}
+            label={`Danh mục`}
           >
             <Input />
           </Form.Item>
         </Col>
 
         <Col span={8}>
-          <Form.Item labelCol={{ span: 24 }} name={`price`} label={`Price`}>
+          <Form.Item labelCol={{ span: 24 }} name={`price`} label={`Giá`}>
             <Input />
           </Form.Item>
         </Col>
@@ -53,7 +53,7 @@ const FormSearch = ({ handleSearch, setFilter }) => {
       <Row>
         <Col span={24} style={{ textAlign: "right" }}>
           <Button type="primary" htmlType="submit">
-            Search
+            Tìm kiếm
           </Button>
           <Button
             style={{ margin: "0 8px" }}
@@ -62,7 +62,7 @@ const FormSearch = ({ handleSearch, setFilter }) => {
               setFilter("");
             }}
           >
-            Clear
+            Làm mới
           </Button>
           {/* <a
                         style={{ fontSize: 12 }}

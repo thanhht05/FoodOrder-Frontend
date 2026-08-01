@@ -53,11 +53,11 @@ const ProductModalCreate = ({
   const beforeUpload = (file) => {
     const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
     if (!isJpgOrPng) {
-      message.error("You can only upload JPG/PNG file!");
+      message.error("Chỉ có thể tải lên tệp JPG/PNG!");
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-      message.error("Image must smaller than 2MB!");
+      message.error("Kích thước ảnh phải nhỏ hơn 2MB!");
     }
     return isJpgOrPng && isLt2M;
   };
@@ -143,7 +143,7 @@ const ProductModalCreate = ({
   return (
     <>
       <Modal
-        title="Basic Modal"
+        title="Thêm mới sản phẩm"
         closable={{ "aria-label": "Custom Close Button" }}
         open={openModalCreateProduct}
         onOk={() => {
@@ -156,15 +156,15 @@ const ProductModalCreate = ({
         <Form form={form} onFinish={onFinish} autoComplete="off" name="basic">
           <Form.Item
             name="name"
-            label="Name"
-            rules={[{ required: true, message: "Please input product name!" }]}
+            label="Tên sản phẩm"
+            rules={[{ required: true, message: "Vui lòng nhập tên sản phẩm!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="price"
-            label="Price"
-            rules={[{ required: true, message: "Please input price!" }]}
+            label="Giá"
+            rules={[{ required: true, message: "Vui lòng nhập giá!" }]}
           >
             <InputNumber
               min={0}
@@ -177,8 +177,8 @@ const ProductModalCreate = ({
           </Form.Item>
           <Form.Item
             name="quantity"
-            label="Quantity"
-            rules={[{ required: true, message: "Please input qantity!" }]}
+            label="Số lượng"
+            rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
           >
             <InputNumber
               min={0}
@@ -191,26 +191,26 @@ const ProductModalCreate = ({
 
           <Form.Item
             name="categoryName"
-            label="Category"
+            label="Danh mục"
             rules={[{ required: true, message: "Vui lòng chọn thể loại!" }]}
           >
             <Select
               showSearch={{
                 optionFilterProp: ["label", "otherField"],
               }}
-              placeholder="Select a category"
+              placeholder="Chọn danh mục"
               options={listCategory}
             />
           </Form.Item>
           <Form.Item
             name="description"
-            label="Description"
-            rules={[{ required: true, message: "Please input description!" }]}
+            label="Mô tả"
+            rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
           >
             <TextArea />
           </Form.Item>
 
-          <Form.Item name="file" label="Upload img">
+          <Form.Item name="file" label="Tải ảnh lên">
             <Upload
               multiple
               name="file"
@@ -227,7 +227,7 @@ const ProductModalCreate = ({
             >
               <div>
                 {loading ? <LoadingOutlined /> : <PlusOutlined />}
-                <div style={{ marginTop: 8 }}>Upload</div>
+                <div style={{ marginTop: 8 }}>Tải lên</div>
               </div>
             </Upload>
           </Form.Item>

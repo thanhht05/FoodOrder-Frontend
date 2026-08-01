@@ -106,7 +106,7 @@ const CheckoutPage = () => {
       }
       console.log("Res order", resOrder)
       if (resOrder?.data) {
-        message.success("Place an order successfully");
+        message.success("Đặt hàng thành công");
 
 
 

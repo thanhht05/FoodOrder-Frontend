@@ -93,7 +93,7 @@ const UserTable = () => {
       ),
     },
     {
-      title: "Fullname",
+      title: "Họ và tên",
       dataIndex: "fullName",
       key: "fullName",
       sorter: true,
@@ -104,12 +104,12 @@ const UserTable = () => {
       key: "email",
     },
     {
-      title: "Phone",
+      title: "Số điện thoại",
       key: "phone",
       dataIndex: "phone",
     },
     {
-      title: "Updated day",
+      title: "Ngày cập nhật",
       dataIndex: "updatedAt",
       key: "updatedAt",
       sorter: true,
@@ -117,10 +117,10 @@ const UserTable = () => {
       render: (updatedAt) =>
         dayjs(updatedAt).isValid()
           ? dayjs(updatedAt).format("DD/MM/YYYY HH:mm")
-          : "User chưa được cập nhật",
+          : "Người dùng chưa được cập nhật",
     },
     {
-      title: "Action",
+      title: "Thao tác",
       key: "action",
       render: (_, record) => {
         return (
@@ -131,16 +131,16 @@ const UserTable = () => {
                 setUserDataUpdate(record);
               }}
             >
-              Update
+              Cập nhật
             </a>
             <Popconfirm
-              title="Delete the user"
-              description="Are you sure to delete this user?"
+              title="Xóa người dùng"
+              description="Bạn có chắc chắn muốn xóa người dùng này không?"
               onConfirm={() => handleDeleteUser(record.id)}
-              okText="Yes"
-              cancelText="No"
+              okText="Có"
+              cancelText="Không"
             >
-              <a style={{ marginLeft: "8px" }}>Delete</a>
+              <a style={{ marginLeft: "8px" }}>Xóa</a>
             </Popconfirm>
           </>
         );
@@ -154,10 +154,10 @@ const UserTable = () => {
   const renderHeader = () => {
     return (
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <span>Table List Users</span>
+        <span>Danh sách người dùng</span>
         <span style={{ display: "flex", gap: 15 }}>
           <Button icon={<ExportOutlined />} type="primary">
-            Export
+            Xuất file
           </Button>
 
           <Button
@@ -165,7 +165,7 @@ const UserTable = () => {
             icon={<CloudUploadOutlined />}
             type="primary"
           >
-            Import
+            Nhập file
           </Button>
 
           <Button

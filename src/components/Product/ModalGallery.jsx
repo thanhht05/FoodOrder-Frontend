@@ -50,12 +50,12 @@ const ModalGallery = ({ images = [], productData }) => {
       );
       dispatch(getCartAPI());
     } else {
-      message.warning("Please login to add product to cart");
+      message.warning("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng");
       navigate("/login");
       return;
     }
 
-    message.success("Add product successfully");
+    message.success("Thêm sản phẩm thành công");
   };
   const variants = ["Nhỏ", "Vừa", "Lớn"]; // Mock data
 

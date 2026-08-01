@@ -25,7 +25,7 @@ const UserModalUpdate = ({
     setIsSubmit(true);
     const res = await callUpdateAUser(id, fullName, phone, point);
     if (res && res.data) {
-      message.success("Cập nhật user thành công");
+      message.success("Cập nhật người dùng thành công");
       setOpenModalUpdateUser(false);
       await fetchUser();
     } else {
@@ -39,7 +39,7 @@ const UserModalUpdate = ({
   return (
     <>
       <Modal
-        title="Update user"
+        title="Cập nhật người dùng"
         closable={{ "aria-label": "Custom Close Button" }}
         open={openModalUpdateUser}
         onOk={() => {
@@ -58,30 +58,30 @@ const UserModalUpdate = ({
           <Form.Item
             name="email"
             label="Email"
-            rules={[{ required: true, message: "Please input email!" }]}
+            rules={[{ required: true, message: "Vui lòng nhập email!" }]}
           >
             <Input disabled />
           </Form.Item>
           <Form.Item
             name="fullName"
-            label="FullName"
-            rules={[{ required: true, message: "Please input fullName!" }]}
+            label="Họ và tên"
+            rules={[{ required: true, message: "Vui lòng nhập họ và tên!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             validateTrigger="onBlur"
             name="point"
-            label="Point"
-            rules={[{ required: true, message: "Please enter point" }]}
+            label="Điểm"
+            rules={[{ required: true, message: "Vui lòng nhập điểm" }]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
             name="phone"
-            label="Phone"
-            rules={[{ required: true, message: "Please input phone!" }]}
+            label="Số điện thoại"
+            rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}
           >
             <Input />
           </Form.Item>

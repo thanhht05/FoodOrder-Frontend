@@ -22,11 +22,11 @@ const UserViewDetail = ({
   };
   return (
     <>
-      <Drawer title="User Detail" onClose={onClose} open={openViewDetail}>
+      <Drawer title="Chi tiết người dùng" onClose={onClose} open={openViewDetail}>
         {/* Header */}
         <Space align="center" style={{ marginBottom: 20 }}>
           {/* <Avatar size={64} icon={<UserOutlined />} /> */}
-          <h2>This is for user avatar </h2> <br />
+          <h2>Ảnh đại diện người dùng</h2> <br />
         </Space>
 
         <Divider />
@@ -34,28 +34,28 @@ const UserViewDetail = ({
         {/* Info */}
         <Descriptions bordered column={1} size="middle">
           <Descriptions.Item label="ID">{userDataDetail?.id}</Descriptions.Item>
-          <Descriptions.Item label="Fullname">
+          <Descriptions.Item label="Họ và tên">
             {userDataDetail?.fullName}
           </Descriptions.Item>
           <Descriptions.Item label="Email">
             {userDataDetail?.email}
           </Descriptions.Item>
 
-          <Descriptions.Item label="Telephone">
+          <Descriptions.Item label="Số điện thoại">
             {userDataDetail?.phone}
           </Descriptions.Item>
-          <Descriptions.Item label="Point">
+          <Descriptions.Item label="Điểm">
             {userDataDetail?.point}
           </Descriptions.Item>
-          <Descriptions.Item label="Role">
+          <Descriptions.Item label="Vai trò">
             {userDataDetail?.roleUser.name}
           </Descriptions.Item>
-          <Descriptions.Item label="Updated at">
+          <Descriptions.Item label="Cập nhật lúc">
             {dayjs(userDataDetail?.updatedAt).isValid()
               ? dayjs(userDataDetail?.updatedAt).format("DD/MM/YYYY HH:mm")
-              : "User chưa được cập nhật"}
+              : "Người dùng chưa được cập nhật"}
           </Descriptions.Item>
-          <Descriptions.Item label="Created at">
+          <Descriptions.Item label="Tạo lúc">
             {dayjs(userDataDetail?.createdAt).format("DD/MM/YYYY HH:mm")}
           </Descriptions.Item>
         </Descriptions>

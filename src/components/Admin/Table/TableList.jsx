@@ -94,19 +94,19 @@ const TableList = () => {
       ),
     },
     {
-      title: "Name",
+      title: "Tên bàn",
       dataIndex: "name",
       key: "name",
       sorter: true,
     },
     {
-      title: "Status",
+      title: "Trạng thái",
       dataIndex: "tableStatus",
       key: "tableStatus",
     },
 
     {
-      title: "Updated day",
+      title: "Ngày cập nhật",
       dataIndex: "updatedAt",
       key: "updatedAt",
       sorter: true,
@@ -114,10 +114,10 @@ const TableList = () => {
       render: (updatedAt) =>
         dayjs(updatedAt).isValid()
           ? dayjs(updatedAt).format("DD/MM/YYYY HH:mm")
-          : "User chưa được cập nhật",
+          : "Bàn chưa được cập nhật",
     },
     {
-      title: "Action",
+      title: "Thao tác",
       key: "action",
       render: (_, record) => {
         return (
@@ -128,16 +128,16 @@ const TableList = () => {
                 setUserDataUpdate(record);
               }}
             >
-              Update
+              Cập nhật
             </a>
             <Popconfirm
-              title="Delete the user"
-              description="Are you sure to delete this user?"
+              title="Xóa bàn"
+              description="Bạn có chắc chắn muốn xóa bàn này không?"
               onConfirm={() => handleDeleteUser(record.id)}
-              okText="Yes"
-              cancelText="No"
+              okText="Có"
+              cancelText="Không"
             >
-              <a style={{ marginLeft: "8px" }}>Delete</a>
+              <a style={{ marginLeft: "8px" }}>Xóa</a>
             </Popconfirm>
           </>
         );
@@ -152,10 +152,10 @@ const TableList = () => {
   const renderHeader = () => {
     return (
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <span>Table List Users</span>
+        <span>Danh sách bàn</span>
         <span style={{ display: "flex", gap: 15 }}>
           <Button icon={<ExportOutlined />} type="primary">
-            Export
+            Xuất file
           </Button>
 
           <Button
@@ -163,7 +163,7 @@ const TableList = () => {
             icon={<CloudUploadOutlined />}
             type="primary"
           >
-            Import
+            Nhập file
           </Button>
 
           <Button
@@ -180,7 +180,7 @@ const TableList = () => {
   const handleDeleteUser = async (userID) => {
     const res = await callDeleteUser(userID);
     if (res && res.data) {
-      message.success("Xóa user thành công");
+      message.success("Xóa bàn thành công");
       fetchTable();
     } else {
       notification.error({
