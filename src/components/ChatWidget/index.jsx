@@ -1,6 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Input, Button } from "antd";
-import { MessageOutlined, CloseOutlined, SendOutlined, ExpandAltOutlined, ShrinkOutlined } from "@ant-design/icons";
+import {
+  MessageOutlined,
+  CloseOutlined,
+  SendOutlined,
+  ExpandAltOutlined,
+  ShrinkOutlined,
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { callChatAI } from "../../services/api";
 import "./chat.scss";
@@ -10,7 +16,7 @@ const formatText = (text) => {
   if (!text) return null;
   const parts = text.split(/(\*\*.*?\*\*)/g);
   return parts.map((part, index) => {
-    if (part.startsWith('**') && part.endsWith('**')) {
+    if (part.startsWith("**") && part.endsWith("**")) {
       return <strong key={index}>{part.slice(2, -2)}</strong>;
     }
     return <span key={index}>{part}</span>;
@@ -43,19 +49,23 @@ const ChatWidget = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (isOpen && widgetRef.current && !widgetRef.current.contains(event.target)) {
+      if (
+        isOpen &&
+        widgetRef.current &&
+        !widgetRef.current.contains(event.target)
+      ) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isOpen]);
 
   const handleSend = async () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim()) return; // if (inputValue.trim() === "") check empty string
 
     const userText = inputValue;
     const newUserMsg = {
@@ -78,7 +88,7 @@ const ChatWidget = () => {
             id: Date.now() + 1,
             sender: "agent",
             text: aiData.message,
-            products: aiData.products || []
+            products: aiData.products || [],
           },
         ]);
       } else {
@@ -99,7 +109,7 @@ const ChatWidget = () => {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSend();
     }
   };
@@ -155,7 +165,9 @@ const ChatWidget = () => {
   return (
     <div className="chat-widget-container" ref={widgetRef}>
       {/* Chat Window */}
-      <div className={`chat-window ${isOpen ? "open" : ""} ${isExpanded ? "expanded" : ""}`}>
+      <div
+        className={`chat-window ${isOpen ? "open" : ""} ${isExpanded ? "expanded" : ""}`}
+      >
         <div className="chat-header">
           <div className="header-title">
             <span className="status-indicator"></span>
@@ -163,11 +175,23 @@ const ChatWidget = () => {
           </div>
           <div className="header-actions">
             {isExpanded ? (
-              <ShrinkOutlined className="action-btn" onClick={() => setIsExpanded(false)} title="Thu nhỏ" />
+              <ShrinkOutlined
+                className="action-btn"
+                onClick={() => setIsExpanded(false)}
+                title="Thu nhỏ"
+              />
             ) : (
-              <ExpandAltOutlined className="action-btn" onClick={() => setIsExpanded(true)} title="Phóng to" />
+              <ExpandAltOutlined
+                className="action-btn"
+                onClick={() => setIsExpanded(true)}
+                title="Phóng to"
+              />
             )}
-            <CloseOutlined className="action-btn close-btn" onClick={() => setIsOpen(false)} title="Đóng" />
+            <CloseOutlined
+              className="action-btn close-btn"
+              onClick={() => setIsOpen(false)}
+              title="Đóng"
+            />
           </div>
         </div>
 
@@ -175,21 +199,31 @@ const ChatWidget = () => {
           {messages.map((msg) => (
             <div key={msg.id} className={`message-wrapper ${msg.sender}`}>
               <div className={`message ${msg.sender}`}>
-                <div style={{ whiteSpace: 'pre-wrap' }}>{formatText(msg.text)}</div>
+                <div style={{ whiteSpace: "pre-wrap" }}>
+                  {formatText(msg.text)}
+                </div>
               </div>
               {msg.products && msg.products.length > 0 && (
                 <div className="recommended-products">
-                  {msg.products.map(p => (
+                  {msg.products.map((p) => (
                     <div
                       key={p.id}
                       className="chat-product-card"
                       onClick={() => handleRedirectBook(p)}
                       title="Xem chi tiết"
                     >
-                      <img src={`${import.meta.env.VITE_BACKEND_URL}/upload/${p.img}`} alt={p.name} />
+                      <img
+                        src={`${import.meta.env.VITE_BACKEND_URL}/upload/${p.img}`}
+                        alt={p.name}
+                      />
                       <div className="info">
                         <div className="name">{p.name}</div>
-                        <div className="price">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price)}</div>
+                        <div className="price">
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(p.price)}
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -197,11 +231,7 @@ const ChatWidget = () => {
               )}
             </div>
           ))}
-          {isTyping && (
-            <div className="typing-indicator">
-              Nhân viên đang gõ...
-            </div>
-          )}
+          {isTyping && <div className="typing-indicator">Đang tìm kiếm...</div>}
           <div ref={messagesEndRef} />
         </div>
 

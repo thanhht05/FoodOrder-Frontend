@@ -45,34 +45,40 @@ instance.interceptors.response.use(
     return response;
   },
   async function (error) {
-    if (
-      error.config &&
-      error.response &&
-      +error.response.status === 401 &&
-      !error.config.headers[NO_RETRY_HEADER]
-    ) {
-      const access_token = await handleRefreshToken();
-      error.config.headers[NO_RETRY_HEADER] = "true";
-      if (access_token) {
-        error.config.headers["Authorization"] = `Bearer ${access_token}`;
+    const originalRequest = error.config;
 
-        localStorage.setItem("access_token", access_token);
-        return instance.request(error.config);
+    if (
+      originalRequest &&
+      error.response?.status === 401 &&
+      originalRequest.url !== "/api/v1/auth/refreshToken" &&
+      !originalRequest.headers[NO_RETRY_HEADER]
+    ) {
+      originalRequest.headers[NO_RETRY_HEADER] = "true";
+
+      try {
+        const accessToken = await handleRefreshToken();
+
+        if (accessToken) {
+          localStorage.setItem("access_token", accessToken);
+
+          originalRequest.headers.Authorization =
+            `Bearer ${accessToken}`;
+
+          return instance.request(originalRequest);
+        }
+      } catch (refreshError) {
+        localStorage.removeItem("access_token");
+
+        if (window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
+
+        return Promise.reject(refreshError);
       }
     }
 
-    if (
-      error.config &&
-      error.response &&
-      +error.response.status === 400 &&
-      error.config.url === "/api/v1/auth/refreshToken" // nếu refresh token hết hạn thì đá qua login
-    ) {
-      if (window.location.pathname !== "/") {
-        window.location.href = "/login";
-      }
-    }
     return Promise.reject(error);
-  },
+  }
 );
 // instance.interceptors.response.use(
 //   (response) => {

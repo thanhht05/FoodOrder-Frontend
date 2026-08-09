@@ -11,10 +11,10 @@ import { useDispatch } from "react-redux";
 const { Title, Text } = Typography;
 
 const PaymentPage = () => {
-  const { orderId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
+  const { orderId } = useParams();
   const [orderTotal, setOrderTotal] = useState(location.state?.total || 1250000);
   const dispatch = useDispatch()
 
@@ -51,7 +51,6 @@ const PaymentPage = () => {
 
     const token = window.localStorage.getItem("access_token") || "";
     const socketUrl = import.meta.env.VITE_BACKEND_URL + "/ws" + (token ? `?token=${token}&access_token=${token}` : "");
-    console.log("Socket URL:", socketUrl);
     const stompClient = new Client({
       webSocketFactory: () => new SockJS(socketUrl),
       connectHeaders: {
@@ -59,13 +58,10 @@ const PaymentPage = () => {
       },
       reconnectDelay: 5000,
       onConnect: () => {
-        console.log("Connected to WebSocket for order:", orderId);
         stompClient.subscribe(`/topic/order/${orderId}`, (msg) => {
-          console.log("Websocket message:", msg)
           if (msg.body) {
             try {
               const data = JSON.parse(msg.body);
-              console.log(" JSON.parse(msg.body);", data)
               if (data.status === "PAID") {
                 message.success("Thanh toán thành công");
                 dispatch(clearCart())

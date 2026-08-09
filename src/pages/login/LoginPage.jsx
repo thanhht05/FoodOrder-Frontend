@@ -16,7 +16,7 @@ import {
   GoogleOutlined,
   FacebookFilled,
 } from "@ant-design/icons";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { doLoginAction } from "../../redux/slices/account/accountSlice";
 import { callLogin } from "../../services/api";
 import "./loginPage.scss";
@@ -29,7 +29,6 @@ const LoginPage = () => {
   const [isSubmit, setIsSubmit] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const localCart = useSelector((state) => state.cart.items);
   const onFinish = async (values) => {
     try {
       setIsSubmit(true); // Bật loading khi bắt đầu submit

@@ -48,7 +48,7 @@ const CartPage = () => {
   };
 
   const handleDecrease = (item) => {
-    if (item.quantity <= 0) {
+    if (item.quantity <= 1) {
       return;
     }
     dispatch(

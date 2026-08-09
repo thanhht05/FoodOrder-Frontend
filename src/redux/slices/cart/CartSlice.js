@@ -1,7 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { addToCartAPI } from "../../thunk/addToCartAPI";
 import { getCartAPI } from "../../thunk/getCartThunk";
-import { IdcardFilled } from "@ant-design/icons";
 import { updateCartAPI } from "../../thunk/updateCartAPI";
 
 const initialState = {

@@ -209,25 +209,6 @@ const ModalGallery = ({ images = [], productData }) => {
               >
                 THÊM VÀO GIỎ HÀNG
               </Button>
-              <Button
-                type="primary"
-                size="large"
-                block
-                icon={<ShoppingCartOutlined style={{ fontSize: "20px" }} />}
-                className="btn-add-cart buy-now-btn"
-                onClick={() =>
-                  navigate("/checkout", {
-                    state: {
-                      buyNowItem: {
-                        productData,
-                        quantity: 1,
-                      },
-                    },
-                  })
-                }
-              >
-                MUA NGAY
-              </Button>
             </div>
             <Text type="secondary" className="ship-note">
               * Miễn phí vận chuyển cho đơn hàng từ 500k

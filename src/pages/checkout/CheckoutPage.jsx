@@ -37,7 +37,6 @@ const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const CheckoutPage = () => {
-  const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -59,7 +58,6 @@ const CheckoutPage = () => {
       },
     ]
     : cartItems;
-  console.log("checkoutItems", checkoutItems);
 
   const total = checkoutItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -104,16 +102,14 @@ const CheckoutPage = () => {
           paymentMethod,
         );
       }
-      console.log("Res order", resOrder)
       if (resOrder?.data) {
         message.success("Đặt hàng thành công");
-
-
-
         const newOrderId = resOrder.data?.orderId;
         if (paymentMethod === "qr") {
+          dispatch(clearCart());
           navigate(`/payment/${newOrderId}`, { state: { total } });
         } else {
+          dispatch(clearCart());
           navigate("/order-history");
         }
       }

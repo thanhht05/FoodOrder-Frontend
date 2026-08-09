@@ -35,6 +35,7 @@ import OrderConfirmPage from "./pages/admin/order/OrderConfirmPage";
 import OrderHistory from "./pages/history/OrderHistoryPage";
 import ChatWidget from "./components/ChatWidget";
 import { getCartAPI } from "./redux/thunk/getCartThunk";
+import ProfilePage from "./pages/profile/ProfilePage";
 
 const Layout = () => {
   return (
@@ -114,6 +115,14 @@ function App() {
           element: (
             <ProtectedRoute>
               <OrderHistory />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "profile",
+          element: (
+            <ProtectedRoute>
+              <ProfilePage />
             </ProtectedRoute>
           ),
         },

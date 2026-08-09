@@ -218,4 +218,12 @@ export const callChatAI = (message) => {
   return axios.post('/api/v1/ai/chat', { message });
 };
 
-
+export const callChangePassword = (oldPassword, newPassword, confirmPassword) => {
+  const URL = "/api/v1/auth/changePassword";
+  const data = {
+    oldPassword,
+    newPassword,
+    confirmPassword,
+  };
+  return axios.post(URL, data);
+};
