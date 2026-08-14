@@ -25,7 +25,7 @@ import ManageUserPage from "./pages/admin/user";
 import ManageProductPage from "./pages/admin/product";
 import Home from "./components/Home";
 import ProductPage from "./pages/product";
-import CartPage from "./pages/Cart/CartPage";
+import CartPage from "./pages/cart/CartPage";
 import CheckoutPage from "./pages/checkout/CheckoutPage";
 import PaymentPage from "./pages/payment/PaymentPage";
 import ManageTablePage from "./pages/admin/table";

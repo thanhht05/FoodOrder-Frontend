@@ -48,7 +48,9 @@ const ManageOrderPage = () => {
           if (msg.body) {
             try {
               const data = JSON.parse(msg.body);
-              if (data.status === "PAID" || data.paymentStatus === "PAID" || data.message) {
+              debugger
+
+              if (data.status === "PAID" || data.paymentStatus === "PAID" || data.message || data.paymentStatus === "UNPAID") {
                 message.info(`Có cập nhật đơn hàng mới!`);
                 if (isSoundEnabledRef.current) {
                   const audio = new Audio('/notification.mp3');
@@ -196,11 +198,11 @@ const ManageOrderPage = () => {
         <h2>Quản lý đơn hàng</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <SoundOutlined style={{ fontSize: '18px', color: isSoundEnabled ? '#1890ff' : '#999' }} />
-          <Switch 
-             checked={isSoundEnabled} 
-             onChange={handleToggleSound} 
-             checkedChildren="Bật âm báo" 
-             unCheckedChildren="Tắt âm báo"
+          <Switch
+            checked={isSoundEnabled}
+            onChange={handleToggleSound}
+            checkedChildren="Bật âm báo"
+            unCheckedChildren="Tắt âm báo"
           />
         </div>
       </div>

@@ -44,29 +44,14 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
   const cartItems = useSelector((state) => state.cart.items);
 
-  let buyNowItem = location.state?.buyNowItem;
+  const dispatch = useDispatch()
 
-  const checkoutItems = buyNowItem
-    ? [
-      {
-        id: buyNowItem.productData.id,
-        name: buyNowItem.productData.name,
-        price: buyNowItem.productData.price,
-        categoryName: buyNowItem.productData.productCate.name,
-        img: buyNowItem.productData.lstImg?.[0]?.name,
-        quantity: buyNowItem.quantity,
-      },
-    ]
-    : cartItems;
-
-  const total = checkoutItems.reduce(
+  const total = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0,
   );
 
-  const cartDetailIds = buyNowItem
-    ? []
-    : checkoutItems.map((item) => item.cartDetailId);
+  const cartDetailIds = cartItems.map((item) => item.cartDetailId);
 
 
   const onFinish = async (values) => {
@@ -84,24 +69,14 @@ const CheckoutPage = () => {
     try {
       let resOrder;
 
-      if (buyNowItem) {
-        // API BUY NOW
-        resOrder = await callBuyNowItem(
-          buyNowItem.productData.id,
-          buyNowItem.quantity,
-          buyNowItem.productData.price,
-          paymentMethod,
-          table?.id,
-        );
-      } else {
-        // API CART CHECKOUT
-        resOrder = await callPlaceAnOrder(
-          cartDetailIds,
-          table?.id,
-          values.note,
-          paymentMethod,
-        );
-      }
+
+      // API CART CHECKOUT
+      resOrder = await callPlaceAnOrder(
+        cartDetailIds,
+        table?.id,
+        values.note,
+        paymentMethod,
+      );
       if (resOrder?.data) {
         message.success("Đặt hàng thành công");
         const newOrderId = resOrder.data?.orderId;
@@ -217,7 +192,7 @@ const CheckoutPage = () => {
               </Title>
 
               <div className="order-items">
-                {checkoutItems.map((item, index) => (
+                {cartItems.map((item, index) => (
                   // Đưa item-row vào trong vòng lặp và thêm key
                   <div
                     className="item-row"

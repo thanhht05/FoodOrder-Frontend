@@ -160,8 +160,8 @@ export const callPlaceAnOrder = (
   const data = {
     cartDetailIds,
     tableId,
-    note,
     paymentMethod,
+    note,
   };
   return axios.post(URL, data);
 };

@@ -15,7 +15,8 @@ export const addToCartAPI = createAsyncThunk(
           withCredentials: true,
         },
       );
-      return res;
+      debugger
+      return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || "Add to cart failed");
     }

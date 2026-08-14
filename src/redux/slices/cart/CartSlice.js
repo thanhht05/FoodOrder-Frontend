@@ -14,7 +14,6 @@ export const cartSlice = createSlice({
 
     clearCart: (state) => {
       state.items = [];
-      state.isGuestCart = true;
     },
 
 
@@ -24,31 +23,83 @@ export const cartSlice = createSlice({
 
       // add procut to cart API
       .addCase(addToCartAPI.fulfilled, (state, action) => {
-        const data = action.payload.data;
-        state.items = data.productsInnerCartDetail || [];
+        const data = action.payload;
+
+
+        state.totalPrice = data.totalPrice;
+        state.totalQuantity = data.totalQuantity;
+
+        state.items = data.lst.map((item) => ({
+          cartDetailId: item.cartDetailId,
+
+          // số lượng user thêm vào cart
+          quantity: item.quantity,
+
+          // thông tin product
+          id: item.productsInnerCartDetail.id,
+          name: item.productsInnerCartDetail.name,
+          price: item.productsInnerCartDetail.price,
+          categoryName: item.productsInnerCartDetail.categoryName,
+          img: item.productsInnerCartDetail.img,
+
+          // số lượng tồn kho
+          stockQuantity: item.productsInnerCartDetail.quantity,
+
+        }));
 
       })
       .addCase(updateCartAPI.fulfilled, (state, action) => {
-        state.items = action.payload.data.productsInnerCartDetail || [];
+        const data = action.payload;
+
+
+        state.totalPrice = data.totalPrice;
+        state.totalQuantity = data.totalQuantity;
+
+        state.items = data.lst.map((item) => ({
+          cartDetailId: item.cartDetailId,
+
+          // số lượng user thêm vào cart
+          quantity: item.quantity,
+
+          // thông tin product
+          id: item.productsInnerCartDetail.id,
+          name: item.productsInnerCartDetail.name,
+          price: item.productsInnerCartDetail.price,
+          categoryName: item.productsInnerCartDetail.categoryName,
+          img: item.productsInnerCartDetail.img,
+
+          // số lượng tồn kho
+          stockQuantity: item.productsInnerCartDetail.quantity,
+
+        }));
       })
 
       // get cart detail. load data from db to redux
       .addCase(getCartAPI.fulfilled, (state, action) => {
         const data = action.payload;
 
-        state.items =
-          data?.results?.map((item) => ({
-            cartDetailId: item.cartDetailId,
-            id: item.id,
-            name: item.name,
-            price: item.price,
-            categoryName: item.categoryName,
-            img: item.img,
-            quantity: item.quantity,
-          })) || [];
+        state.totalPrice = data.totalPrice;
+        state.totalQuantity = data.totalQuantity;
 
+        state.items = data.lst.map((item) => ({
+          cartDetailId: item.cartDetailId,
+
+          // số lượng user thêm vào cart
+          quantity: item.quantity,
+
+          // thông tin product
+          id: item.productsInnerCartDetail.id,
+          name: item.productsInnerCartDetail.name,
+          price: item.productsInnerCartDetail.price,
+          categoryName: item.productsInnerCartDetail.categoryName,
+          img: item.productsInnerCartDetail.img,
+
+          // số lượng tồn kho
+          stockQuantity: item.productsInnerCartDetail.quantity,
+
+        }));
         state.loading = false;
-      });
+      })
   },
 });
 export const { clearCart } =
