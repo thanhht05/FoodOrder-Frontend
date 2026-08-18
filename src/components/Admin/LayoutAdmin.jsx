@@ -18,6 +18,7 @@ import {
   HomeOutlined,
   TableOutlined,
   ShoppingCartOutlined,
+  MessageOutlined,
 } from "@ant-design/icons";
 import "./layoutAdmin.scss";
 import { useState } from "react";
@@ -36,6 +37,7 @@ const AdminLayout = () => {
     if (location.pathname === "/admin/order") return "5";
     if (location.pathname === "/admin/order-confirm") return "5-confirm";
     if (location.pathname === "/admin/order-cancel") return "5-cancel";
+    if (location.pathname.startsWith("/admin/chat")) return "chat";
     return "1";
   };
   const [collapsed, setCollapsed] = useState(false);
@@ -94,6 +96,11 @@ const AdminLayout = () => {
                   label: <Link to="/admin/order-cancel">Đơn đã hủy</Link>,
                 }
               ]
+            },
+            {
+              key: "chat",
+              icon: <MessageOutlined />,
+              label: <Link to="/admin/chat">Tin nhắn</Link>,
             },
             { key: "6", icon: <SettingOutlined />, label: "Cấu hình" },
           ]}

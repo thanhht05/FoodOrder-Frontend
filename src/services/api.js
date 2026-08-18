@@ -227,3 +227,19 @@ export const callChangePassword = (oldPassword, newPassword, confirmPassword) =>
   };
   return axios.post(URL, data);
 };
+
+export const callCreateConversation = () => {
+  return axios.post('/api/v1/conversations');
+};
+
+export const callFetchAdminMessages = (conversationId) => {
+  return axios.get(`/api/v1/conversations/${conversationId}/messages`);
+};
+
+export const callFetchAllConversations = () => {
+  return axios.get('/api/v1/conversations');
+};
+
+export const callCloseConversation = (conversationId) => {
+  return axios.put(`/api/v1/conversations/${conversationId}`);
+};

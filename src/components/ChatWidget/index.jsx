@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
-import { Input, Button } from "antd";
+import { useState, useRef, useEffect } from "react";
+import { Input, message, Button } from "antd";
 import {
   MessageOutlined,
   CloseOutlined,
@@ -8,7 +8,9 @@ import {
   ShrinkOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { callChatAI } from "../../services/api";
+import { callChatAI, callCreateConversation, callFetchAdminMessages } from "../../services/api";
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 import "./chat.scss";
 
 // Simple markdown formatter to handle **bold** text
@@ -26,15 +28,24 @@ const formatText = (text) => {
 const ChatWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [activeTab, setActiveTab] = useState("ai"); // 'ai' or 'admin'
   const [inputValue, setInputValue] = useState("");
-  const [messages, setMessages] = useState([
+
+  // AI Chat State
+  const [aiMessages, setAiMessages] = useState([
     {
       id: 1,
       sender: "agent",
       text: "Xin chào! Cảm ơn bạn đã ghé thăm. Tôi có thể giúp gì cho bạn hôm nay? (VD: Hỗ trợ thanh toán, Kiểm tra đơn hàng...)",
     },
   ]);
-  const [isTyping, setIsTyping] = useState(false);
+  const [isTypingAI, setIsTypingAI] = useState(false);
+
+  // Admin Chat State
+  const [adminMessages, setAdminMessages] = useState([]);
+  const [conversationId, setConversationId] = useState(null);
+  const stompClientRef = useRef(null);
+
   const messagesEndRef = useRef(null);
   const widgetRef = useRef(null);
   const navigate = useNavigate();
@@ -45,7 +56,7 @@ const ChatWidget = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isTyping]);
+  }, [aiMessages, adminMessages, isTypingAI, activeTab]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -64,25 +75,89 @@ const ChatWidget = () => {
     };
   }, [isOpen]);
 
-  const handleSend = async () => {
-    if (!inputValue.trim()) return; // if (inputValue.trim() === "") check empty string
+  // STOMP WebSocket Connection for Admin Chat
+  useEffect(() => {
+    const token = window.localStorage.getItem("access_token") || "";
+    // Only init if we are on admin tab, open, and logged in
+    if (isOpen && activeTab === "admin" && token) {
+      const initAdminChat = async () => {
+        try {
+          const res = await callCreateConversation();
+          if (res?.data?.id) {
+            const convId = res.data.id;
+            setConversationId(convId);
 
-    const userText = inputValue;
-    const newUserMsg = {
-      id: Date.now(),
-      sender: "user",
-      text: userText,
+            // Fetch history
+            const historyRes = await callFetchAdminMessages(convId);
+            if (historyRes?.data) {
+              const mappedHistory = historyRes.data.map(msg => ({
+                id: msg.id,
+                sender: msg.senderId === res.data.userId ? "user" : "agent",
+                text: msg.content
+              }));
+              setAdminMessages(mappedHistory);
+            }
+
+            // Connect to WebSocket
+            const socketUrl = import.meta.env.VITE_BACKEND_URL + "/ws";
+
+            const stompClient = new Client({
+              webSocketFactory: () => new SockJS(socketUrl),
+              connectHeaders: {
+                Authorization: `Bearer ${token}`
+              },
+              reconnectDelay: 5000,
+              onConnect: () => {
+                console.log("Connected to Admin Chat WebSocket");
+                stompClient.subscribe(`/topic/chat/${convId}`, (msg) => {
+                  if (msg.body) {
+                    const data = JSON.parse(msg.body);
+                    // Prevent duplicate if it's our own message (handled via local state append already)
+                    if (data.senderId !== res.data.userId) {
+                      ((prev) => [...prev, {
+                        id: data.id || Date.now(),
+                        sender: "agent",
+                        text: data.content
+                      }]);
+                    }
+                  }
+                });
+              },
+            });
+            stompClient.activate();
+            stompClientRef.current = stompClient;
+          }
+        } catch (error) {
+          console.error("Failed to initialize admin chat", error);
+        }
+      };
+
+      if (!conversationId) {
+        initAdminChat();
+      }
+    } else if (isOpen && activeTab === "admin" && !token) {
+      message.warning("Vui lòng đăng nhập để chat với Admin");
+      setActiveTab("ai");
+    }
+
+    return () => {
+      // Cleanup happens when modal closes or switching out of admin (optional: we can keep connection alive, but closing on tab switch saves resources)
+      if (!isOpen && stompClientRef.current) {
+        stompClientRef.current.deactivate();
+        stompClientRef.current = null;
+        setConversationId(null);
+      }
     };
+  }, [isOpen, activeTab]);
 
-    setMessages((prev) => [...prev, newUserMsg]);
-    setInputValue("");
-    setIsTyping(true);
-
+  const handleSendAI = async (userText) => {
+    setAiMessages((prev) => [...prev, { id: Date.now(), sender: "user", text: userText }]);
+    setIsTypingAI(true);
     try {
       const res = await callChatAI(userText);
       const aiData = res?.data;
       if (aiData) {
-        setMessages((prev) => [
+        setAiMessages((prev) => [
           ...prev,
           {
             id: Date.now() + 1,
@@ -95,7 +170,7 @@ const ChatWidget = () => {
         throw new Error("Invalid response format");
       }
     } catch (error) {
-      setMessages((prev) => [
+      setAiMessages((prev) => [
         ...prev,
         {
           id: Date.now() + 1,
@@ -104,7 +179,37 @@ const ChatWidget = () => {
         },
       ]);
     } finally {
-      setIsTyping(false);
+      setIsTypingAI(false);
+    }
+  };
+
+  const handleSendAdmin = (userText) => {
+    if (!conversationId || !stompClientRef.current || !stompClientRef.current.connected) {
+      message.error("Đang kết nối đến Admin, vui lòng thử lại sau.");
+      return;
+    }
+
+    ((prev) => [...prev, { id: Date.now(), sender: "user", text: userText }]);
+
+    stompClientRef.current.publish({
+      destination: `/app/chat/${conversationId}`,
+      body: JSON.stringify({
+        conversationId: conversationId,
+        content: userText
+      })
+    });
+  };
+
+  const handleSend = () => {
+    if (!inputValue.trim()) return;
+
+    const userText = inputValue;
+    setInputValue("");
+
+    if (activeTab === "ai") {
+      handleSendAI(userText);
+    } else {
+      handleSendAdmin(userText);
     }
   };
 
@@ -135,6 +240,7 @@ const ChatWidget = () => {
     str = str.replace(/\u02C6|\u0306|\u031B/g, ""); // Â, Ê, Ă, Ơ, Ư
     return str;
   };
+
   // dùng để tạo URL đẹp (SEO-friendly URL) từ tên sản phẩm
   const convertSlug = (str) => {
     str = nonAccentVietnamese(str);
@@ -162,6 +268,9 @@ const ChatWidget = () => {
     const slug = convertSlug(product.name);
     navigate(`/product/${slug}?id=${product.id}`);
   };
+
+  const currentMessages = activeTab === "ai" ? aiMessages : adminMessages;
+
   return (
     <div className="chat-widget-container" ref={widgetRef}>
       {/* Chat Window */}
@@ -195,8 +304,24 @@ const ChatWidget = () => {
           </div>
         </div>
 
+        {/* Tab Switcher */}
+        <div className="chat-tabs">
+          <div
+            className={`chat-tab ${activeTab === 'ai' ? 'active' : ''}`}
+            onClick={() => setActiveTab('ai')}
+          >
+            Chat với AI
+          </div>
+          <div
+            className={`chat-tab ${activeTab === 'admin' ? 'active' : ''}`}
+            onClick={() => setActiveTab('admin')}
+          >
+            Chat với Admin
+          </div>
+        </div>
+
         <div className="chat-body">
-          {messages.map((msg) => (
+          {currentMessages.map((msg) => (
             <div key={msg.id} className={`message-wrapper ${msg.sender}`}>
               <div className={`message ${msg.sender}`}>
                 <div style={{ whiteSpace: "pre-wrap" }}>
@@ -231,14 +356,14 @@ const ChatWidget = () => {
               )}
             </div>
           ))}
-          {isTyping && <div className="typing-indicator">Đang tìm kiếm...</div>}
+          {activeTab === "ai" && isTypingAI && <div className="typing-indicator">Đang tìm kiếm...</div>}
           <div ref={messagesEndRef} />
         </div>
 
         <div className="chat-footer">
           <div className="input-wrapper">
             <Input
-              placeholder="Nhập tin nhắn..."
+              placeholder={activeTab === "ai" ? "Hỏi AI..." : "Nhắn tin cho Admin..."}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={handleKeyPress}

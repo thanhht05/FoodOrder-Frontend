@@ -36,6 +36,7 @@ import OrderHistory from "./pages/history/OrderHistoryPage";
 import ChatWidget from "./components/ChatWidget";
 import { getCartAPI } from "./redux/thunk/getCartThunk";
 import ProfilePage from "./pages/profile/ProfilePage";
+import AdminChatPage from "./pages/admin/chat";
 
 const Layout = () => {
   return (
@@ -187,6 +188,14 @@ function App() {
           element: (
             <ProtectedRoute roles={["ADMIN"]}>
               <OrderConfirmPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "chat",
+          element: (
+            <ProtectedRoute roles={["ADMIN"]}>
+              <AdminChatPage />
             </ProtectedRoute>
           ),
         },

@@ -83,6 +83,34 @@
       }
     }
 
+    .chat-tabs {
+      display: flex;
+      background: #f0f0f0;
+      border-bottom: 1px solid #e2e8f0;
+
+      .chat-tab {
+        flex: 1;
+        text-align: center;
+        padding: 10px 0;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: #8c8c8c;
+        transition: all 0.3s ease;
+        border-bottom: 2px solid transparent;
+
+        &.active {
+          color: #ff4d4f;
+          border-bottom: 2px solid #ff4d4f;
+          background: #fff;
+        }
+
+        &:hover:not(.active) {
+          color: #333;
+        }
+      }
+    }
+
     .chat-body {
       flex: 1;
       background: #f8fafc;
