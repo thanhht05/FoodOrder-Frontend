@@ -44,6 +44,7 @@ const ChatWidget = () => {
   // Admin Chat State
   const [adminMessages, setAdminMessages] = useState([]);
   const [conversationId, setConversationId] = useState(null);
+  const [conversationStatus, setConversationStatus] = useState("OPEN");
   const stompClientRef = useRef(null);
 
   const messagesEndRef = useRef(null);
@@ -75,77 +76,95 @@ const ChatWidget = () => {
     };
   }, [isOpen]);
 
+  const initAdminChat = async () => {
+    const token = window.localStorage.getItem("access_token") || "";
+    if (!token) return;
+
+    try {
+      debugger
+      const res = await callCreateConversation();
+      if (res?.data?.id) {
+        const convId = res.data.id;
+        setConversationId(convId);
+        setConversationStatus(res.data.status || "OPEN");
+
+        // Fetch history
+        const historyRes = await callFetchAdminMessages(convId);
+        if (historyRes?.data) {
+          const mappedHistory = historyRes.data.map(msg => ({
+            id: msg.id,
+            sender: msg.senderId === res.data.userId ? "user" : "agent",
+            text: msg.content,
+            isRead: msg.isRead || msg.read || false
+          }));
+          setAdminMessages(mappedHistory);
+
+          // Mark as read after fetching history
+          callMarkMessagesAsRead(convId).catch(console.error);
+        }
+
+        // Clean old subscription if exists
+        if (stompClientRef.current) {
+          stompClientRef.current.deactivate();
+        }
+
+        // Connect to WebSocket
+        const socketUrl = import.meta.env.VITE_BACKEND_URL + "/ws";
+
+        const stompClient = new Client({
+          webSocketFactory: () => new SockJS(socketUrl),
+          connectHeaders: {
+            Authorization: `Bearer ${token}`
+          },
+          reconnectDelay: 5000,
+          onConnect: () => {
+            console.log("Connected to Admin Chat WebSocket");
+            stompClient.subscribe(`/topic/chat/${convId}`, (msg) => {
+              if (msg.body) {
+                const data = JSON.parse(msg.body);
+                debugger
+
+                if (data.content === "SYSTEM_CONVERSATION_CLOSED") {
+                  setConversationStatus("CLOSED");
+                  message.info("Admin đã kết thúc cuộc trò chuyện.");
+                  return;
+                }
+
+                const senderRole = data.senderId === res.data.userId ? "user" : "agent";
+                setAdminMessages((prev) => {
+                  if (prev.find(m => m.id === data.id)) return prev;
+                  return [...prev, {
+                    id: data.id,
+                    sender: senderRole,
+                    text: data.content,
+                    isRead: data.isRead || false
+                  }];
+                });
+
+                if (senderRole === "agent") {
+                  callMarkMessagesAsRead(convId).catch(console.error);
+                }
+              }
+            });
+
+            stompClient.subscribe(`/topic/conversations/${convId}/read`, (msg) => {
+              setAdminMessages(prev => prev.map(m => ({ ...m, isRead: true })));
+            });
+          },
+        });
+        stompClient.activate();
+        stompClientRef.current = stompClient;
+      }
+    } catch (error) {
+      console.error("Failed to initialize admin chat", error);
+    }
+  };
+
   // STOMP WebSocket Connection for Admin Chat
   useEffect(() => {
     const token = window.localStorage.getItem("access_token") || "";
     // Only init if we are on admin tab, open, and logged in
     if (isOpen && activeTab === "admin" && token) {
-      const initAdminChat = async () => {
-        try {
-          const res = await callCreateConversation();
-          if (res?.data?.id) {
-            const convId = res.data.id;
-            setConversationId(convId);
-
-            // Fetch history
-            const historyRes = await callFetchAdminMessages(convId);
-            if (historyRes?.data) {
-              const mappedHistory = historyRes.data.map(msg => ({
-                id: msg.id,
-                sender: msg.senderId === res.data.userId ? "user" : "agent",
-                text: msg.content,
-                isRead: msg.isRead || msg.read || false
-              }));
-              setAdminMessages(mappedHistory);
-
-              // Mark as read after fetching history
-              callMarkMessagesAsRead(convId).catch(console.error);
-            }
-
-            // Connect to WebSocket
-            const socketUrl = import.meta.env.VITE_BACKEND_URL + "/ws";
-
-            const stompClient = new Client({
-              webSocketFactory: () => new SockJS(socketUrl),
-              connectHeaders: {
-                Authorization: `Bearer ${token}`
-              },
-              reconnectDelay: 5000,
-              onConnect: () => {
-                console.log("Connected to Admin Chat WebSocket");
-                stompClient.subscribe(`/topic/chat/${convId}`, (msg) => {
-                  if (msg.body) {
-                    const data = JSON.parse(msg.body);
-                    const senderRole = data.senderId === res.data.userId ? "user" : "agent";
-                    setAdminMessages((prev) => {
-                      if (prev.find(m => m.id === data.id)) return prev;
-                      return [...prev, {
-                        id: data.id,
-                        sender: senderRole,
-                        text: data.content,
-                        isRead: data.isRead || false
-                      }];
-                    });
-
-                    if (senderRole === "agent") {
-                      callMarkMessagesAsRead(convId).catch(console.error);
-                    }
-                  }
-                });
-
-                stompClient.subscribe(`/topic/conversations/${convId}/read`, (msg) => {
-                  setAdminMessages(prev => prev.map(m => ({ ...m, isRead: true })));
-                });
-              },
-            });
-            stompClient.activate();
-            stompClientRef.current = stompClient;
-          }
-        } catch (error) {
-          console.error("Failed to initialize admin chat", error);
-        }
-      };
-
       if (!conversationId) {
         initAdminChat();
       }
@@ -163,6 +182,11 @@ const ChatWidget = () => {
       }
     };
   }, [isOpen, activeTab]);
+
+  const startNewAdminChat = () => {
+    setAdminMessages([]);
+    initAdminChat();
+  };
 
   const handleSendAI = async (userText) => {
     setAiMessages((prev) => [...prev, { id: Date.now(), sender: "user", text: userText }]);
@@ -390,19 +414,28 @@ const ChatWidget = () => {
         </div>
 
         <div className="chat-footer">
-          <div className="input-wrapper">
-            <Input
-              placeholder={activeTab === "ai" ? "Hỏi AI..." : "Nhắn tin cho Admin..."}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyPress={handleKeyPress}
-              bordered={false}
-              className="chat-input"
-            />
-            <button className="send-btn" onClick={handleSend}>
-              <SendOutlined />
-            </button>
-          </div>
+          {activeTab === "admin" && conversationStatus === "CLOSED" ? (
+            <div className="closed-conversation-actions" style={{ padding: '12px', textAlign: 'center', width: '100%' }}>
+              <Button type="primary" onClick={startNewAdminChat} style={{ width: '100%', borderRadius: '20px' }}>Bắt đầu trò chuyện mới</Button>
+            </div>
+          ) : (
+            <div className="input-wrapper">
+              <Input
+                placeholder={activeTab === "ai" ? "Hỏi AI..." : "Nhắn tin cho Admin..."}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyPress={handleKeyPress}
+                bordered={false}
+                className="chat-input"
+              />
+              <button
+                className="send-btn"
+                onClick={handleSend}
+              >
+                <SendOutlined />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

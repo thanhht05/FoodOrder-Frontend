@@ -33,16 +33,18 @@
     .conversation-list {
       flex: 1;
       overflow-y: auto;
-      
+
       &::-webkit-scrollbar {
         width: 4px;
       }
+
       &::-webkit-scrollbar-thumb {
         background: #e2e8f0;
         border-radius: 4px;
       }
 
-      .loading-center, .empty-list {
+      .loading-center,
+      .empty-list {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -90,9 +92,11 @@
 
             .status {
               font-weight: 600;
+
               &.open {
                 color: #52c41a;
               }
+
               &.closed {
                 color: #ff4d4f;
               }
@@ -113,7 +117,7 @@
       padding: 16px 24px;
       border-bottom: 1px solid #f0f0f0;
       background: #fff;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
       z-index: 1;
 
       h3 {
@@ -136,12 +140,14 @@
       &::-webkit-scrollbar {
         width: 6px;
       }
+
       &::-webkit-scrollbar-thumb {
         background: #cbd5e1;
         border-radius: 4px;
       }
 
-      .loading-center, .empty-messages {
+      .loading-center,
+      .empty-messages {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -153,9 +159,10 @@
       .message-row {
         display: flex;
         max-width: 75%;
-        
+
         &.admin {
           align-self: flex-end;
+
           .message-bubble {
             background: #1890ff;
             color: #fff;
@@ -166,6 +173,7 @@
 
         &.user {
           align-self: flex-start;
+
           .message-bubble {
             background: #fff;
             color: #333;

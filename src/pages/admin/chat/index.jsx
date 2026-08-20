@@ -4,7 +4,7 @@ import { Input, Button, Spin, message, Avatar } from "antd";
 import { SendOutlined, UserOutlined, MessageOutlined } from "@ant-design/icons";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import { callFetchAllConversations, callFetchAdminMessages, callMarkMessagesAsRead } from "../../../services/api";
+import { callFetchAllConversations, callFetchAdminMessages, callMarkMessagesAsRead, callCloseConversation } from "../../../services/api";
 import "./chat.scss";
 
 const AdminChatPage = () => {
@@ -12,6 +12,7 @@ const AdminChatPage = () => {
   const [activeConversation, setActiveConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [inputValue, setInputValue] = useState("");
+  const [activeTabConv, setActiveTabConv] = useState("OPEN");
   const [loadingConv, setLoadingConv] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
 
@@ -112,7 +113,7 @@ const AdminChatPage = () => {
         // Sort messages by createdAt
         const list = Array.isArray(res.data) ? res.data : (res.data.data || res.data);
         setMessages(list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)));
-        
+
         // Mark as read after fetching history
         callMarkMessagesAsRead(convId).catch(console.error);
       } else {
@@ -145,7 +146,7 @@ const AdminChatPage = () => {
           if (prev.find(m => m.id === data.id)) return prev;
           return [...prev, data];
         });
-        
+
         // If received message from user, mark as read
         if (data.senderId !== adminUser.id) {
           callMarkMessagesAsRead(conversation.id).catch(console.error);
@@ -160,6 +161,31 @@ const AdminChatPage = () => {
 
     currentSubscriptionRef.current = sub;
     readSubscriptionRef.current = readSub;
+  };
+
+  const handleCloseConversation = async () => {
+    debugger
+    if (!activeConversation) return;
+    try {
+      const res = await callCloseConversation(activeConversation.id);
+      if (res && res.data) {
+        message.success("Đã kết thúc hội thoại");
+        if (stompClientRef.current && stompClientRef.current.connected) {
+          stompClientRef.current.publish({
+            destination: `/app/chat/${activeConversation.id}`,
+            body: JSON.stringify({
+              conversationId: activeConversation.id,
+              content: "SYSTEM_CONVERSATION_CLOSED"
+            })
+          });
+        }
+        fetchConversations();
+        setActiveConversation(prev => ({ ...prev, status: 'CLOSED' }));
+      }
+    } catch (error) {
+      console.error(error);
+      message.error("Lỗi khi kết thúc hội thoại");
+    }
   };
 
   const handleSend = () => {
@@ -184,13 +210,27 @@ const AdminChatPage = () => {
           <h3>Hội thoại</h3>
           <Button type="primary" size="small" onClick={fetchConversations}>Làm mới</Button>
         </div>
+        <div className="conversation-tabs" style={{ display: 'flex', borderBottom: '1px solid #f0f0f0', background: '#fff' }}>
+          <div
+            style={{ flex: 1, textAlign: 'center', padding: '12px 0', cursor: 'pointer', borderBottom: activeTabConv === 'OPEN' ? '2px solid #1890ff' : 'none', color: activeTabConv === 'OPEN' ? '#1890ff' : '#8c8c8c', fontWeight: activeTabConv === 'OPEN' ? 600 : 400 }}
+            onClick={() => setActiveTabConv('OPEN')}
+          >
+            Đang hoạt động
+          </div>
+          <div
+            style={{ flex: 1, textAlign: 'center', padding: '12px 0', cursor: 'pointer', borderBottom: activeTabConv === 'CLOSED' ? '2px solid #1890ff' : 'none', color: activeTabConv === 'CLOSED' ? '#1890ff' : '#8c8c8c', fontWeight: activeTabConv === 'CLOSED' ? 600 : 400 }}
+            onClick={() => setActiveTabConv('CLOSED')}
+          >
+            Đã đóng
+          </div>
+        </div>
         <div className="conversation-list">
           {loadingConv ? (
             <div className="loading-center"><Spin /></div>
-          ) : conversations.length === 0 ? (
+          ) : conversations.filter(c => (c.status || 'OPEN') === activeTabConv).length === 0 ? (
             <div className="empty-list">Chưa có hội thoại</div>
           ) : (
-            conversations.map((conv) => (
+            conversations.filter(c => (c.status || 'OPEN') === activeTabConv).map((conv) => (
               <div
                 key={conv.id}
                 className={`conversation-item ${activeConversation?.id === conv.id ? 'active' : ''}`}
@@ -214,6 +254,11 @@ const AdminChatPage = () => {
           <>
             <div className="chat-header">
               <h3>Đang chat với Người dùng #{activeConversation.userId}</h3>
+              {activeConversation.status !== 'CLOSED' && (
+                <Button type="primary" danger onClick={handleCloseConversation}>
+                  Kết thúc
+                </Button>
+              )}
             </div>
 
             <div className="chat-messages">
@@ -224,23 +269,29 @@ const AdminChatPage = () => {
               ) : (
                 (() => {
                   const lastAdminMsgId = [...messages].reverse().find(m => m.senderId === adminUser.id)?.id;
-                  
+
                   return messages.map((msg) => {
                     const isAdmin = msg.senderId === adminUser.id;
                     const isLastAdminMsg = msg.id === lastAdminMsgId;
-                    
+
                     return (
                       <div key={msg.id} className={`message-row ${isAdmin ? 'admin' : 'user'}`}>
-                        <div className="message-container" style={{ display: 'flex', flexDirection: 'column', alignItems: isAdmin ? 'flex-end' : 'flex-start' }}>
-                          <div className="message-bubble">
-                            {msg.content}
+                        {msg.content === "SYSTEM_CONVERSATION_CLOSED" ? (
+                          <div className="system-message" style={{ width: '100%', textAlign: 'center', color: '#8c8c8c', fontSize: '12px', margin: '10px 0' }}>
+                            Hội thoại đã kết thúc
                           </div>
-                          {isLastAdminMsg && msg.isRead && (
-                            <div className="read-receipt" style={{ fontSize: '11px', color: '#8c8c8c', marginTop: '4px', paddingRight: '4px' }}>
-                              Đã xem
+                        ) : (
+                          <div className="message-container" style={{ display: 'flex', flexDirection: 'column', alignItems: isAdmin ? 'flex-end' : 'flex-start' }}>
+                            <div className="message-bubble">
+                              {msg.content}
                             </div>
-                          )}
-                        </div>
+                            {isLastAdminMsg && msg.isRead && (
+                              <div className="read-receipt" style={{ fontSize: '11px', color: '#8c8c8c', marginTop: '4px', paddingRight: '4px' }}>
+                                Đã xem
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   });
@@ -254,11 +305,19 @@ const AdminChatPage = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onPressEnter={handleSend}
-                placeholder="Nhập tin nhắn..."
+                placeholder={activeConversation.status === 'CLOSED' ? "Hội thoại đã kết thúc" : "Nhập tin nhắn..."}
                 bordered={false}
                 className="input-field"
+                disabled={activeConversation.status === 'CLOSED'}
               />
-              <Button type="primary" shape="circle" icon={<SendOutlined />} onClick={handleSend} className="send-button" />
+              <Button
+                type="primary"
+                shape="circle"
+                icon={<SendOutlined />}
+                onClick={handleSend}
+                className="send-button"
+                disabled={activeConversation.status === 'CLOSED'}
+              />
             </div>
           </>
         ) : (
