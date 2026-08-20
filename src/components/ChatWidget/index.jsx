@@ -8,7 +8,7 @@ import {
   ShrinkOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { callChatAI, callCreateConversation, callFetchAdminMessages } from "../../services/api";
+import { callChatAI, callCreateConversation, callFetchAdminMessages, callMarkMessagesAsRead } from "../../services/api";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import "./chat.scss";
@@ -93,9 +93,13 @@ const ChatWidget = () => {
               const mappedHistory = historyRes.data.map(msg => ({
                 id: msg.id,
                 sender: msg.senderId === res.data.userId ? "user" : "agent",
-                text: msg.content
+                text: msg.content,
+                isRead: msg.isRead || msg.read || false
               }));
               setAdminMessages(mappedHistory);
+
+              // Mark as read after fetching history
+              callMarkMessagesAsRead(convId).catch(console.error);
             }
 
             // Connect to WebSocket
@@ -112,15 +116,25 @@ const ChatWidget = () => {
                 stompClient.subscribe(`/topic/chat/${convId}`, (msg) => {
                   if (msg.body) {
                     const data = JSON.parse(msg.body);
-                    // Prevent duplicate if it's our own message (handled via local state append already)
-                    if (data.senderId !== res.data.userId) {
-                      ((prev) => [...prev, {
-                        id: data.id || Date.now(),
-                        sender: "agent",
-                        text: data.content
-                      }]);
+                    const senderRole = data.senderId === res.data.userId ? "user" : "agent";
+                    setAdminMessages((prev) => {
+                      if (prev.find(m => m.id === data.id)) return prev;
+                      return [...prev, {
+                        id: data.id,
+                        sender: senderRole,
+                        text: data.content,
+                        isRead: data.isRead || false
+                      }];
+                    });
+
+                    if (senderRole === "agent") {
+                      callMarkMessagesAsRead(convId).catch(console.error);
                     }
                   }
+                });
+
+                stompClient.subscribe(`/topic/conversations/${convId}/read`, (msg) => {
+                  setAdminMessages(prev => prev.map(m => ({ ...m, isRead: true })));
                 });
               },
             });
@@ -188,8 +202,6 @@ const ChatWidget = () => {
       message.error("Đang kết nối đến Admin, vui lòng thử lại sau.");
       return;
     }
-
-    ((prev) => [...prev, { id: Date.now(), sender: "user", text: userText }]);
 
     stompClientRef.current.publish({
       destination: `/app/chat/${conversationId}`,
@@ -321,41 +333,58 @@ const ChatWidget = () => {
         </div>
 
         <div className="chat-body">
-          {currentMessages.map((msg) => (
-            <div key={msg.id} className={`message-wrapper ${msg.sender}`}>
-              <div className={`message ${msg.sender}`}>
-                <div style={{ whiteSpace: "pre-wrap" }}>
-                  {formatText(msg.text)}
-                </div>
-              </div>
-              {msg.products && msg.products.length > 0 && (
-                <div className="recommended-products">
-                  {msg.products.map((p) => (
-                    <div
-                      key={p.id}
-                      className="chat-product-card"
-                      onClick={() => handleRedirectBook(p)}
-                      title="Xem chi tiết"
-                    >
-                      <img
-                        src={`${import.meta.env.VITE_BACKEND_URL}/upload/${p.img}`}
-                        alt={p.name}
-                      />
-                      <div className="info">
-                        <div className="name">{p.name}</div>
-                        <div className="price">
-                          {new Intl.NumberFormat("vi-VN", {
-                            style: "currency",
-                            currency: "VND",
-                          }).format(p.price)}
-                        </div>
-                      </div>
+          {(() => {
+            const lastUserMsgId = activeTab === "admin"
+              ? [...adminMessages].reverse().find(m => m.sender === "user")?.id
+              : null;
+
+            return currentMessages.map((msg) => {
+              const isLastUserMsg = msg.id === lastUserMsgId;
+
+              return (
+                <div key={msg.id} className={`message-wrapper ${msg.sender}`}>
+                  <div className={`message ${msg.sender}`}>
+                    <div style={{ whiteSpace: "pre-wrap" }}>
+                      {formatText(msg.text)}
                     </div>
-                  ))}
+                  </div>
+
+                  {activeTab === "admin" && msg.sender === "user" && isLastUserMsg && msg.isRead && (
+                    <div className="read-receipt" style={{ fontSize: '11px', color: '#8c8c8c', marginTop: '2px', textAlign: 'right', width: '100%', paddingRight: '8px' }}>
+                      Đã xem
+                    </div>
+                  )}
+
+                  {msg.products && msg.products.length > 0 && (
+                    <div className="recommended-products">
+                      {msg.products.map((p) => (
+                        <div
+                          key={p.id}
+                          className="chat-product-card"
+                          onClick={() => handleRedirectBook(p)}
+                          title="Xem chi tiết"
+                        >
+                          <img
+                            src={`${import.meta.env.VITE_BACKEND_URL}/upload/${p.img}`}
+                            alt={p.name}
+                          />
+                          <div className="info">
+                            <div className="name">{p.name}</div>
+                            <div className="price">
+                              {new Intl.NumberFormat("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                              }).format(p.price)}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
+              );
+            });
+          })()}
           {activeTab === "ai" && isTypingAI && <div className="typing-indicator">Đang tìm kiếm...</div>}
           <div ref={messagesEndRef} />
         </div>

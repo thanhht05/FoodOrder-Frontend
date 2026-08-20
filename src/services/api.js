@@ -236,6 +236,10 @@ export const callFetchAdminMessages = (conversationId) => {
   return axios.get(`/api/v1/conversations/${conversationId}/messages`);
 };
 
+export const callMarkMessagesAsRead = (conversationId) => {
+  return axios.put(`/api/v1/conversations/${conversationId}/messages`);
+};
+
 export const callFetchAllConversations = () => {
   return axios.get('/api/v1/conversations');
 };

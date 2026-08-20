@@ -4,7 +4,7 @@ import { Input, Button, Spin, message, Avatar } from "antd";
 import { SendOutlined, UserOutlined, MessageOutlined } from "@ant-design/icons";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
-import { callFetchAllConversations, callFetchAdminMessages } from "../../../services/api";
+import { callFetchAllConversations, callFetchAdminMessages, callMarkMessagesAsRead } from "../../../services/api";
 import "./chat.scss";
 
 const AdminChatPage = () => {
@@ -19,6 +19,7 @@ const AdminChatPage = () => {
 
   const stompClientRef = useRef(null);
   const currentSubscriptionRef = useRef(null);
+  const readSubscriptionRef = useRef(null);
   const messagesEndRef = useRef(null);
 
   // Auto scroll to bottom
@@ -111,6 +112,9 @@ const AdminChatPage = () => {
         // Sort messages by createdAt
         const list = Array.isArray(res.data) ? res.data : (res.data.data || res.data);
         setMessages(list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)));
+        
+        // Mark as read after fetching history
+        callMarkMessagesAsRead(convId).catch(console.error);
       } else {
         setMessages([]);
       }
@@ -128,20 +132,34 @@ const AdminChatPage = () => {
       currentSubscriptionRef.current.unsubscribe();
       currentSubscriptionRef.current = null;
     }
+    if (readSubscriptionRef.current) {
+      readSubscriptionRef.current.unsubscribe();
+      readSubscriptionRef.current = null;
+    }
 
-    // Subscribe to new
+    // Subscribe to new messages
     const sub = client.subscribe(`/topic/chat/${conversation.id}`, (msg) => {
       if (msg.body) {
         const data = JSON.parse(msg.body);
-
-        // Local state check to prevent duplicate admin messages
+        setMessages(prev => {
+          if (prev.find(m => m.id === data.id)) return prev;
+          return [...prev, data];
+        });
+        
+        // If received message from user, mark as read
         if (data.senderId !== adminUser.id) {
-          setMessages(prev => [...prev, data]);
+          callMarkMessagesAsRead(conversation.id).catch(console.error);
         }
       }
     });
 
+    // Subscribe to read receipts
+    const readSub = client.subscribe(`/topic/conversations/${conversation.id}/read`, (msg) => {
+      setMessages(prev => prev.map(m => ({ ...m, isRead: true })));
+    });
+
     currentSubscriptionRef.current = sub;
+    readSubscriptionRef.current = readSub;
   };
 
   const handleSend = () => {
@@ -149,16 +167,6 @@ const AdminChatPage = () => {
 
     const content = inputValue;
     setInputValue("");
-
-    // Optimistic append
-    const tempMsg = {
-      id: Date.now(),
-      conversationId: activeConversation.id,
-      senderId: adminUser.id,
-      content: content,
-      createdAt: new Date().toISOString()
-    };
-    setMessages(prev => [...prev, tempMsg]);
 
     stompClientRef.current.publish({
       destination: `/app/chat/${activeConversation.id}`,
@@ -214,16 +222,29 @@ const AdminChatPage = () => {
               ) : messages.length === 0 ? (
                 <div className="empty-messages">Bắt đầu trò chuyện...</div>
               ) : (
-                messages.map((msg) => {
-                  const isAdmin = msg.senderId === adminUser.id;
-                  return (
-                    <div key={msg.id} className={`message-row ${isAdmin ? 'admin' : 'user'}`}>
-                      <div className="message-bubble">
-                        {msg.content}
+                (() => {
+                  const lastAdminMsgId = [...messages].reverse().find(m => m.senderId === adminUser.id)?.id;
+                  
+                  return messages.map((msg) => {
+                    const isAdmin = msg.senderId === adminUser.id;
+                    const isLastAdminMsg = msg.id === lastAdminMsgId;
+                    
+                    return (
+                      <div key={msg.id} className={`message-row ${isAdmin ? 'admin' : 'user'}`}>
+                        <div className="message-container" style={{ display: 'flex', flexDirection: 'column', alignItems: isAdmin ? 'flex-end' : 'flex-start' }}>
+                          <div className="message-bubble">
+                            {msg.content}
+                          </div>
+                          {isLastAdminMsg && msg.isRead && (
+                            <div className="read-receipt" style={{ fontSize: '11px', color: '#8c8c8c', marginTop: '4px', paddingRight: '4px' }}>
+                              Đã xem
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })
+                    );
+                  });
+                })()
               )}
               <div ref={messagesEndRef} />
             </div>
