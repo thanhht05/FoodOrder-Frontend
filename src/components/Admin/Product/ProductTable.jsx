@@ -11,10 +11,11 @@ import {
   Popconfirm,
   Row,
   Table,
+  Switch,
 } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { callDeleteProduct, callFetchAllProcut } from "../../../services/api";
+import { callDeleteProduct, callFetchAllProcut, callUpdateProductStatus } from "../../../services/api";
 import FormSearch from "./FormSearch";
 import ProductViewDetail from "./ProductViewDetail";
 import ProductModalCreate from "./ProductModalCreate";
@@ -61,6 +62,19 @@ const ProductTable = () => {
     const res = await callDeleteProduct(id);
     if (res && res.data) {
       message.success("Xóa sản phẩm thành công");
+    } else {
+      notification.error({
+        message: "Có lỗi xảy ra",
+        description: res.message,
+      });
+    }
+    await fetchProduct();
+  };
+
+  const handleUpdateStatus = async (id) => {
+    const res = await callUpdateProductStatus(id);
+    if (res && res.data) {
+      message.success("Cập nhật trạng thái thành công");
     } else {
       notification.error({
         message: "Có lỗi xảy ra",
@@ -118,6 +132,7 @@ const ProductTable = () => {
       title: "Thao tác",
       key: "action",
       render: (_, record) => {
+        console.log("record", record)
         return (
           <>
             <a
@@ -127,6 +142,12 @@ const ProductTable = () => {
             >
               Cập nhật
             </a>
+            <Switch
+              style={{ marginLeft: "8px" }}
+              checked={record.productStatus === "ACTIVE" ? true : false}
+              onChange={() => handleUpdateStatus(record.id)}
+
+            />
             <Popconfirm
               title="Xóa sản phẩm"
               description="Bạn có chắc chắn muốn xóa sản phẩm này không?"
@@ -134,7 +155,7 @@ const ProductTable = () => {
               okText="Có"
               cancelText="Không"
             >
-              <a style={{ marginLeft: "8px" }}>Xóa</a>
+              <a style={{ marginLeft: "8px", color: "red" }}>Xóa</a>
             </Popconfirm>
           </>
         );

@@ -282,7 +282,7 @@ const Home = () => {
                     </div>
 
                     <Row gutter={[16, 16]}>
-                      {productData.map((p) => (
+                      {productData.map((p) => (p.quantity > 0) && (
                         <Col
                           key={p.id}
                           xs={12}

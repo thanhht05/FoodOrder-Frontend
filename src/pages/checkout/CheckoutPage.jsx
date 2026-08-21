@@ -40,7 +40,7 @@ const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const [paymentMethod, setPaymentMethod] = useState("qr");
+  const [paymentMethod, setPaymentMethod] = useState("CARD");
   const [loading, setLoading] = useState(false);
   const cartItems = useSelector((state) => state.cart.items);
 
@@ -74,8 +74,8 @@ const CheckoutPage = () => {
       resOrder = await callPlaceAnOrder(
         cartDetailIds,
         table?.id,
-        values.note,
         paymentMethod,
+        values.note,
       );
       if (resOrder?.data) {
         message.success("Đặt hàng thành công");
@@ -166,7 +166,7 @@ const CheckoutPage = () => {
                 value={paymentMethod}
                 className="payment-methods"
               >
-                <Radio value="qr" className="payment-option">
+                <Radio value="CARD" className="payment-option">
                   <span className="option-title">
                     Chuyển khoản qua mã QR (Khuyên dùng)
                   </span>
@@ -174,7 +174,7 @@ const CheckoutPage = () => {
                     Thanh toán tự động, nhanh chóng và chính xác.
                   </Text>
                 </Radio>
-                <Radio value="cod" className="payment-option">
+                <Radio value="CASH" className="payment-option">
                   <span className="option-title">Thanh toán tiền mặt</span>
                   <Text type="secondary" className="option-desc">
                     Thanh toán bằng tiền mặt

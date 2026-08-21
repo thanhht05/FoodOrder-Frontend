@@ -247,3 +247,7 @@ export const callFetchAllConversations = () => {
 export const callCloseConversation = (conversationId) => {
   return axios.put(`/api/v1/conversations/${conversationId}`);
 };
+
+export const callUpdateProductStatus = (id) => {
+  return axios.put(`/api/v1/products/${id}/status`);
+};
