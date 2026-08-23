@@ -251,3 +251,9 @@ export const callCloseConversation = (conversationId) => {
 export const callUpdateProductStatus = (id) => {
   return axios.put(`/api/v1/products/${id}/status`);
 };
+
+
+
+export const callCountOrderStatus = () => {
+  return axios.get("/api/v1/count-orderStatus")
+}

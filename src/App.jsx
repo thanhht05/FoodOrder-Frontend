@@ -17,7 +17,6 @@ import { doGetAccountAction } from "./redux/slices/account/accountSlice";
 import { useEffect } from "react";
 import Loading from "./components/Loading/loading";
 import NotFound from "./components/NotFound/notfound";
-import AdminPage from "./pages/admin/adminPage";
 import ProtectedRoute from "./pages/protectedRoute/ProtectedRoute";
 import AppHeader from "./components/Header/AppHeader";
 import LayoutAdmin from "./components/Admin/LayoutAdmin";
@@ -37,6 +36,7 @@ import ChatWidget from "./components/ChatWidget";
 import { getCartAPI } from "./redux/thunk/getCartThunk";
 import ProfilePage from "./pages/profile/ProfilePage";
 import AdminChatPage from "./pages/admin/chat";
+import DashboardPage from "./pages/admin/dashboard";
 
 const Layout = () => {
   return (
@@ -138,7 +138,7 @@ function App() {
           index: true,
           element: (
             <ProtectedRoute roles={["ADMIN"]}>
-              <AdminPage />
+              <DashboardPage />
             </ProtectedRoute>
           ),
         },
