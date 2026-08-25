@@ -1,5 +1,5 @@
-import React from 'react';
-import { Card, Col, Row, Statistic, Table, List, Typography, Tag } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Card, Col, Row, Statistic, Table, List, Typography, Tag, Avatar } from 'antd';
 import {
     ShoppingCartOutlined,
     DollarCircleOutlined,
@@ -8,18 +8,15 @@ import {
 } from '@ant-design/icons';
 import OrderDistribution from "../../../components/Admin/Dashboard/OrderDistribution";
 import RevenueChart from "../../../components/Admin/Dashboard/RevenueChart";
+import { callStatisticOverview, callGetLatestOrder, callGetTopProduct } from '../../../services/api';
 
 const { Title } = Typography;
 
 const DashboardPage = () => {
-    // Fake data for Recent Orders
-    const recentOrdersData = [
-        { key: '1', orderId: '#ORD001', customer: 'Nguyễn Văn A', total: '250,000 ₫', status: 'Hoàn thành', statusCode: 'success' },
-        { key: '2', orderId: '#ORD002', customer: 'Trần Thị B', total: '120,000 ₫', status: 'Đang giao', statusCode: 'processing' },
-        { key: '3', orderId: '#ORD003', customer: 'Lê Văn C', total: '450,000 ₫', status: 'Chờ duyệt', statusCode: 'warning' },
-        { key: '4', orderId: '#ORD004', customer: 'Phạm Thị D', total: '300,000 ₫', status: 'Hoàn thành', statusCode: 'success' },
-        { key: '5', orderId: '#ORD005', customer: 'Hoàng Văn E', total: '150,000 ₫', status: 'Đã hủy', statusCode: 'error' },
-    ];
+    const [statisticOverview, setStatisticOverview] = useState();
+    const [recentOrdersData, setRecentOrdersData] = useState([]);
+    const [topItemsData, setTopItemsData] = useState([]);
+
 
     const recentOrdersColumns = [
         { title: 'Mã đơn', dataIndex: 'orderId', key: 'orderId', fontWeight: 'bold' },
@@ -35,17 +32,54 @@ const DashboardPage = () => {
         },
     ];
 
-    // Fake data for Top Selling Items
-    const topItemsData = [
-        { name: 'Trà sữa Trân châu đường đen', sales: 120 },
-        { name: 'Gà rán KFC', sales: 95 },
-        { name: 'Pizza Hải sản', sales: 80 },
-        { name: 'Hamburger Bò', sales: 65 },
-        { name: 'Mì Ý Sốt Bò Bằm', sales: 50 },
-    ];
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            const resStat = await callStatisticOverview();
+            if (resStat?.data) {
+                setStatisticOverview(resStat.data);
+            }
+
+            const resOrder = await callGetLatestOrder();
+            if (resOrder?.data) {
+                const formattedOrders = resOrder.data.map((order) => {
+                    let statusText = order.orderStatus;
+                    let statusCode = 'default';
+
+                    if (order.orderStatus === 'PENDING') {
+                        statusText = 'Chờ duyệt';
+                        statusCode = 'warning';
+                    } else if (order.orderStatus === 'CONFIRMED') {
+                        statusText = 'Hoàn thành';
+                        statusCode = 'success';
+                    } else if (order.orderStatus === 'CANCELLED') {
+                        statusText = 'Đã hủy';
+                        statusCode = 'error';
+                    }
+
+                    return {
+                        key: order.id,
+                        orderId: '#' + order.id,
+                        customer: order.fullName,
+                        total: `${new Intl.NumberFormat('vi-VN').format(order.totalAmount)} ₫`,
+                        status: statusText,
+                        statusCode: statusCode
+                    };
+                });
+                setRecentOrdersData(formattedOrders);
+            }
+
+            const resTop = await callGetTopProduct();
+            if (resTop?.data) {
+                setTopItemsData(resTop.data);
+            }
+        };
+        fetchDashboardData();
+    }, []);
+
 
     return (
-        <div style={{ padding: '24px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
+        <div style={{ marginTop: '20px', padding: '24px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
             <Title level={2} style={{ marginBottom: '24px' }}>Tổng quan hệ thống</Title>
 
             <Row gutter={[16, 16]}>
@@ -58,7 +92,7 @@ const DashboardPage = () => {
                     }}>
                         <Statistic
                             title={<span style={{ color: '#0050b3', fontWeight: 500, fontSize: '15px' }}>Tổng đơn hàng</span>}
-                            value={1254}
+                            value={statisticOverview?.totalOrder}
                             valueStyle={{ color: '#0050b3', fontWeight: 'bold', fontSize: '28px' }}
                             prefix={<ShoppingCartOutlined style={{ marginRight: '8px' }} />}
                         />
@@ -73,7 +107,7 @@ const DashboardPage = () => {
                     }}>
                         <Statistic
                             title={<span style={{ color: '#237804', fontWeight: 500, fontSize: '15px' }}>Tổng doanh thu</span>}
-                            value={125430000}
+                            value={statisticOverview?.totalRevenue}
                             valueStyle={{ color: '#237804', fontWeight: 'bold', fontSize: '28px' }}
                             prefix={<DollarCircleOutlined style={{ marginRight: '8px' }} />}
                             suffix="₫"
@@ -89,7 +123,7 @@ const DashboardPage = () => {
                     }}>
                         <Statistic
                             title={<span style={{ color: '#391085', fontWeight: 500, fontSize: '15px' }}>Tổng khách hàng</span>}
-                            value={856}
+                            value={statisticOverview?.totalUser}
                             valueStyle={{ color: '#391085', fontWeight: 'bold', fontSize: '28px' }}
                             prefix={<UserOutlined style={{ marginRight: '8px' }} />}
                         />
@@ -104,7 +138,7 @@ const DashboardPage = () => {
                     }}>
                         <Statistic
                             title={<span style={{ color: '#ad6800', fontWeight: 500, fontSize: '15px' }}>Đơn hàng chờ duyệt</span>}
-                            value={45}
+                            value={statisticOverview?.pendingOrder}
                             valueStyle={{ color: '#ad6800', fontWeight: 'bold', fontSize: '28px' }}
                             prefix={<ClockCircleOutlined style={{ marginRight: '8px' }} />}
                         />
@@ -128,7 +162,7 @@ const DashboardPage = () => {
             </Row>
 
             <Row gutter={[16, 16]} style={{ marginTop: '24px' }}>
-                <Col xs={24} lg={16}>
+                <Col xs={24} lg={14}>
                     <Card title="Đơn hàng gần đây" bordered={false} style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)' }}>
                         <Table
                             columns={recentOrdersColumns}
@@ -138,7 +172,7 @@ const DashboardPage = () => {
                         />
                     </Card>
                 </Col>
-                <Col xs={24} lg={8}>
+                <Col xs={24} lg={10}>
                     <Card title="Top món bán chạy" bordered={false} style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)' }}>
                         <List
                             itemLayout="horizontal"
@@ -147,22 +181,13 @@ const DashboardPage = () => {
                                 <List.Item>
                                     <List.Item.Meta
                                         avatar={
-                                            <div style={{
-                                                width: '28px',
-                                                height: '28px',
-                                                borderRadius: '50%',
-                                                backgroundColor: index < 3 ? '#ffe58f' : '#f0f2f5',
-                                                color: index < 3 ? '#faad14' : '#595959',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                fontWeight: 'bold'
-                                            }}>
-                                                {index + 1}
-                                            </div>
+                                            <Avatar
+                                                src={`${import.meta.env.VITE_BACKEND_URL}/upload/${item.img}`}
+                                                size={40}
+                                            />
                                         }
                                         title={<span style={{ fontWeight: 500 }}>{item.name}</span>}
-                                        description={`Đã bán: ${item.sales} phần`}
+                                        description={`Đã bán: ${item.sold} phần`}
                                     />
                                 </List.Item>
                             )}

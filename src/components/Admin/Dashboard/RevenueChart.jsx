@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
     LineChart,
     Line,
@@ -8,21 +9,30 @@ import {
     Legend,
     ResponsiveContainer,
 } from "recharts";
-
-const data = [
-    { month: "Jan", revenue: 12000000 },
-    { month: "Feb", revenue: 15000000 },
-    { month: "Mar", revenue: 18000000 },
-    { month: "Apr", revenue: 14000000 },
-    { month: "May", revenue: 22000000 },
-    { month: "Jun", revenue: 25000000 },
-];
+import { callGetRevenueMonth } from "../../../services/api";
 
 const RevenueChart = () => {
+    const [chartData, setChartData] = useState([]);
+
+    useEffect(() => {
+        const fetchRevenue = async () => {
+            const res = await callGetRevenueMonth();
+            if (res?.data) {
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const formattedData = res.data.map(item => ({
+                    month: monthNames[item.month - 1],
+                    revenue: item.revenue
+                }));
+                setChartData(formattedData);
+            }
+        };
+        fetchRevenue();
+    }, []);
+
     return (
         <ResponsiveContainer width="100%" height={400}>
             <LineChart
-                data={data}
+                data={chartData}
                 margin={{
                     top: 5,
                     right: 20,

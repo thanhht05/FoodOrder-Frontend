@@ -257,3 +257,18 @@ export const callUpdateProductStatus = (id) => {
 export const callCountOrderStatus = () => {
   return axios.get("/api/v1/count-orderStatus")
 }
+export const callStatisticOverview = () => {
+  return axios.get("/api/v1/statistic-overview")
+}
+
+export const callGetLatestOrder = () => {
+  return axios.get("/api/v1/get-latest-order")
+}
+
+export const callGetTopProduct = () => {
+  return axios.get("/api/v1/get-top-product")
+}
+
+export const callGetRevenueMonth = () => {
+  return axios.get("/api/v1/get-revenue-month")
+}
