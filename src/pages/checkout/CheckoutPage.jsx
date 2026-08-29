@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Row,
   Col,
@@ -13,6 +13,7 @@ import {
   Badge,
   message,
   notification,
+  Select,
 } from "antd";
 import {
   UserOutlined,
@@ -27,7 +28,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   callBuyNowItem,
   // callFetchCardetails,
-  callFetchTableByName,
   callPlaceAnOrder,
 } from "../../services/api";
 import { clearCart } from "../../redux/slices/cart/CartSlice";
@@ -44,7 +44,29 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState(false);
   const cartItems = useSelector((state) => state.cart.items);
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+
+  const [provinces, setProvinces] = useState([]);
+  const [wards, setWards] = useState([]);
+
+  useEffect(() => {
+    fetch("https://provinces.open-api.vn/api/v2/p/")
+      .then((res) => res.json())
+      .then((data) => setProvinces(data))
+      .catch((err) => console.error(err));
+  }, []);
+
+  const handleProvinceChange = (value, option) => {
+    debugger
+
+    form.setFieldsValue({ district: undefined, ward: undefined });
+    setWards([]);
+    fetch(`https://provinces.open-api.vn/api/v2/p/${option.key}?depth=2`)
+      .then((res) => res.json())
+      .then((data) => setWards(data.wards || []))
+      .catch((err) => console.error(err));
+  };
+
 
   const total = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -57,25 +79,24 @@ const CheckoutPage = () => {
   const onFinish = async (values) => {
     if (loading) return;
     setLoading(true);
-    let table;
-
-    if (values.table) {
-      const res = await callFetchTableByName(values.table.trim());
-      if (res?.data) {
-        table = res.data;
-      }
-    }
-
     try {
       let resOrder;
 
 
-      // API CART CHECKOUT
+      const shippingAddress = {
+        recipientName: values.fullName,
+        phone: values.phone,
+        province: values.province,
+        ward: values.ward,
+        addressDetail: values.address
+      }
+      debugger
       resOrder = await callPlaceAnOrder(
         cartDetailIds,
-        table?.id,
         paymentMethod,
         values.note,
+        shippingAddress,
+
       );
       if (resOrder?.data) {
         message.success("Đặt hàng thành công");
@@ -131,23 +152,78 @@ const CheckoutPage = () => {
                 </Col>
                 <Col xs={24} md={12}>
                   <Form.Item
-                    name="table"
-                    label="Số bàn"
+                    name="phone"
+                    label="Số điện thoại"
                     rules={[
-                      {
-                        required: true,
-                        message: "Vui lòng nhập số bàn!",
-                      },
+                      { required: true, message: "Vui lòng nhập số điện thoại!" },
                     ]}
                   >
                     <Input
-                      prefix={<TabletOutlined />}
-                      placeholder="Nhập số bàn"
+                      prefix={<PhoneOutlined />}
+                      placeholder="0912345678"
                       size="large"
                     />
                   </Form.Item>
                 </Col>
               </Row>
+
+              <Row gutter={16}>
+                <Col xs={24} md={8}>
+                  <Form.Item
+                    name="province"
+                    label="Tỉnh/Thành phố"
+                    rules={[{ required: true, message: "Vui lòng chọn Tỉnh/Thành phố!" }]}
+                  >
+                    <Select
+                      size="large"
+                      placeholder="Chọn Tỉnh/Thành phố"
+                      onChange={handleProvinceChange}
+                      showSearch
+                      optionFilterProp="children"
+                    >
+                      {provinces.map((p) => (
+                        <Select.Option key={p.code} value={p.name}>
+                          {p.name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+
+                <Col xs={24} md={8}>
+                  <Form.Item
+                    name="ward"
+                    label="Phường/Xã"
+                    rules={[{ required: true, message: "Vui lòng chọn Phường/Xã!" }]}
+                  >
+                    <Select
+                      size="large"
+                      placeholder="Chọn Phường/Xã"
+                      showSearch
+                      optionFilterProp="children"
+                      disabled={wards.length === 0}
+                    >
+                      {wards.map((w) => (
+                        <Select.Option key={w.code} value={w.name}>
+                          {w.name}
+                        </Select.Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </Row>
+
+              <Form.Item
+                name="address"
+                label="Địa chỉ cụ thể"
+                rules={[{ required: true, message: "Vui lòng nhập địa chỉ cụ thể!" }]}
+              >
+                <Input
+                  prefix={<EnvironmentOutlined />}
+                  placeholder="Số nhà, ngõ, ngách, tên đường..."
+                  size="large"
+                />
+              </Form.Item>
 
               <Form.Item name="note" label="Ghi chú cho đơn hàng (Tùy chọn)">
                 <TextArea

@@ -152,16 +152,17 @@ export const callFetchTableByName = (tableName) => {
 
 export const callPlaceAnOrder = (
   cartDetailIds,
-  tableId,
   paymentMethod,
   note,
+  shippingAddress,
+
 ) => {
   const URL = "/api/v1/orders/placeOrder";
   const data = {
     cartDetailIds,
-    tableId,
     paymentMethod,
     note,
+    shippingAddress,
   };
   return axios.post(URL, data);
 };
@@ -271,4 +272,4 @@ export const callGetTopProduct = () => {
 
 export const callGetRevenueMonth = () => {
   return axios.get("/api/v1/get-revenue-month")
-}
+}
