@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { Typography, Empty, Spin } from "antd";
+import React, { useState, useEffect, useMemo } from "react";
+import { Typography, Empty, Spin, Tabs } from "antd";
 import "./OrderHistory.scss";
 import OrderCard from "../../components/Order/OrderCard";
 import { callFetchOrderHistory } from "../../services/api";
-import { isAllOf } from "@reduxjs/toolkit";
 
 const { Title } = Typography;
-
-// Mock API response
 
 const OrderHistory = () => {
   const [orderData, setOrderData] = useState(null);
   const [loading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("ALL");
 
   useEffect(() => {
     const getOrderHistory = async () => {
@@ -29,24 +27,70 @@ const OrderHistory = () => {
     };
     getOrderHistory();
   }, []);
-  console.log("isLoading", loading);
+
+  const tabItems = [
+    { key: "ALL", label: "Tất cả" },
+    { key: "PENDING", label: "Chờ thanh toán" },
+    { key: "PROCESSING", label: "Đang xử lý" },
+    { key: "DELIVERING", label: "Đang giao" },
+    { key: "COMPLETED", label: "Đã giao" },
+  ];
+
+  const filteredOrders = useMemo(() => {
+    if (!orderData?.orderInfo) return [];
+    let orders = orderData.orderInfo;
+
+    // Filter by tab
+    if (activeTab === "PENDING") {
+      orders = orders.filter((o) => o.orderStatus === "PENDING" || o.orderStatus === "PENDING_PAYMENT");
+    } else if (activeTab === "PROCESSING") {
+      orders = orders.filter((o) => ["PAID", "CONFIRMED", "PREPARING"].includes(o.orderStatus));
+    } else if (activeTab === "DELIVERING") {
+      orders = orders.filter((o) => o.orderStatus === "DELIVERING");
+    } else if (activeTab === "COMPLETED") {
+      orders = orders.filter((o) => o.orderStatus === "COMPLETED");
+    }
+
+    // Sort: If "ALL" tab, push PENDING to the top
+    if (activeTab === "ALL") {
+      orders = [...orders].sort((a, b) => {
+        const isAPending = a.orderStatus === "PENDING" || a.orderStatus === "PENDING_PAYMENT";
+        const isBPending = b.orderStatus === "PENDING" || b.orderStatus === "PENDING_PAYMENT";
+        if (isAPending && !isBPending) return -1;
+        if (!isAPending && isBPending) return 1;
+        return 0; // Maintain original order otherwise
+      });
+    }
+
+    return orders;
+  }, [orderData, activeTab]);
+
   return (
     <>
       {loading ? (
-        <Spin />
+        <div className="loading-container">
+          <Spin size="large" />
+        </div>
       ) : (
         <div className="order-history-container">
           <Title level={4} className="section-title">
-            Order History
+            Đơn Hàng Của Tôi
           </Title>
+          
+          <Tabs 
+            activeKey={activeTab} 
+            onChange={(key) => setActiveTab(key)} 
+            items={tabItems} 
+            className="order-tabs"
+          />
 
           {/* Orders Map list section */}
-          {orderData?.orderInfo && orderData.orderInfo.length > 0 ? (
-            orderData.orderInfo.map((order) => (
+          {filteredOrders && filteredOrders.length > 0 ? (
+            filteredOrders.map((order) => (
               <OrderCard key={order.orderId} order={order} />
             ))
           ) : (
-            <Empty description="No orders found" style={{ marginTop: 40 }} />
+            <Empty description="Chưa có đơn hàng nào" style={{ marginTop: 40 }} />
           )}
         </div>
       )}

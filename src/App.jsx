@@ -13,7 +13,7 @@ import BookPage from "./pages/product";
 import Footer from "./components/Footer/footer";
 import { useDispatch, useSelector } from "react-redux";
 import { callGetAccount } from "./services/api";
-import { doGetAccountAction } from "./redux/slices/account/accountSlice";
+import { doGetAccountAction, doSetLoadingAction } from "./redux/slices/account/accountSlice";
 import { useEffect } from "react";
 import Loading from "./components/Loading/loading";
 import NotFound from "./components/NotFound/notfound";
@@ -57,13 +57,23 @@ function App() {
     if (
       window.location.pathname === "/login" ||
       window.location.pathname === "/register"
-    )
+    ) {
+      dispatch(doSetLoadingAction(false));
       return;
+    }
 
-    const res = await callGetAccount();
-    if (res.data) {
-      dispatch(doGetAccountAction(res.data));
-      dispatch(getCartAPI())
+    try {
+      const res = await callGetAccount();
+      if (res?.data) {
+        dispatch(doGetAccountAction(res.data));
+        dispatch(getCartAPI());
+      }
+    } catch (error) {
+      console.error("Get account failed:", error);
+      // Khi callGetAccount lỗi, có thể dispatch thêm action reset user nếu cần
+    } finally {
+      // Khối này LUÔN CHẠY bất kể API thành công hay gặp lỗi (400, 401, 500)
+      dispatch(doSetLoadingAction(false));
     }
   };
 
@@ -91,7 +101,11 @@ function App() {
         },
         {
           path: "cart",
-          element: <CartPage />,
+          element: (
+            <ProtectedRoute>
+              <CartPage />
+            </ProtectedRoute>
+          ),
         },
         {
           path: "checkout",

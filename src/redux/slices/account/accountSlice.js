@@ -35,6 +35,9 @@ export const accountSlide = createSlice({
 
       state.user = mapUser(action.payload.userLogin);
     },
+    doSetLoadingAction: (state, action) => {
+      state.isLoading = action.payload;
+    },
     doLogoutAction: (state) => {
       localStorage.removeItem("access_token");
       state.isAuthenticated = false;
@@ -48,9 +51,9 @@ export const accountSlide = createSlice({
       };
     },
   },
-  extraReducers: () => {},
+  extraReducers: () => { },
 });
 
-export const { doLoginAction, doGetAccountAction, doLogoutAction } =
+export const { doLoginAction, doGetAccountAction, doSetLoadingAction, doLogoutAction } =
   accountSlide.actions;
 export default accountSlide.reducer;
