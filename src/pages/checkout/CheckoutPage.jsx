@@ -57,7 +57,7 @@ const CheckoutPage = () => {
   }, []);
 
   const handleProvinceChange = (value, option) => {
-    debugger
+
 
     form.setFieldsValue({ district: undefined, ward: undefined });
     setWards([]);
@@ -90,7 +90,7 @@ const CheckoutPage = () => {
         ward: values.ward,
         addressDetail: values.address
       }
-      debugger
+
       resOrder = await callPlaceAnOrder(
         cartDetailIds,
         paymentMethod,
@@ -101,7 +101,7 @@ const CheckoutPage = () => {
       if (resOrder?.data) {
         message.success("Đặt hàng thành công");
         const newOrderId = resOrder.data?.orderId;
-        if (paymentMethod === "qr") {
+        if (paymentMethod === "CARD") {
           dispatch(clearCart());
           navigate(`/payment/${newOrderId}`, { state: { total } });
         } else {

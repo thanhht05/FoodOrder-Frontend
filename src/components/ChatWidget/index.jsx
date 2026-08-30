@@ -81,7 +81,7 @@ const ChatWidget = () => {
     if (!token) return;
 
     try {
-      debugger
+
       const res = await callCreateConversation();
       if (res?.data?.id) {
         const convId = res.data.id;
@@ -122,7 +122,7 @@ const ChatWidget = () => {
             stompClient.subscribe(`/topic/chat/${convId}`, (msg) => {
               if (msg.body) {
                 const data = JSON.parse(msg.body);
-                debugger
+
 
                 if (data.content === "SYSTEM_CONVERSATION_CLOSED") {
                   setConversationStatus("CLOSED");

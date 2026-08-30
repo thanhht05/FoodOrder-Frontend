@@ -69,12 +69,18 @@ const Home = () => {
 
     const fetchProduct = async () => {
       setIsLoading(true);
-      const res = await callFetchAllProcut(query);
-      if (res && res.data) {
-        setProductData(res.data.results);
-        setTotal(res.data.meta.totalElements);
+      try {
+        const res = await callFetchAllProcut(query);
+
+        if (res && res.data) {
+          setProductData(res.data.results);
+          setTotal(res.data.meta.totalElements);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
     fetchProduct();
   }, [currentPage, sortQuery, filter, searchKeyword]);

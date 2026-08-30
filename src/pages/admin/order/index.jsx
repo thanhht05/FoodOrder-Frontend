@@ -48,7 +48,7 @@ const ManageOrderPage = () => {
           if (msg.body) {
             try {
               const data = JSON.parse(msg.body);
-              debugger
+
 
               if (data.status === "PAID" || data.paymentStatus === "PAID" || data.message || data.paymentStatus === "UNPAID") {
                 message.info(`Có cập nhật đơn hàng mới!`);

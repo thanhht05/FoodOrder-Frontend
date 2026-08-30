@@ -63,14 +63,12 @@ function App() {
     const res = await callGetAccount();
     if (res.data) {
       dispatch(doGetAccountAction(res.data));
+      dispatch(getCartAPI())
     }
   };
-  const getCart = () => {
-    dispatch(getCartAPI())
-  }
+
   useEffect(() => {
     getAccount();
-    getCart()
 
   }, []);
   const router = createBrowserRouter([

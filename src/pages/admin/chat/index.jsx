@@ -164,7 +164,7 @@ const AdminChatPage = () => {
   };
 
   const handleCloseConversation = async () => {
-    debugger
+
     if (!activeConversation) return;
     try {
       const res = await callCloseConversation(activeConversation.id);

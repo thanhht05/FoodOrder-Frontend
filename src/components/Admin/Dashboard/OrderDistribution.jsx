@@ -152,7 +152,7 @@ const OrderDistribution = () => {
         const fetchOrderStatus = async () => {
             try {
                 const response = await callCountOrderStatus();
-                debugger
+
 
                 if (response.data) {
                     const mappedData = response.data.map(item => ({
