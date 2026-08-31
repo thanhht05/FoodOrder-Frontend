@@ -163,12 +163,7 @@ const ChatWidget = () => {
   // STOMP WebSocket Connection for Admin Chat
   useEffect(() => {
     const token = window.localStorage.getItem("access_token") || "";
-    // Only init if we are on admin tab, open, and logged in
-    if (isOpen && activeTab === "admin" && token) {
-      if (!conversationId) {
-        initAdminChat();
-      }
-    } else if (isOpen && activeTab === "admin" && !token) {
+    if (isOpen && activeTab === "admin" && !token) {
       message.warning("Vui lòng đăng nhập để chat với Admin");
       setActiveTab("ai");
     }
@@ -358,6 +353,18 @@ const ChatWidget = () => {
 
         <div className="chat-body">
           {(() => {
+            if (activeTab === "admin" && !conversationId && window.localStorage.getItem("access_token")) {
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: '10px' }}>
+                  <MessageOutlined style={{ fontSize: '40px', color: '#1677ff' }} />
+                  <div style={{ color: '#666' }}>Bạn có thắc mắc? Hãy trò chuyện với chúng tôi.</div>
+                  <Button type="primary" onClick={initAdminChat} style={{ borderRadius: '20px', marginTop: '10px' }}>
+                    Bắt đầu chát
+                  </Button>
+                </div>
+              );
+            }
+
             const lastUserMsgId = activeTab === "admin"
               ? [...adminMessages].reverse().find(m => m.sender === "user")?.id
               : null;
@@ -417,6 +424,18 @@ const ChatWidget = () => {
           {activeTab === "admin" && conversationStatus === "CLOSED" ? (
             <div className="closed-conversation-actions" style={{ padding: '12px', textAlign: 'center', width: '100%' }}>
               <Button type="primary" onClick={startNewAdminChat} style={{ width: '100%', borderRadius: '20px' }}>Bắt đầu trò chuyện mới</Button>
+            </div>
+          ) : activeTab === "admin" && !conversationId ? (
+            <div className="input-wrapper">
+              <Input
+                placeholder="Vui lòng bắt đầu chát..."
+                disabled
+                bordered={false}
+                className="chat-input"
+              />
+              <button className="send-btn" disabled style={{ opacity: 0.5 }}>
+                <SendOutlined />
+              </button>
             </div>
           ) : (
             <div className="input-wrapper">

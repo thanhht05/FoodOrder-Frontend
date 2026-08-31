@@ -21,28 +21,13 @@ import { useNavigate } from "react-router-dom";
 
 const { Text } = Typography;
 
-const OrderCard = ({ order }) => {
+const OrderCard = ({ order, onShowDetail }) => {
+
+  console.log("order", order)
   const { token } = theme.useToken();
   const navigate = useNavigate();
 
-  const getStatusTag = (status) => {
-    const statusMap = {
-      PENDING: { color: "warning", text: "Chờ thanh toán" },
-      PENDING_PAYMENT: { color: "warning", text: "Chờ thanh toán" },
-      PAID: { color: "processing", text: "Đã thanh toán" },
-      CONFIRMED: { color: "processing", text: "Đã xác nhận" },
-      PREPARING: { color: "processing", text: "Đang chuẩn bị" },
-      DELIVERING: { color: "blue", text: "Đang giao" },
-      COMPLETED: { color: "success", text: "Đã giao" },
-      CANCELLED: { color: "error", text: "Đã hủy" },
-    };
-    const config = statusMap[status] || { color: "default", text: status };
-    return (
-      <Tag color={config.color} className="status-tag">
-        {config.text}
-      </Tag>
-    );
-  };
+
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -95,12 +80,12 @@ const OrderCard = ({ order }) => {
     },
   ];
 
-  const isPending = order.orderStatus === "PENDING" || order.orderStatus === "PENDING_PAYMENT";
+  const isPending = order.orderStatus === "PENDING";
   const isDelivering = order.orderStatus === "DELIVERING";
 
   return (
-    <Card 
-      className={`order-card ${isPending ? "order-card-pending" : ""}`} 
+    <Card
+      className={`order-card ${isPending ? "order-card-pending" : ""}`}
       bordered={false}
     >
       {/* Order Card Header */}
@@ -115,17 +100,15 @@ const OrderCard = ({ order }) => {
                 <ClockCircleOutlined />{" "}
                 {dayjs(order.orderDate).format("MMM DD, YYYY - HH:mm")}
               </span>
-              <span className="table-id">
-                <ShopOutlined /> Bàn: <strong>{order.tableId}</strong>
-              </span>
+
             </Space>
           </Col>
-          <Col>{getStatusTag(order.orderStatus)}</Col>
+
         </Row>
-        
+
         {isPending && (
           <div style={{ marginTop: 12, color: token.colorWarning }}>
-            <Text type="warning">⚠ Đơn hàng chưa thanh toán</Text>
+            <Text type="warning">⚠ Đơn hàng đang chờ xác nhận</Text>
           </div>
         )}
       </div>
@@ -157,8 +140,8 @@ const OrderCard = ({ order }) => {
           <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
             <Space>
               {isPending && (
-                <Button 
-                  type="primary" 
+                <Button
+                  type="primary"
                   size="large"
                   onClick={() => navigate(`/payment/${order.orderId}`)}
                   style={{ backgroundColor: token.colorWarning }}
@@ -167,14 +150,15 @@ const OrderCard = ({ order }) => {
                 </Button>
               )}
               {isDelivering && (
-                <Button 
-                  type="primary" 
+                <Button
+                  type="primary"
                   size="large"
+                  onClick={() => onShowDetail && onShowDetail(order)}
                 >
                   Theo dõi đơn hàng
                 </Button>
               )}
-              <Button size="large">Xem chi tiết</Button>
+              <Button size="large" onClick={() => onShowDetail && onShowDetail(order)}>Xem chi tiết</Button>
             </Space>
           </Col>
         </Row>

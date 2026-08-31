@@ -41,7 +41,7 @@ const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [form] = Form.useForm();
-  const [paymentMethod, setPaymentMethod] = useState("CARD");
+  const [paymentMethod, setPaymentMethod] = useState("QR");
   const [loading, setLoading] = useState(false);
   const cartItems = useSelector((state) => state.cart.items);
 
@@ -102,11 +102,11 @@ const CheckoutPage = () => {
       if (resOrder?.data) {
         message.success("Đặt hàng thành công");
         const newOrderId = resOrder.data?.orderId;
-        if (paymentMethod === "CARD") {
+        if (paymentMethod === "QR") {
           dispatch(clearCart());
           const returnUrl = window.location.origin + "/payment/success";
           const cancelUrl = window.location.origin + "/payment/cancel";
-          
+
           try {
             const payLinkRes = await callCreatePaymentLink({
               orderId: newOrderId,
@@ -262,7 +262,7 @@ const CheckoutPage = () => {
                 value={paymentMethod}
                 className="payment-methods"
               >
-                <Radio value="CARD" className="payment-option">
+                <Radio value="QR" className="payment-option">
                   <span className="option-title">
                     Chuyển khoản qua mã QR (Khuyên dùng)
                   </span>
@@ -270,7 +270,7 @@ const CheckoutPage = () => {
                     Thanh toán tự động, nhanh chóng và chính xác.
                   </Text>
                 </Radio>
-                <Radio value="CASH" className="payment-option">
+                <Radio value="COD" className="payment-option">
                   <span className="option-title">Thanh toán tiền mặt</span>
                   <Text type="secondary" className="option-desc">
                     Thanh toán bằng tiền mặt
