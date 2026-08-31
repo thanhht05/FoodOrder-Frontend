@@ -215,6 +215,10 @@ export const callPayOrder = () => {
   return axios.post(`/api/v1/orders/pay`);
 };
 
+export const callCreatePaymentLink = (data) => {
+  return axios.post("/api/v1/create-payment-link", data);
+};
+
 export const callChatAI = (message) => {
   return axios.post('/api/v1/ai/chat', { message });
 };

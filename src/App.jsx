@@ -27,6 +27,8 @@ import ProductPage from "./pages/product";
 import CartPage from "./pages/cart/CartPage";
 import CheckoutPage from "./pages/checkout/CheckoutPage";
 import PaymentPage from "./pages/payment/PaymentPage";
+import PaymentSuccess from "./pages/payment/PaymentSuccess";
+import PaymentCancel from "./pages/payment/PaymentCancel";
 import ManageTablePage from "./pages/admin/table";
 import ManageOrderPage from "./pages/admin/order";
 import OrderCancelPage from "./pages/admin/order/OrderCancelPage";
@@ -112,6 +114,22 @@ function App() {
           element: (
             <ProtectedRoute>
               <CheckoutPage />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "payment/success",
+          element: (
+            <ProtectedRoute>
+              <PaymentSuccess />
+            </ProtectedRoute>
+          ),
+        },
+        {
+          path: "payment/cancel",
+          element: (
+            <ProtectedRoute>
+              <PaymentCancel />
             </ProtectedRoute>
           ),
         },

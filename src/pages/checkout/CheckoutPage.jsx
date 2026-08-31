@@ -29,6 +29,7 @@ import {
   callBuyNowItem,
   // callFetchCardetails,
   callPlaceAnOrder,
+  callCreatePaymentLink,
 } from "../../services/api";
 import { clearCart } from "../../redux/slices/cart/CartSlice";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -103,7 +104,26 @@ const CheckoutPage = () => {
         const newOrderId = resOrder.data?.orderId;
         if (paymentMethod === "CARD") {
           dispatch(clearCart());
-          navigate(`/payment/${newOrderId}`, { state: { total } });
+          const returnUrl = window.location.origin + "/payment/success";
+          const cancelUrl = window.location.origin + "/payment/cancel";
+          
+          try {
+            const payLinkRes = await callCreatePaymentLink({
+              orderId: newOrderId,
+              returnUrl,
+              cancelUrl
+            });
+            if (payLinkRes?.data?.checkoutUrl) {
+              window.location.href = payLinkRes.data.checkoutUrl;
+            } else {
+              message.error("Không thể tạo link thanh toán");
+              navigate("/order-history");
+            }
+          } catch (err) {
+            console.error("Create payment link error:", err);
+            message.error("Lỗi tạo link thanh toán");
+            navigate("/order-history");
+          }
         } else {
           dispatch(clearCart());
           navigate("/order-history");
