@@ -141,14 +141,6 @@ export const callFetchProductId = (id) => {
   return axios.get(URL);
 };
 
-export const callFetchTable = (query) => {
-  const URL = `/api/v1/bookingTables?${query}`;
-  return axios.get(URL);
-};
-export const callFetchTableByName = (tableName) => {
-  const URL = `/api/v1/bookingTables/search?tableName=${tableName}`;
-  return axios.get(URL);
-};
 
 export const callPlaceAnOrder = (
   cartDetailIds,
@@ -173,6 +165,10 @@ export const callFetchCardetails = () => {
 
 export const callFetchOrderHistory = () => {
   return axios.get("/api/v1/orderHistory");
+};
+
+export const callFetchOrderById = (orderId) => {
+  return axios.get(`/api/v1/orders/${orderId}`);
 };
 
 export const callBuyNowItem = (

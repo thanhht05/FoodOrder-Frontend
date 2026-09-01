@@ -105,7 +105,7 @@ const CheckoutPage = () => {
         if (paymentMethod === "QR") {
           dispatch(clearCart());
           const returnUrl = window.location.origin + "/payment/success";
-          const cancelUrl = window.location.origin + "/payment/cancel";
+          const cancelUrl = window.location.origin + "/payment/cancel?paymentLinkId=" + resOrder.paymentLinkId;
 
           try {
             const payLinkRes = await callCreatePaymentLink({

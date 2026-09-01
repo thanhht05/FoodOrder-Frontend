@@ -50,7 +50,6 @@ const OrderHistory = () => {
     if (!orderData?.orderInfo) return [];
     let orders = orderData.orderInfo;
 
-    debugger
 
     // Filter by tab
     if (activeTab === "PENDING") {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Tag,
@@ -18,6 +18,7 @@ import {
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
+import { callFetchOrderById } from "../../services/api";
 
 const { Text } = Typography;
 
@@ -26,6 +27,8 @@ const OrderCard = ({ order, onShowDetail }) => {
   console.log("order", order)
   const { token } = theme.useToken();
   const navigate = useNavigate();
+
+
 
 
 
@@ -82,6 +85,10 @@ const OrderCard = ({ order, onShowDetail }) => {
 
   const isPending = order.orderStatus === "PENDING";
   const isDelivering = order.orderStatus === "DELIVERING";
+  const isPendingPayment = order.paymentStatus === "PENDING";
+  const isCancel = order.orderStatus === "CANCELLED";
+
+
 
   return (
     <Card
@@ -105,8 +112,11 @@ const OrderCard = ({ order, onShowDetail }) => {
           </Col>
 
         </Row>
-
-        {isPending && (
+        {isPendingPayment ? (
+          <div style={{ marginTop: 12, color: token.colorWarning }}>
+            <Text type="warning">⚠ Đơn hàng đang chờ thanh toán</Text>
+          </div>
+        ) : isPending && (
           <div style={{ marginTop: 12, color: token.colorWarning }}>
             <Text type="warning">⚠ Đơn hàng đang chờ xác nhận</Text>
           </div>
@@ -139,11 +149,11 @@ const OrderCard = ({ order, onShowDetail }) => {
           </Col>
           <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
             <Space>
-              {isPending && (
+              {!isCancel && isPendingPayment && (
                 <Button
                   type="primary"
                   size="large"
-                  onClick={() => navigate(`/payment/${order.orderId}`)}
+                  onClick={() => window.location.href = `https://pay.payos.vn/web/${order.paymentLinkId}`}
                   style={{ backgroundColor: token.colorWarning }}
                 >
                   💳 Thanh toán ngay
@@ -163,7 +173,7 @@ const OrderCard = ({ order, onShowDetail }) => {
           </Col>
         </Row>
       </div>
-    </Card>
+    </Card >
   );
 };
 

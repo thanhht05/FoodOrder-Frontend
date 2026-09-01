@@ -29,7 +29,6 @@ import CheckoutPage from "./pages/checkout/CheckoutPage";
 import PaymentPage from "./pages/payment/PaymentPage";
 import PaymentSuccess from "./pages/payment/PaymentSuccess";
 import PaymentCancel from "./pages/payment/PaymentCancel";
-import ManageTablePage from "./pages/admin/table";
 import ManageOrderPage from "./pages/admin/order";
 import OrderCancelPage from "./pages/admin/order/OrderCancelPage";
 import OrderConfirmPage from "./pages/admin/order/OrderConfirmPage";
@@ -189,14 +188,7 @@ function App() {
             </ProtectedRoute>
           ),
         },
-        {
-          path: "table",
-          element: (
-            <ProtectedRoute roles={["ADMIN"]}>
-              <ManageTablePage />
-            </ProtectedRoute>
-          ),
-        },
+
         {
           path: "order",
           element: (
