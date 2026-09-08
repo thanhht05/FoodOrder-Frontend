@@ -9,7 +9,6 @@ import {
 import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import Contact from "./pages/contact";
-import BookPage from "./pages/product";
 import Footer from "./components/Footer/footer";
 import { useDispatch, useSelector } from "react-redux";
 import { callGetAccount } from "./services/api";
@@ -30,8 +29,6 @@ import PaymentPage from "./pages/payment/PaymentPage";
 import PaymentSuccess from "./pages/payment/PaymentSuccess";
 import PaymentCancel from "./pages/payment/PaymentCancel";
 import ManageOrderPage from "./pages/admin/order";
-import OrderCancelPage from "./pages/admin/order/OrderCancelPage";
-import OrderConfirmPage from "./pages/admin/order/OrderConfirmPage";
 import OrderHistory from "./pages/history/OrderHistoryPage";
 import ChatWidget from "./components/ChatWidget";
 import { getCartAPI } from "./redux/thunk/getCartThunk";
@@ -197,22 +194,7 @@ function App() {
             </ProtectedRoute>
           ),
         },
-        {
-          path: "order-cancel",
-          element: (
-            <ProtectedRoute roles={["ADMIN"]}>
-              <OrderCancelPage />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "order-confirm",
-          element: (
-            <ProtectedRoute roles={["ADMIN"]}>
-              <OrderConfirmPage />
-            </ProtectedRoute>
-          ),
-        },
+
         {
           path: "chat",
           element: (

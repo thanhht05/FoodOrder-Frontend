@@ -1,13 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Dropdown, message, Spin, Modal, Table, Button, Switch } from 'antd';
-import { MoreOutlined, FileTextOutlined, EditOutlined, CheckCircleOutlined, SoundOutlined } from '@ant-design/icons';
+import { Dropdown, message, Spin, Drawer, Table, Button, Switch, Tabs } from 'antd';
+import { SoundOutlined } from '@ant-design/icons';
 import { callFetchOrders, callFetchOrderDetails, callUpdateOrderStatus } from '../../../services/api';
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import './order.scss';
+
+const { TabPane } = Tabs;
+
 const ManageOrderPage = () => {
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('PENDING');
 
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const isSoundEnabledRef = useRef(true);
@@ -16,19 +20,18 @@ const ManageOrderPage = () => {
     setIsSoundEnabled(checked);
     isSoundEnabledRef.current = checked;
     if (checked) {
-      // Play a short sound to test and request interaction permission
       new Audio('/notification.mp3').play().catch(e => console.log("Audio play blocked", e));
     }
   };
 
-  // Modal states
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Drawer states
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    fetchOrders(activeTab);
+  }, [activeTab]);
 
   // WebSocket connection for admin order updates
   useEffect(() => {
@@ -48,23 +51,21 @@ const ManageOrderPage = () => {
           if (msg.body) {
             try {
               const data = JSON.parse(msg.body);
-
-
               if (data.status === "PAID" || data.paymentStatus === "PAID" || data.message || data.paymentStatus === "UNPAID") {
                 message.info(`Có cập nhật đơn hàng mới!`);
                 if (isSoundEnabledRef.current) {
                   const audio = new Audio('/notification.mp3');
                   audio.play().catch(e => console.log("Audio play blocked", e));
                 }
-                fetchOrders();
+                fetchOrders(activeTab);
               } else {
-                fetchOrders();
+                fetchOrders(activeTab);
               }
             } catch (error) {
-              fetchOrders();
+              fetchOrders(activeTab);
             }
           } else {
-            fetchOrders();
+            fetchOrders(activeTab);
           }
         });
       },
@@ -78,24 +79,23 @@ const ManageOrderPage = () => {
     return () => {
       stompClient.deactivate();
     };
-  }, []);
+  }, [activeTab]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (status) => {
     try {
       setLoading(true);
-      const res = await callFetchOrders();
+      const res = await callFetchOrders(`?status=${status}`);
       if (res && res.data) {
-        // If custom interceptor returns payload, res.data is the actual array
         const orderData = Array.isArray(res.data) ? res.data : (res.data.data || res.data);
-        // Get orders is peding
-        const activeOrders = orderData.filter(
-          order => order.status !== 'CONFIRMED' && order.status !== 'CANCELLED'
-        );
-        const mappedTables = activeOrders.map(order => ({
+
+
+
+        const mappedTables = orderData.map(order => ({
           id: order.orderId,
-          tableNo: `Bàn ${order.tableId < 10 ? '0' + order.tableId : order.tableId}`,
+          customerName: order.innerUserOrder?.fullName,
           status: order.status,
           orderTime: formatTime(order.orderDate),
+          date: formatDate(order.orderDate),
           total: order.totalPrice,
           paymentStatus: order.paymentStatus
         }));
@@ -112,12 +112,13 @@ const ManageOrderPage = () => {
   };
 
   const handleCardClick = async (orderId) => {
-    setIsModalOpen(true);
+    setIsDrawerOpen(true);
     setLoadingDetails(true);
     try {
       const res = await callFetchOrderDetails(orderId);
-      console.log("res", res)
       if (res && res.data) {
+
+        console.log("selected order", res.data)
         setSelectedOrder(res.data);
       } else {
         message.error("Không thể lấy chi tiết đơn hàng");
@@ -136,8 +137,8 @@ const ManageOrderPage = () => {
       const res = await callUpdateOrderStatus(selectedOrder.orderId, status);
       if (res && res.data) {
         message.success(`Cập nhật trạng thái thành công`);
-        setIsModalOpen(false);
-        fetchOrders(); // refresh the list
+        setIsDrawerOpen(false);
+        fetchOrders(activeTab);
       } else {
         message.error(`Không thể cập nhật trạng thái đơn hàng`);
       }
@@ -153,48 +154,85 @@ const ManageOrderPage = () => {
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN');
+  };
+
   const getStatusLabel = (status) => {
     switch (status?.toUpperCase()) {
-      case 'AVAILABLE': return 'Có sẵn';
-      case 'ORDERING': return 'Đang gọi món';
+
       case 'PENDING': return 'Chờ xử lý';
       case 'CONFIRMED': return 'Đã xác nhận';
+      case 'DELIVERING': return 'Đang giao';
+      case 'COMPLETED': return 'Hoàn thành';
       case 'PREPARING': return 'Đang chuẩn bị';
       case 'READY': return 'Đã xong';
-      case 'OCCUPIED': return 'Đang dùng';
-      case 'PAID': return 'Đã thanh toán';
-      case 'CANCELLED': return 'Đã hủy';
-      default: return status || 'Không rõ';
+
+
     }
   };
 
   const getStatusClass = (status) => {
     switch (status?.toUpperCase()) {
-      case 'AVAILABLE': return 'status-available';
-      case 'ORDERING': return 'status-ordering';
-      case 'PENDING': return 'status-preparing'; // using preparing color for pending
+
+
+      case 'PENDING': return 'status-preparing';
       case 'CONFIRMED': return 'status-ready';
-      case 'PREPARING': return 'status-preparing';
-      case 'READY': return 'status-ready';
-      case 'OCCUPIED': return 'status-occupied';
+      case 'DELIVERING': return 'status-preparing';
+      case 'COMPLETED': return 'status-available';
       case 'PAID': return 'status-paid';
-      case 'CANCELLED': return 'status-occupied'; // using red for cancelled
-      default: return 'status-available';
+      case 'CANCELLED': return 'status-occupied';
     }
   };
 
-  const getActionMenu = (table) => {
-    const items = [
-      { key: '1', icon: <FileTextOutlined />, label: 'Xem đơn hàng' },
-      { key: '2', icon: <EditOutlined />, label: 'Sửa đơn hàng' },
-      { key: '3', icon: <CheckCircleOutlined />, label: 'Hoàn tất TT' },
-    ];
-    return { items };
-  };
+  const columns = [
+    {
+      title: 'Order',
+      dataIndex: 'id',
+      key: 'id',
+      render: (text) => <strong>#{text}</strong>,
+    },
+    {
+      title: 'Customer',
+      dataIndex: 'customerName',
+      key: 'customerName',
+    },
+    {
+      title: 'Date',
+      dataIndex: 'date',
+      key: 'date',
+    },
+    {
+      title: 'Total',
+      dataIndex: 'total',
+      key: 'total',
+      render: (total) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => (
+        <div className={`status-badge ${getStatusClass(status)}`} style={{ padding: '4px 10px', borderRadius: '9999px', display: 'inline-flex', alignItems: 'center', fontSize: '13px', fontWeight: 600 }}>
+          <span className="dot" style={{ width: '8px', height: '8px', borderRadius: '50%', marginRight: '6px' }}></span>
+          {getStatusLabel(status)}
+        </div>
+      )
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_, record) => (
+        <Button type="link" onClick={() => handleCardClick(record.id)}>View</Button>
+      ),
+    },
+  ];
 
   return (
     <div className="manage-order-page">
-      <div className="header-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div className="header-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h2>Quản lý đơn hàng</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <SoundOutlined style={{ fontSize: '18px', color: isSoundEnabled ? '#1890ff' : '#999' }} />
@@ -207,109 +245,142 @@ const ManageOrderPage = () => {
         </div>
       </div>
 
+      <Tabs
+        activeKey={activeTab}
+        onChange={setActiveTab}
+        type="card"
+        style={{ marginBottom: 16 }}
+      >
+        <TabPane tab="Chờ xử lý " key="PENDING" />
+        <TabPane tab="Đã xác nhận " key="CONFIRMED" />
+        <TabPane tab="Đang giao " key="DELIVERING" />
+        <TabPane tab="Hoàn thành " key="COMPLETED" />
+        <TabPane tab="Đã hủy " key="CANCELLED" />
+      </Tabs>
+
       {loading ? (
         <div style={{ textAlign: 'center', padding: '50px' }}>
           <Spin size="large" />
         </div>
       ) : (
-        <div className="tables-grid">
-          {tables.map(table => (
-            <div
-              key={table.id}
-              className="table-card"
-              style={{ cursor: 'pointer' }}
-              onClick={() => handleCardClick(table.id)}
-            >
-              <div className="card-header">
-                <div className="table-info">
-                  <h3>{table.tableNo}</h3>
-                  <div className={`status-badge ${getStatusClass(table.status)}`}>
-                    <span className="dot"></span>
-                    {getStatusLabel(table.status)}
-                  </div>
-                </div>
-                <Dropdown
-                  menu={getActionMenu(table)}
-                  trigger={['click']}
-                  placement="bottomRight"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="action-menu">
-                    <MoreOutlined />
-                  </div>
-                </Dropdown>
-              </div>
-
-              <div className="card-body">
-
-                <div className="info-row">
-                  <span className="label">Giờ đặt:</span>
-                  <span className="value">{table.orderTime}</span>
-                </div>
-                <div className="total-amount">
-                  <div className="info-row">
-                    <span className="label">Tổng:</span>
-                    <span className="amount-value">
-                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(table.total)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <Table
+          columns={columns}
+          dataSource={tables}
+          rowKey="id"
+          pagination={{ pageSize: 10 }}
+          style={{ background: 'white', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+        />
       )}
 
-      {/* Order Details Modal */}
-      <Modal
-        title={selectedOrder ? `Chi tiết đơn hàng - Bàn ${selectedOrder.tableId}` : 'Chi tiết đơn hàng'}
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        footer={[
-          <Button key="cancel" danger onClick={() => handleUpdateStatus('CANCELLED')}>
-            Hủy đơn
-          </Button>,
-          <Button key="confirm" type="primary" onClick={() => handleUpdateStatus('CONFIRMED')}>
-            Xác nhận
-          </Button>,
-        ]}
-        width={700}
+      {/* Order Details Drawer */}
+      <Drawer
+        title={selectedOrder ? `Order #${selectedOrder.orderId}` : 'Chi tiết đơn hàng'}
+        placement="right"
+        onClose={() => setIsDrawerOpen(false)}
+        open={isDrawerOpen}
+        width={500}
+        footer={
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
+            <Button onClick={() => setIsDrawerOpen(false)}>Đóng</Button>
+            {selectedOrder &&
+              ['PENDING', 'CONFIRMED'].includes(selectedOrder.status) && (
+                <>
+                  <Button
+                    danger
+                    onClick={() => handleUpdateStatus('CANCELLED')}
+                  >
+                    Hủy đơn
+                  </Button>
+
+                  {selectedOrder.status === 'PENDING' && (
+                    <Button
+                      type="primary"
+                      onClick={() => handleUpdateStatus('CONFIRMED')}
+                    >
+                      Xác nhận
+                    </Button>
+                  )}
+                </>
+              )}
+            {selectedOrder && selectedOrder.status === 'CONFIRMED' && (
+              <Button type="primary" onClick={() => handleUpdateStatus('DELIVERING')}>
+                Giao hàng
+              </Button>
+            )}
+            {selectedOrder && selectedOrder.status === 'DELIVERING' && (
+              <Button type="primary" onClick={() => handleUpdateStatus('COMPLETED')}>
+                Hoàn thành
+              </Button>
+            )}
+          </div>
+        }
       >
         {loadingDetails ? (
-          <div style={{ textAlign: 'center', padding: '30px' }}><Spin /></div>
+          <div style={{ textAlign: 'center', padding: '50px' }}><Spin size="large" /></div>
         ) : selectedOrder ? (
-          <div>
-            <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between' }}>
-              <div>
-                <p><strong>Mã đơn:</strong> #{selectedOrder.orderId}</p>
-                <p><strong>Trạng thái:</strong> <span className={`status-badge ${getStatusClass(selectedOrder.status)}`} style={{ padding: '2px 8px', borderRadius: '4px', border: '1px solid currentColor', fontSize: '12px' }}>{getStatusLabel(selectedOrder.status)}</span></p>
-                <p><strong>TT Thanh toán:</strong> {selectedOrder.paymentStatus}</p>
+          <div className="order-drawer-content">
+            <div className="drawer-status">
+              <div className="status-title">Trạng thái</div>
+              <div className={`status-badge ${getStatusClass(selectedOrder.status)}`} style={{ padding: '4px 10px', borderRadius: '9999px', display: 'inline-flex', alignItems: 'center', fontSize: '13px', fontWeight: 600, border: '1px solid currentColor' }}>
+                <span className="dot" style={{ width: '8px', height: '8px', borderRadius: '50%', marginRight: '6px', background: 'currentColor' }}></span>
+                {getStatusLabel(selectedOrder.status)}
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: '14px', marginBottom: 4 }}><strong>Tổng cộng:</strong></p>
-                <p style={{ fontSize: '24px', color: '#10b981', fontWeight: 'bold', margin: 0 }}>
-                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedOrder.totalPrice)}
-                </p>
+
+
+            </div>
+
+            <div className="info-section">
+              <div className="info-block">
+                <div className="info-title">Khách hàng </div>
+                <div className="info-content">
+
+                  {selectedOrder.user?.phone && <div>📞 {selectedOrder.user.phone}</div>}
+                </div>
+              </div>
+              <div className="info-block">
+                <div className="info-title">Thông tin giao hàng</div>
+                <div className="info-content">
+                  <p> <strong>Người nhận hàng:</strong> {selectedOrder.address.recipientName}</p>
+                  <p> <strong>Số điện thoại:</strong> {selectedOrder.address.phone}</p>
+                  <p> <strong>Địa chỉ giao hàng:</strong> {selectedOrder.address.addressDetail}  {selectedOrder.address.ward}  {selectedOrder.address.district} {selectedOrder.address.province} </p>
+                </div>
+              </div>
+              <div className="info-block">
+                <div className="info-title">Thanh toán</div>
+                <div className="info-content">
+                  {selectedOrder.paymentStatus}
+                </div>
               </div>
             </div>
 
-            <Table
-              dataSource={selectedOrder.items || []}
-              rowKey="productId"
-              pagination={false}
-              bordered
-              columns={[
-                { title: 'Tên sản phẩm', dataIndex: 'productName', key: 'productName' },
-                { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity', align: 'center' },
-                { title: 'Đơn giá', dataIndex: 'price', key: 'price', align: 'right', render: (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price) },
-                { title: 'Tổng', key: 'total', align: 'right', render: (_, record) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.price * record.quantity) },
-              ]}
-            />
+            <div className="products-section">
+              <div className="products-title">Sản phẩm</div>
+              {selectedOrder.items?.map(item => (
+                <div className="product-item" key={item.productId}>
+                  <div className="product-name">{item.productName}</div>
+                  <div className="product-qty">x{item.quantity}</div>
+                  <div className="product-price">
+                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="summary-section">
+              <div className="summary-row">
+                <span>Tổng phụ</span>
+                <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedOrder.totalPrice)}</span>
+              </div>
+              <div className="summary-row total">
+                <span>Tổng cộng</span>
+                <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedOrder.totalPrice)}</span>
+              </div>
+            </div>
           </div>
         ) : (
           <p>Không có chi tiết.</p>
         )}
-      </Modal>
+      </Drawer>
     </div>
   );
 };

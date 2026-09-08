@@ -84,27 +84,39 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
     currentStatus.tag = "Chờ thanh toán";
   }
 
+  const statusStep = {
+    PENDING: 0,
+    CONFIRMED: 1,
+    DELIVERING: 2,
+    COMPLETED: 3,
+  };
+
+  const currentStep = statusStep[order.orderStatus] ?? 0;
+
   const stepsItems = [
     {
-      title: (order.orderStatus === 'PENDING' && isPendingPayment) ? 'Chờ thanh toán' : 'Chờ xác nhận',
+      title:
+        order.orderStatus === 'PENDING' && isPendingPayment
+          ? 'Chờ thanh toán'
+          : 'Chờ xác nhận',
       icon: <ContainerOutlined />,
-      description: (order.orderStatus !== 'PENDING') ? "Hoàn tất" : "--:--"
+      description: currentStep >= 0 ? 'Hoàn tất' : '--:--',
     },
     {
       title: 'Đang chuẩn bị',
       icon: <CodeSandboxOutlined />,
-      description: (order.orderStatus === 'CONFIRMED') ? "Hoàn tất" : "--:--"
+      description: currentStep >= 1 ? 'Hoàn tất' : '--:--',
     },
     {
       title: 'Đang giao hàng',
       icon: <CarOutlined />,
-      description: (order.orderStatus === 'DELIVERING') ? "Đang giao" : "--:--"
+      description: currentStep >= 2 ? 'Hoàn tất' : '--:--',
     },
     {
       title: 'Hoàn thành',
       icon: <CheckCircleOutlined />,
-      description: order.orderStatus === 'COMPLETED' ? "Thành công" : "--:--"
-    }
+      description: currentStep >= 3 ? 'Thành công' : '--:--',
+    },
   ];
 
   return (
@@ -156,7 +168,7 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
         {/* Timeline */}
         <div className="timeline-section section-card">
           <Steps
-            current={currentStatus.stepIndex}
+            current={currentStep}
             status={isCancelled ? "error" : "process"}
             labelPlacement="vertical"
             className="custom-steps"

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dropdown, message, Spin, Modal, Table, Button } from 'antd';
-import { MoreOutlined, FileTextOutlined } from '@ant-design/icons';
+import { message, Spin, Drawer, Table, Button } from 'antd';
 import { callFetchOrders, callFetchOrderDetails } from '../../../services/api';
 import './order.scss';
 
@@ -8,8 +7,8 @@ const OrderCancelPage = () => {
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Modal states
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // Drawer states
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
@@ -25,9 +24,10 @@ const OrderCancelPage = () => {
         const orderData = Array.isArray(res.data) ? res.data : (res.data.data || res.data);
         const mappedTables = orderData.map(order => ({
           id: order.orderId,
-          tableNo: `Bàn ${order.tableId < 10 ? '0' + order.tableId : order.tableId}`,
+          customer: order.user ? order.user.fullName : `Bàn ${order.tableId < 10 ? '0' + order.tableId : order.tableId}`,
           status: order.status,
           orderTime: formatTime(order.orderDate),
+          date: formatDate(order.orderDate),
           total: order.totalPrice,
           paymentStatus: order.paymentStatus
         }));
@@ -44,7 +44,7 @@ const OrderCancelPage = () => {
   };
 
   const handleCardClick = async (orderId) => {
-    setIsModalOpen(true);
+    setIsDrawerOpen(true);
     setLoadingDetails(true);
     try {
       const res = await callFetchOrderDetails(orderId);
@@ -66,20 +66,62 @@ const OrderCancelPage = () => {
     const date = new Date(dateString);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
+  
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN');
+  };
 
   const getStatusLabel = (status) => 'Đã hủy';
-  const getStatusClass = (status) => 'status-occupied'; // Reusing red styling
+  const getStatusClass = (status) => 'status-occupied'; // Red style for cancelled
 
-  const getActionMenu = (table) => {
-    const items = [
-      { key: '1', icon: <FileTextOutlined />, label: 'Xem đơn hàng' },
-    ];
-    return { items };
-  };
+  const columns = [
+    {
+      title: 'Order',
+      dataIndex: 'id',
+      key: 'id',
+      render: (text) => <strong>#{text}</strong>,
+    },
+    {
+      title: 'Customer / Table',
+      dataIndex: 'customer',
+      key: 'customer',
+    },
+    {
+      title: 'Date',
+      dataIndex: 'date',
+      key: 'date',
+    },
+    {
+      title: 'Total',
+      dataIndex: 'total',
+      key: 'total',
+      render: (total) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status) => (
+        <div className={`status-badge ${getStatusClass(status)}`} style={{ padding: '4px 10px', borderRadius: '9999px', display: 'inline-flex', alignItems: 'center', fontSize: '13px', fontWeight: 600 }}>
+          <span className="dot" style={{ width: '8px', height: '8px', borderRadius: '50%', marginRight: '6px' }}></span>
+          {getStatusLabel(status)}
+        </div>
+      )
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_, record) => (
+        <Button type="link" onClick={() => handleCardClick(record.id)}>View</Button>
+      ),
+    },
+  ];
 
   return (
     <div className="manage-order-page">
-      <div className="header-actions">
+      <div className="header-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <h2>Đơn hàng đã hủy</h2>
       </div>
 
@@ -88,101 +130,99 @@ const OrderCancelPage = () => {
           <Spin size="large" />
         </div>
       ) : (
-        <div className="tables-grid">
-          {tables.map(table => (
-            <div
-              key={table.id}
-              className="table-card"
-              style={{ cursor: 'pointer' }}
-              onClick={() => handleCardClick(table.id)}
-            >
-              <div className="card-header">
-                <div className="table-info">
-                  <h3>{table.tableNo}</h3>
-                  <div className={`status-badge ${getStatusClass(table.status)}`}>
-                    <span className="dot"></span>
-                    {getStatusLabel(table.status)}
-                  </div>
-                </div>
-                <Dropdown
-                  menu={getActionMenu(table)}
-                  trigger={['click']}
-                  placement="bottomRight"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="action-menu">
-                    <MoreOutlined />
-                  </div>
-                </Dropdown>
-              </div>
-
-              <div className="card-body">
-                <div className="info-row">
-                  <span className="label">Giờ đặt:</span>
-                  <span className="value">{table.orderTime}</span>
-                </div>
-                <div className="total-amount">
-                  <div className="info-row">
-                    <span className="label">Tổng:</span>
-                    <span className="amount-value">
-                      {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(table.total)}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-          {tables.length === 0 && <p style={{ gridColumn: '1 / -1', textAlign: 'center' }}>Không có đơn hàng đã hủy.</p>}
-        </div>
+        <Table 
+          columns={columns} 
+          dataSource={tables} 
+          rowKey="id" 
+          pagination={{ pageSize: 10 }}
+          style={{ background: 'white', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+        />
       )}
 
-      {/* Order Details Modal */}
-      <Modal
-        title={selectedOrder ? `Chi tiết đơn hàng - Bàn ${selectedOrder.tableId}` : 'Chi tiết đơn hàng'}
-        open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
-        footer={[
-          <Button key="close" onClick={() => setIsModalOpen(false)}>
-            Đóng
-          </Button>
-        ]}
-        width={700}
+      {/* Order Details Drawer */}
+      <Drawer
+        title={selectedOrder ? `Order #${selectedOrder.orderId}` : 'Chi tiết đơn hàng'}
+        placement="right"
+        onClose={() => setIsDrawerOpen(false)}
+        open={isDrawerOpen}
+        width={500}
+        footer={
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button onClick={() => setIsDrawerOpen(false)}>Đóng</Button>
+          </div>
+        }
       >
         {loadingDetails ? (
-          <div style={{ textAlign: 'center', padding: '30px' }}><Spin /></div>
+          <div style={{ textAlign: 'center', padding: '50px' }}><Spin size="large" /></div>
         ) : selectedOrder ? (
-          <div>
-            <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between' }}>
-              <div>
-                <p><strong>Mã đơn:</strong> #{selectedOrder.orderId}</p>
-                <p><strong>Trạng thái:</strong> <span className={`status-badge ${getStatusClass(selectedOrder.status)}`} style={{ padding: '2px 8px', borderRadius: '4px', border: '1px solid currentColor', fontSize: '12px' }}>{getStatusLabel(selectedOrder.status)}</span></p>
-                <p><strong>TT Thanh toán:</strong> {selectedOrder.paymentStatus}</p>
+          <div className="order-drawer-content">
+            <div className="drawer-status">
+              <div className="status-title">Trạng thái</div>
+              <div className={`status-badge ${getStatusClass(selectedOrder.status)}`} style={{ padding: '4px 10px', borderRadius: '9999px', display: 'inline-flex', alignItems: 'center', fontSize: '13px', fontWeight: 600, border: '1px solid currentColor' }}>
+                <span className="dot" style={{ width: '8px', height: '8px', borderRadius: '50%', marginRight: '6px', background: 'currentColor' }}></span>
+                {getStatusLabel(selectedOrder.status)}
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: '14px', marginBottom: 4 }}><strong>Tổng cộng:</strong></p>
-                <p style={{ fontSize: '24px', color: '#10b981', fontWeight: 'bold', margin: 0 }}>
-                  {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedOrder.totalPrice)}
-                </p>
+              
+              <div className="timeline-container">
+                <div className={`timeline-step cancelled`}>
+                  🟡 Pending
+                </div>
+                <div className={`timeline-step cancelled`}>
+                  🔴 Cancelled
+                </div>
               </div>
             </div>
 
-            <Table
-              dataSource={selectedOrder.items || []}
-              rowKey="productId"
-              pagination={false}
-              bordered
-              columns={[
-                { title: 'Tên sản phẩm', dataIndex: 'productName', key: 'productName' },
-                { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity', align: 'center' },
-                { title: 'Đơn giá', dataIndex: 'price', key: 'price', align: 'right', render: (price) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price) },
-                { title: 'Tổng', key: 'total', align: 'right', render: (_, record) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(record.price * record.quantity) },
-              ]}
-            />
+            <div className="info-section">
+              <div className="info-block">
+                <div className="info-title">Khách hàng / Bàn</div>
+                <div className="info-content">
+                  {selectedOrder.user ? selectedOrder.user.fullName : `Bàn ${selectedOrder.tableId}`}
+                  {selectedOrder.user?.phone && <div>📞 {selectedOrder.user.phone}</div>}
+                </div>
+              </div>
+              <div className="info-block">
+                <div className="info-title">Thông tin giao hàng</div>
+                <div className="info-content">
+                  {selectedOrder.user?.address || 'Tại quán'}
+                </div>
+              </div>
+              <div className="info-block">
+                <div className="info-title">Thanh toán</div>
+                <div className="info-content">
+                  {selectedOrder.paymentStatus}
+                </div>
+              </div>
+            </div>
+
+            <div className="products-section">
+              <div className="products-title">Sản phẩm</div>
+              {selectedOrder.items?.map(item => (
+                <div className="product-item" key={item.productId}>
+                  <div className="product-name">{item.productName}</div>
+                  <div className="product-qty">x{item.quantity}</div>
+                  <div className="product-price">
+                    {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.price)}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="summary-section">
+              <div className="summary-row">
+                <span>Tổng phụ</span>
+                <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedOrder.totalPrice)}</span>
+              </div>
+              <div className="summary-row total">
+                <span>Tổng cộng</span>
+                <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedOrder.totalPrice)}</span>
+              </div>
+            </div>
           </div>
         ) : (
           <p>Không có chi tiết.</p>
         )}
-      </Modal>
+      </Drawer>
     </div>
   );
 };

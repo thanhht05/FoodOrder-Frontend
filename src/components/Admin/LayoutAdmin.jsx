@@ -35,8 +35,7 @@ const AdminLayout = () => {
     if (location.pathname.startsWith("/admin/product")) return "3";
     if (location.pathname.startsWith("/admin/table")) return "4";
     if (location.pathname === "/admin/order") return "5";
-    if (location.pathname === "/admin/order-confirm") return "5-confirm";
-    if (location.pathname === "/admin/order-cancel") return "5-cancel";
+
     if (location.pathname.startsWith("/admin/chat")) return "chat";
     return "1";
   };
@@ -73,29 +72,11 @@ const AdminLayout = () => {
               icon: <UserOutlined />,
               label: <Link to="/admin/product">Sản phẩm</Link>,
             },
+
             {
-              key: "4",
-              icon: <TableOutlined />,
-              label: <Link to="/admin/table">Bàn</Link>,
-            },
-            {
-              key: "5-group",
+              key: "5",
               icon: <ShoppingCartOutlined />,
-              label: "Đơn hàng",
-              children: [
-                {
-                  key: "5",
-                  label: <Link to="/admin/order">Đơn hàng hiện tại</Link>,
-                },
-                {
-                  key: "5-confirm",
-                  label: <Link to="/admin/order-confirm">Đơn đã xác nhận</Link>,
-                },
-                {
-                  key: "5-cancel",
-                  label: <Link to="/admin/order-cancel">Đơn đã hủy</Link>,
-                }
-              ]
+              label: <Link to="/admin/order">Đơn hàng</Link>,
             },
             {
               key: "chat",
