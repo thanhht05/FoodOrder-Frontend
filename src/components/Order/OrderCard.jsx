@@ -48,7 +48,7 @@ const OrderCard = ({ order, onShowDetail }) => {
           <Avatar
             shape="square"
             size={54}
-            src={`${import.meta.env.VITE_BACKEND_URL}/upload/${record.img}`}
+            src={record.img}
             icon={<ShoppingCartOutlined />}
           />
           <Text className="product-name" strong>

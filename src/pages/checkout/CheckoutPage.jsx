@@ -30,6 +30,7 @@ import {
   // callFetchCardetails,
   callPlaceAnOrder,
   callCreatePaymentLink,
+  callApplyVoucher,
 } from "../../services/api";
 import { clearCart } from "../../redux/slices/cart/CartSlice";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -49,6 +50,13 @@ const CheckoutPage = () => {
 
   const [provinces, setProvinces] = useState([]);
   const [wards, setWards] = useState([]);
+
+  // Voucher states
+  const [voucherCodeInput, setVoucherCodeInput] = useState("");
+  const [appliedVoucher, setAppliedVoucher] = useState(null);
+  const [isApplyingVoucher, setIsApplyingVoucher] = useState(false);
+  const [voucherError, setVoucherError] = useState("");
+  const [voucherSuccessMsg, setVoucherSuccessMsg] = useState("");
 
   useEffect(() => {
     fetch("https://provinces.open-api.vn/api/v2/p/")
@@ -76,6 +84,33 @@ const CheckoutPage = () => {
 
   const cartDetailIds = cartItems.map((item) => item.cartDetailId);
 
+  const handleApplyVoucher = async () => {
+    if (!voucherCodeInput.trim()) {
+      setVoucherError("Vui lòng nhập mã voucher");
+      setVoucherSuccessMsg("");
+      return;
+    }
+    setIsApplyingVoucher(true);
+    setVoucherError("");
+    setVoucherSuccessMsg("");
+    try {
+
+      const res = await callApplyVouycher({ orderId: 0, code: voucherCodeInput.trim() });
+      if (res && res.data) {
+        setAppliedVoucher(res.data);
+        setVoucherSuccessMsg("Voucher hợp lệ");
+        setVoucherError("");
+      }
+    } catch (e) {
+      setAppliedVoucher(null);
+      setVoucherError(
+        "Voucher không hợp lệ hoặc đã hết hạn"
+      );
+    } finally {
+      setIsApplyingVoucher(false);
+    }
+  };
+
 
   const onFinish = async (values) => {
     if (loading) return;
@@ -97,7 +132,7 @@ const CheckoutPage = () => {
         paymentMethod,
         values.note,
         shippingAddress,
-
+        appliedVoucher?.code || null
       );
       if (resOrder?.data) {
         message.success("Đặt hàng thành công");
@@ -324,6 +359,38 @@ const CheckoutPage = () => {
                 ))}
               </div>
 
+              <div className="voucher-section" style={{ marginTop: 24, marginBottom: 24 }}>
+                <Text strong>Mã giảm giá</Text>
+                <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+                  <Input
+                    placeholder="Nhập mã voucher"
+                    value={voucherCodeInput}
+                    onChange={(e) => setVoucherCodeInput(e.target.value)}
+                    disabled={isApplyingVoucher || loading}
+                  />
+                  <Button
+                    type="primary"
+                    onClick={handleApplyVoucher}
+                    loading={isApplyingVoucher}
+                    disabled={loading || !voucherCodeInput.trim()}
+                  >
+                    Áp dụng
+                  </Button>
+                </div>
+                {voucherSuccessMsg && (
+                  <div style={{ color: '#52c41a', marginTop: 8, fontSize: 14 }}>
+                    ✓ {voucherSuccessMsg}
+                    <br />
+                    Giảm giá: -{new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(appliedVoucher?.discountAmount || 0)}
+                  </div>
+                )}
+                {voucherError && (
+                  <div style={{ color: '#ff4d4f', marginTop: 8, fontSize: 14 }}>
+                    {voucherError}
+                  </div>
+                )}
+              </div>
+
               <Divider dashed />
 
               <div className="price-row">
@@ -335,6 +402,19 @@ const CheckoutPage = () => {
                   }).format(total)}
                 </Text>
               </div>
+
+              {appliedVoucher && (
+                <div className="price-row">
+                  <Text type="secondary">Giảm giá</Text>
+                  <Text type="danger" strong>
+                    -{new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(appliedVoucher.discountAmount)}
+                  </Text>
+                </div>
+              )}
+
               <div className="price-row">
                 <Text type="secondary">Phí vận chuyển</Text>
                 <Text type="success">Miễn phí</Text>
@@ -348,7 +428,7 @@ const CheckoutPage = () => {
                   {new Intl.NumberFormat("vi-VN", {
                     style: "currency",
                     currency: "VND",
-                  }).format(total)}
+                  }).format(appliedVoucher ? appliedVoucher.finalTotal : total)}
                 </Text>
               </div>
 

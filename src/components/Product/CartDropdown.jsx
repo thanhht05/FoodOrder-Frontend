@@ -89,7 +89,7 @@ const CartDropdown = () => {
             >
               {/* IMAGE */}
               <img
-                src={`${import.meta.env.VITE_BACKEND_URL}/upload/${item.img}`}
+                src={item.img}
                 alt={item.name}
                 style={{
                   width: 50,

@@ -189,7 +189,7 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
               <div className="product-item" key={idx}>
                 <div className="product-image-container">
                   <img
-                    src={`${import.meta.env.VITE_BACKEND_URL}/upload/${item.img}`}
+                    src={item.img}
                     alt={item.productName}
                     className="product-image"
                   />

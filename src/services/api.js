@@ -147,7 +147,7 @@ export const callPlaceAnOrder = (
   paymentMethod,
   note,
   shippingAddress,
-
+  voucherCode,
 ) => {
   const URL = "/api/v1/orders/placeOrder";
   const data = {
@@ -155,7 +155,13 @@ export const callPlaceAnOrder = (
     paymentMethod,
     note,
     shippingAddress,
+    voucherCode,
   };
+  return axios.post(URL, data);
+};
+
+export const callApplyVoucher = (data) => {
+  const URL = "/api/v1/apply-vouchers";
   return axios.post(URL, data);
 };
 

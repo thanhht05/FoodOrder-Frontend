@@ -93,7 +93,6 @@ const CartPage = () => {
       </div>
     );
   }
-
   return (
     <div className="cart-page-container">
       <div className="cart-wrapper">
@@ -115,7 +114,7 @@ const CartPage = () => {
                   <Row align="middle" gutter={[16, 16]}>
                     <Col xs={8} sm={4}>
                       <img
-                        src={`${import.meta.env.VITE_BACKEND_URL}/upload/${item.img}`}
+                        src={item.img}
                         alt={item.name}
                         className="product-img"
                       />
