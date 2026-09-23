@@ -8,6 +8,8 @@ const ViewDetail = ({ productData }) => {
 
   const images = productData?.items ?? [];
 
+
+
   return <ModalGallery images={images} productData={productData} />;
 };
 

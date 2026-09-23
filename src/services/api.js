@@ -82,7 +82,7 @@ export const callUploadProductImg = (fileImg) => {
   bodyFormData.append("file", fileImg);
   return axios({
     method: "post",
-    url: "/api/v1/upload",
+    url: "/api/v1/cloudinary/upload",
     data: bodyFormData,
     headers: {
       "Content-Type": "multipart/form-data",
@@ -167,9 +167,7 @@ export const callFetchOrderHistory = () => {
   return axios.get("/api/v1/orderHistory");
 };
 
-export const callFetchOrderById = (orderId) => {
-  return axios.get(`/api/v1/orders/${orderId}`);
-};
+
 
 export const callBuyNowItem = (
   productId,

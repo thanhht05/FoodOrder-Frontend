@@ -61,7 +61,7 @@ const ProductModalUpdate = ({
           uid: uuidv4(),
           name: item.name,
           status: "done",
-          url: `${import.meta.env.VITE_BACKEND_URL}/upload/${item.name}`,
+          url: item.name,
         };
       });
 
@@ -139,7 +139,7 @@ const ProductModalUpdate = ({
       setDataImg((dataImg) => [
         ...dataImg,
         {
-          name: res.data.fileName,
+          name: res.data.imgUrl,
           uid: file.uid,
         },
       ]);

@@ -94,10 +94,11 @@ const ProductModalCreate = ({
     const res = await callUploadProductImg(file);
     if (res && res.data) {
       //copy previous state => upload multiple images
+      debugger
       setDataImg((img) => [
         ...img,
         {
-          name: res.data.fileName,
+          name: res.data.imgUrl,
           uid: file.uid,
         },
       ]);

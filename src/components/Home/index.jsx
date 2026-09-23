@@ -307,7 +307,7 @@ const Home = () => {
                               <div className="image-wrapper">
                                 <img
                                   alt={p.name}
-                                  src={`${import.meta.env.VITE_BACKEND_URL}/upload/${p.lstImg?.[0]?.name}`}
+                                  src={p.lstImg?.[0]?.name}
                                 />
                               </div>
                             }

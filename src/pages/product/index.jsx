@@ -1,5 +1,5 @@
 import { useLocation } from "react-router-dom";
-import ViewDetail from "../../components/Product/Viewdetail";
+import ViewDetail from "../../components/Product/ViewDetail";
 import { useEffect, useState } from "react";
 import { callFetchProductId } from "../../services/api";
 
@@ -13,8 +13,8 @@ const ProductPage = () => {
     if (raw.lstImg) {
       raw.lstImg?.map((item) => {
         images.push({
-          original: `${import.meta.env.VITE_BACKEND_URL}/upload/${item.name}`,
-          thumbnail: `${import.meta.env.VITE_BACKEND_URL}/upload/${item.name}`,
+          original: item.name,
+          thumbnail: item.name,
           originalClass: "original-image",
           thumbnailClass: "thumbnail-image",
         });
@@ -38,6 +38,8 @@ const ProductPage = () => {
     };
     fetchProductById(id);
   }, [id]);
+
+
   return (
     <>
       <ViewDetail productData={productData} />

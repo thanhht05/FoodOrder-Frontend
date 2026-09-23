@@ -26,7 +26,10 @@ import { getCartAPI } from "../../redux/thunk/getCartThunk";
 const { Title, Text, Paragraph } = Typography;
 
 const ModalGallery = ({ images = [], productData }) => {
+
+
   const galleryRef = useRef(null);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeVariant, setActiveVariant] = useState(0); // Giả lập chọn màu/size
   const dispatch = useDispatch();
@@ -59,6 +62,7 @@ const ModalGallery = ({ images = [], productData }) => {
   };
   const variants = ["Nhỏ", "Vừa", "Lớn"]; // Mock data
 
+
   return !productData ? (
     <ProductSkeleton />
   ) : (
@@ -81,18 +85,21 @@ const ModalGallery = ({ images = [], productData }) => {
 
           <div className="thumbnail-strip">
             <div className="strip-container">
-              {images.map((item, i) => (
-                <div
-                  key={i}
-                  className={`custom-thumb ${currentIndex === i ? "active" : ""}`}
-                  onClick={() => handleThumbnailClick(i)}
-                >
-                  <img
-                    src={item.thumbnail || item.original}
-                    alt={`thumb-${i}`}
-                  />
-                </div>
-              ))}
+              {images.map((item, i) => {
+                return (
+                  <div
+                    key={i}
+                    className={`custom-thumb ${currentIndex === i ? "active" : ""}`}
+                    onClick={() => handleThumbnailClick(i)}
+                  >
+
+                    <img
+                      src={item.thumbnail || item.original}
+                      alt={`thumb-${i}`}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
         </Col>
@@ -216,7 +223,7 @@ const ModalGallery = ({ images = [], productData }) => {
           </div>
         </Col>
       </Row>
-    </div>
+    </div >
   );
 };
 

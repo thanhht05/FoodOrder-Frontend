@@ -24,20 +24,22 @@ const ProductViewDetail = ({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
-
+  debugger
   useEffect(() => {
     if (productDataDetail) {
       let lstImg = [];
 
       if (productDataDetail.lstImg) {
+
         const resLtsImg = productDataDetail.lstImg;
+
 
         resLtsImg.forEach((i) => {
           const img = {
             uid: uuidv4(),
             name: i.name,
             status: "done",
-            url: `${import.meta.env.VITE_BACKEND_URL}/upload/${i.name}`,
+            url: i.name,
           };
           lstImg.push(img);
         });
@@ -54,7 +56,6 @@ const ProductViewDetail = ({
     setPreviewOpen(true);
   };
   const handleChange = ({ fileList: newFileList }) => setFileList(newFileList);
-  console.log(fileList);
   return (
     <>
       <Drawer
