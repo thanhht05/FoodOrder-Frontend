@@ -35,6 +35,7 @@ import { getCartAPI } from "./redux/thunk/getCartThunk";
 import ProfilePage from "./pages/profile/ProfilePage";
 import AdminChatPage from "./pages/admin/chat";
 import DashboardPage from "./pages/admin/dashboard";
+import ManageVoucherPage from "./pages/admin/voucher";
 
 const Layout = () => {
   return (
@@ -155,7 +156,7 @@ function App() {
         },
       ],
     },
-    {
+      {
       path: "/admin",
       element: <LayoutAdmin />,
       errorElement: <NotFound />,
@@ -173,7 +174,7 @@ function App() {
           path: "user",
           element: (
             <ProtectedRoute roles={["ADMIN"]}>
-              <ManageUserPage />,
+              <ManageUserPage />
             </ProtectedRoute>
           ),
         },
@@ -185,7 +186,14 @@ function App() {
             </ProtectedRoute>
           ),
         },
-
+        {
+          path: "voucher",
+          element: (
+            <ProtectedRoute roles={["ADMIN"]}>
+              <ManageVoucherPage />
+            </ProtectedRoute>
+          ),
+        },
         {
           path: "order",
           element: (

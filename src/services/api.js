@@ -277,3 +277,44 @@ export const callGetTopProduct = () => {
 export const callGetRevenueMonth = () => {
   return axios.get("/api/v1/get-revenue-month")
 }
+
+export const callFetchAllVouchers = (query = "") => {
+  return axios.get(`/api/v1/vouchers${query}`);
+};
+
+export const callCreateVoucher = (code, expiration, percentDiscount, maxDiscount, usageLimit) => {
+  const URL = "/api/v1/vouchers";
+  const data = {
+    code,
+    expiration,
+    percentDiscount,
+    maxDiscount,
+    usageLimit,
+  };
+  return axios.post(URL, data);
+};
+
+export const callUpdateVoucher = (id, code, expiration, percentDiscount, maxDiscount, usageLimit) => {
+  const URL = "/api/v1/vouchers";
+  const data = {
+    id,
+    code,
+    expiration,
+    percentDiscount,
+    maxDiscount,
+    usageLimit,
+  };
+  return axios.put(URL, data);
+};
+
+export const callDeleteVoucher = (id) => {
+  return axios.delete(`/api/v1/vouchers/${id}`);
+};
+
+export const callFetchVoucherById = (id) => {
+  return axios.get(`/api/v1/vouchers/${id}`);
+};
+
+export const callUpdateVoucherStatus = (id, status) => {
+  return axios.put(`/api/v1/vouchers/${id}/status`, { status });
+};

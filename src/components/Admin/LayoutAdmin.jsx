@@ -19,6 +19,7 @@ import {
   TableOutlined,
   ShoppingCartOutlined,
   MessageOutlined,
+  GiftOutlined,
 } from "@ant-design/icons";
 import "./layoutAdmin.scss";
 import { useState } from "react";
@@ -35,6 +36,7 @@ const AdminLayout = () => {
     if (location.pathname.startsWith("/admin/product")) return "3";
     if (location.pathname.startsWith("/admin/table")) return "4";
     if (location.pathname === "/admin/order") return "5";
+    if (location.pathname.startsWith("/admin/voucher")) return "voucher";
 
     if (location.pathname.startsWith("/admin/chat")) return "chat";
     return "1";
@@ -71,6 +73,11 @@ const AdminLayout = () => {
               key: "3",
               icon: <UserOutlined />,
               label: <Link to="/admin/product">Sản phẩm</Link>,
+            },
+            {
+              key: "voucher",
+              icon: <GiftOutlined />,
+              label: <Link to="/admin/voucher">Voucher</Link>,
             },
 
             {
