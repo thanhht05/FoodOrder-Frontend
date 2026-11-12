@@ -13,8 +13,11 @@ import {
   Typography,
 } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { callRegister } from "../../services/api";
+import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { doLoginAction } from "../../redux/slices/account/accountSlice";
+import { callRegister, callGoogleLogin } from "../../services/api";
+import { getCartAPI } from "../../redux/thunk/getCartThunk";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
@@ -22,6 +25,7 @@ const { Title, Text } = Typography;
 const RegisterPage = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isSubmit, setIsSubmit] = useState(false);
 
   const onFinish = async (values) => {
@@ -47,6 +51,91 @@ const RegisterPage = () => {
       setIsSubmit(false);
     }
   };
+
+  const handleGoogleLoginCallback = async (response) => {
+    try {
+      setIsSubmit(true);
+      const idToken = response.credential;
+      if (!idToken) {
+        notification.error({
+          message: "Lỗi đăng ký Google",
+          description: "Không nhận được token xác thực từ Google",
+        });
+        return;
+      }
+
+      const res = await callGoogleLogin(idToken);
+
+      if (res?.data) {
+        localStorage.setItem("access_token", res.data.accessToken);
+        dispatch(doLoginAction(res.data));
+
+        try {
+          await dispatch(getCartAPI()).unwrap();
+        } catch {
+          // ignore cart errors if empty
+        }
+
+        message.success("Đăng nhập bằng Google thành công!");
+
+        if (res.data.userLogin?.role?.name === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
+      } else {
+        notification.error({
+          message: "Lỗi đăng ký Google",
+          description: res.message || "Xác thực tài khoản Google thất bại",
+        });
+      }
+    } catch (error) {
+      notification.error({
+        message: "Đăng nhập Google thất bại",
+        description: error?.response?.data?.message || error.message,
+      });
+    } finally {
+      setIsSubmit(false);
+    }
+  };
+
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) return;
+
+    const initGoogle = () => {
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleGoogleLoginCallback,
+        });
+
+        const btnDiv = document.getElementById("googleRegisterBtn");
+        if (btnDiv) {
+          window.google.accounts.id.renderButton(btnDiv, {
+            theme: "outline",
+            size: "large",
+            width: btnDiv.offsetWidth || 180,
+            text: "signup_with",
+            shape: "rectangular",
+          });
+        }
+      }
+    };
+
+    if (window.google?.accounts?.id) {
+      initGoogle();
+    } else {
+      const interval = setInterval(() => {
+        if (window.google?.accounts?.id) {
+          initGoogle();
+          clearInterval(interval);
+        }
+      }, 200);
+      return () => clearInterval(interval);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="register-page">
@@ -179,12 +268,25 @@ const RegisterPage = () => {
               </div>
 
               <div className="social-login">
-                <Button
-                  className="social-btn"
-                  icon={<img src={googleIcon} width={20} alt="G" />}
+                <div
+                  id="googleRegisterBtn"
+                  style={{ flex: 1, minHeight: 44, display: "flex", justifyContent: "center" }}
                 >
-                  Google
-                </Button>
+                  <Button
+                    className="social-btn"
+                    icon={<img src={googleIcon} width={20} alt="G" />}
+                    loading={isSubmit}
+                    onClick={() => {
+                      if (window.google?.accounts?.id) {
+                        window.google.accounts.id.prompt();
+                      } else {
+                        message.warning("Google Sign-In đang khởi tạo, vui lòng thử lại sau giây lát.");
+                      }
+                    }}
+                  >
+                    Google
+                  </Button>
+                </div>
                 <Button
                   className="social-btn"
                   icon={<img src={facebookIcon} width={20} alt="F" />}

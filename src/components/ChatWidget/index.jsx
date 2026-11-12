@@ -122,8 +122,6 @@ const ChatWidget = () => {
             stompClient.subscribe(`/topic/chat/${convId}`, (msg) => {
               if (msg.body) {
                 const data = JSON.parse(msg.body);
-
-
                 if (data.content === "SYSTEM_CONVERSATION_CLOSED") {
                   setConversationStatus("CLOSED");
                   message.info("Admin đã kết thúc cuộc trò chuyện.");

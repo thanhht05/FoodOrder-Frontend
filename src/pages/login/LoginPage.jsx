@@ -9,7 +9,7 @@ import {
   Row,
   Typography,
 } from "antd";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeftOutlined,
@@ -18,7 +18,7 @@ import {
 } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
 import { doLoginAction } from "../../redux/slices/account/accountSlice";
-import { callLogin } from "../../services/api";
+import { callLogin, callGoogleLogin } from "../../services/api";
 import "./loginPage.scss";
 import { getCartAPI } from "../../redux/thunk/getCartThunk";
 
@@ -71,6 +71,91 @@ const LoginPage = () => {
       setIsSubmit(false); // SỬA: Tắt loading sau khi mọi thứ đã chạy xong
     }
   };
+
+  const handleGoogleLoginCallback = async (response) => {
+    try {
+      setIsSubmit(true);
+      const idToken = response.credential;
+      if (!idToken) {
+        notification.error({
+          message: "Lỗi đăng nhập Google",
+          description: "Không nhận được token xác thực từ Google",
+        });
+        return;
+      }
+
+      const res = await callGoogleLogin(idToken);
+
+      if (res?.data) {
+        localStorage.setItem("access_token", res.data.accessToken);
+        dispatch(doLoginAction(res.data));
+
+        try {
+          await dispatch(getCartAPI()).unwrap();
+        } catch {
+          // ignore cart errors if empty
+        }
+
+        message.success("Đăng nhập bằng Google thành công!");
+
+        if (res.data.userLogin?.role?.name === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
+      } else {
+        notification.error({
+          message: "Lỗi đăng nhập Google",
+          description: res.message || "Xác thực tài khoản Google thất bại",
+        });
+      }
+    } catch (error) {
+      notification.error({
+        message: "Đăng nhập Google thất bại",
+        description: error?.response?.data?.message || error.message,
+      });
+    } finally {
+      setIsSubmit(false);
+    }
+  };
+
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!clientId) return;
+
+    const initGoogle = () => {
+      if (window.google?.accounts?.id) {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: handleGoogleLoginCallback,
+        });
+
+        const btnDiv = document.getElementById("googleSignInBtn");
+        if (btnDiv) {
+          window.google.accounts.id.renderButton(btnDiv, {
+            theme: "outline",
+            size: "large",
+            width: btnDiv.offsetWidth || 180,
+            text: "signin_with",
+            shape: "rectangular",
+          });
+        }
+      }
+    };
+
+    if (window.google?.accounts?.id) {
+      initGoogle();
+    } else {
+      const interval = setInterval(() => {
+        if (window.google?.accounts?.id) {
+          initGoogle();
+          clearInterval(interval);
+        }
+      }, 200);
+      return () => clearInterval(interval);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <div className="login-page">
       <Row className="login-container">
@@ -171,12 +256,32 @@ const LoginPage = () => {
               </div>
 
               <div className="social-login">
-                <Button
-                  className="social-btn"
-                  icon={<GoogleOutlined style={{ color: "#EA4335" }} />}
+                <div
+                  id="googleSignInBtn"
+                  style={{
+                    flex: 1,
+                    minHeight: 44,
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
                 >
-                  Google
-                </Button>
+                  <Button
+                    className="social-btn"
+                    icon={<GoogleOutlined style={{ color: "#EA4335" }} />}
+                    loading={isSubmit}
+                    onClick={() => {
+                      if (window.google?.accounts?.id) {
+                        window.google.accounts.id.prompt();
+                      } else {
+                        message.warning(
+                          "Google Sign-In đang khởi tạo, vui lòng thử lại sau giây lát.",
+                        );
+                      }
+                    }}
+                  >
+                    Google
+                  </Button>
+                </div>
                 <Button
                   className="social-btn"
                   icon={<FacebookFilled style={{ color: "#1877F2" }} />}

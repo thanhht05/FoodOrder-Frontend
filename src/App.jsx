@@ -101,7 +101,7 @@ function App() {
         {
           path: "cart",
           element: (
-            <ProtectedRoute>
+            <ProtectedRoute> // check user đã login chưa
               <CartPage />
             </ProtectedRoute>
           ),
@@ -156,7 +156,7 @@ function App() {
         },
       ],
     },
-      {
+    {
       path: "/admin",
       element: <LayoutAdmin />,
       errorElement: <NotFound />,
@@ -164,7 +164,7 @@ function App() {
         {
           index: true,
           element: (
-            <ProtectedRoute roles={["ADMIN"]}>
+            <ProtectedRoute roles={["ADMIN"]}>  check user đã login chưa  và có role là admin không
               <DashboardPage />
             </ProtectedRoute>
           ),
