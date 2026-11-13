@@ -36,6 +36,7 @@ import ProfilePage from "./pages/profile/ProfilePage";
 import AdminChatPage from "./pages/admin/chat";
 import DashboardPage from "./pages/admin/dashboard";
 import ManageVoucherPage from "./pages/admin/voucher";
+import useSessionGuard from "./hooks/useSessionGuard";
 
 const Layout = () => {
   return (
@@ -52,6 +53,9 @@ function App() {
   const dispatch = useDispatch();
 
   const isLoading = useSelector((state) => state.account.isLoading);
+
+  // Single active session: tự đăng xuất khi tài khoản đăng nhập ở trình duyệt khác
+  useSessionGuard();
   const getAccount = async () => {
     if (
       window.location.pathname === "/login" ||

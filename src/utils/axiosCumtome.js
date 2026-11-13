@@ -1,4 +1,5 @@
 import axios from "axios";
+import { forceLogout, isForceLogoutError } from "./forceLogout";
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
@@ -46,6 +47,14 @@ instance.interceptors.response.use(
   },
   async function (error) {
     const originalRequest = error.config;
+
+    // Phiên bị vô hiệu (đăng nhập ở trình duyệt khác / đổi mật khẩu):
+    // xử lý trước bước refresh token vì refresh cũng sẽ thất bại.
+    const errorCode = error.response?.data?.error;
+    if (error.response?.status === 401 && isForceLogoutError(errorCode)) {
+      forceLogout(errorCode);
+      return Promise.reject(error);
+    }
 
     if (
       originalRequest &&
