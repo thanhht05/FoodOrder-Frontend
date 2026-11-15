@@ -10,8 +10,10 @@ import {
     ResponsiveContainer,
 } from "recharts";
 import { callGetRevenueMonth } from "../../../services/api";
+import { useTranslation } from "../../../i18n";
 
 const RevenueChart = () => {
+    const { t } = useTranslation();
     const [chartData, setChartData] = useState([]);
 
     useEffect(() => {
@@ -53,7 +55,7 @@ const RevenueChart = () => {
                 <Line
                     type="monotone"
                     dataKey="revenue"
-                    name="Revenue"
+                    name={t("admin.dashboard.revenueTooltip")}
                     stroke="#8884d8"
                     strokeWidth={2}
                 />

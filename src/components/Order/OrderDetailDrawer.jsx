@@ -17,11 +17,13 @@ import {
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 import './OrderDetail.scss';
+import { useTranslation } from '../../i18n';
 
 const { Text, Title } = Typography;
 
 const OrderDetailDrawer = ({ visible, onClose, order }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   if (!order) return null;
 
   const formatCurrency = (amount) => {
@@ -33,41 +35,41 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
 
   const statusConfig = {
     PENDING: {
-      text: "Đơn hàng đang chờ xác nhận",
-      desc: "Cảm ơn bạn đã đặt hàng! Chúng tôi sẽ xác nhận đơn hàng của bạn trong thời gian sớm nhất.",
-      tag: "Chờ xác nhận",
+      text: t("orderHistory.pendingTitle"),
+      desc: t("orderHistory.pendingDesc"),
+      tag: t("orderHistory.statusPending"),
       tagColor: "success",
       icon: <ClockCircleOutlined />,
       stepIndex: 0
     },
     CONFIRMED: {
-      text: "Đơn hàng đang được chuẩn bị",
-      desc: "Đơn hàng của bạn đã được xác nhận và đang được cửa hàng chuẩn bị.",
-      tag: "Đang chuẩn bị",
+      text: t("orderHistory.confirmedTitle"),
+      desc: t("orderHistory.confirmedDesc"),
+      tag: t("orderHistory.preparingTag"),
       tagColor: "processing",
       icon: <CodeSandboxOutlined />,
       stepIndex: 1
     },
     DELIVERING: {
-      text: "Đơn hàng đang được giao",
-      desc: "Tài xế đang trên đường giao hàng cho bạn. Vui lòng giữ điện thoại.",
-      tag: "Đang giao hàng",
+      text: t("orderHistory.deliveringTitle"),
+      desc: t("orderHistory.deliveringDesc"),
+      tag: t("orderHistory.statusShipping"),
       tagColor: "processing",
       icon: <CarOutlined />,
       stepIndex: 2
     },
     COMPLETED: {
-      text: "Đơn hàng đã hoàn thành",
-      desc: "Đơn hàng đã được giao thành công. Cảm ơn bạn đã mua sắm!",
-      tag: "Hoàn thành",
+      text: t("orderHistory.completedTitle"),
+      desc: t("orderHistory.completedDesc"),
+      tag: t("orderHistory.stepDelivered"),
       tagColor: "success",
       icon: <CheckCircleOutlined />,
       stepIndex: 3
     },
     CANCELLED: {
-      text: "Đơn hàng đã bị hủy",
-      desc: "Đơn hàng của bạn đã bị hủy.",
-      tag: "Đã hủy",
+      text: t("orderHistory.cancelledTitle"),
+      desc: t("orderHistory.cancelledDesc"),
+      tag: t("orderHistory.statusCancelled"),
       tagColor: "error",
       icon: <CheckCircleOutlined />,
       stepIndex: -1
@@ -80,8 +82,8 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
 
   let currentStatus = { ...(statusConfig[order.orderStatus] || statusConfig.PENDING) };
   if (order.orderStatus === 'PENDING' && isPendingPayment) {
-    currentStatus.text = "Đơn hàng đang chờ thanh toán";
-    currentStatus.tag = "Chờ thanh toán";
+    currentStatus.text = t("orderHistory.pendingPaymentTitle");
+    currentStatus.tag = t("orderHistory.pendingPaymentTag");
   }
 
   const statusStep = {
@@ -97,25 +99,25 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
     {
       title:
         order.orderStatus === 'PENDING' && isPendingPayment
-          ? 'Chờ thanh toán'
-          : 'Chờ xác nhận',
+          ? t("orderHistory.pendingPaymentTag")
+          : t("orderHistory.statusPending"),
       icon: <ContainerOutlined />,
-      description: currentStep >= 0 ? 'Hoàn tất' : '--:--',
+      description: currentStep >= 0 ? t("orderHistory.stepDone") : '--:--',
     },
     {
-      title: 'Đang chuẩn bị',
+      title: t("orderHistory.preparingTag"),
       icon: <CodeSandboxOutlined />,
-      description: currentStep >= 1 ? 'Hoàn tất' : '--:--',
+      description: currentStep >= 1 ? t("orderHistory.stepDone") : '--:--',
     },
     {
-      title: 'Đang giao hàng',
+      title: t("orderHistory.statusShipping"),
       icon: <CarOutlined />,
-      description: currentStep >= 2 ? 'Hoàn tất' : '--:--',
+      description: currentStep >= 2 ? t("orderHistory.stepDone") : '--:--',
     },
     {
-      title: 'Hoàn thành',
+      title: t("orderHistory.stepDelivered"),
       icon: <CheckCircleOutlined />,
-      description: currentStep >= 3 ? 'Thành công' : '--:--',
+      description: currentStep >= 3 ? t("orderHistory.stepSuccess") : '--:--',
     },
   ];
 
@@ -133,7 +135,7 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
       <div className="drawer-header">
         <div className="header-left">
           <ArrowLeftOutlined onClick={onClose} className="back-icon" />
-          <span className="header-title">Đơn hàng #{order.orderId}</span>
+          <span className="header-title">{t("orderHistory.orderCodePrefix", { id: order.orderId })}</span>
         </div>
 
       </div>
@@ -152,7 +154,7 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
               {currentStatus.desc}
             </p>
             <p className="status-time">
-              Cập nhật cuối: {dayjs(order.orderDate || new Date()).format("DD/MM/YYYY - HH:mm")}
+              {t("orderHistory.updatedAtLabel")} {dayjs(order.orderDate || new Date()).format("DD/MM/YYYY - HH:mm")}
             </p>
           </div>
           <div className="status-illustration">
@@ -180,7 +182,7 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
         <div className="items-section section-card">
           <div className="section-title">
             <Space>
-              <ShopOutlined /> Đơn hàng của bạn
+              <ShopOutlined /> {t("orderHistory.yourOrderTitle")}
             </Space>
           </div>
 
@@ -206,7 +208,7 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
           <Divider dashed style={{ margin: '16px 0' }} />
 
           <div className="subtotal-row">
-            <Text strong>Tổng tiền hàng</Text>
+            <Text strong>{t("orderHistory.merchandiseTotal")}</Text>
             <Text strong>{formatCurrency(order.totalPrice)}</Text>
           </div>
         </div>
@@ -215,19 +217,19 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
         <div className="delivery-section section-card">
           <div className="section-title">
             <Space>
-              <EnvironmentOutlined /> Thông tin giao hàng
+              <EnvironmentOutlined /> {t("orderHistory.recipientInfoTitle")}
             </Space>
           </div>
           <div className="delivery-grid">
             <div className="delivery-col">
-              <Text type="secondary" className="info-label">Người nhận hàng</Text>
+              <Text type="secondary" className="info-label">{t("orderHistory.fullNameLabel")}</Text>
               <Text strong className="info-value">{order.recipientName}</Text>
 
-              <Text type="secondary" className="info-label" style={{ marginTop: 12 }}>Số điện thoại</Text>
+              <Text type="secondary" className="info-label" style={{ marginTop: 12 }}>{t("orderHistory.phoneLabel")}</Text>
               <Text strong className="info-value">{order.phone}</Text>
             </div>
             <div className="delivery-col">
-              <Text type="secondary" className="info-label">Địa chỉ giao hàng</Text>
+              <Text type="secondary" className="info-label">{t("orderHistory.addressLabel")}</Text>
               <Text strong className="info-value address-value">
                 {[order.addressDetail, order.ward, order.province].filter(Boolean).join(', ')}
               </Text>
@@ -239,40 +241,40 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
         <div className="payment-section section-card">
           <div className="section-title">
             <Space>
-              <CreditCardOutlined /> Thanh toán
+              <CreditCardOutlined /> {t("orderHistory.paymentSectionTitle")}
             </Space>
           </div>
 
           <div className="payment-grid">
             <div className="payment-col">
-              <Text type="secondary" className="info-label">Phương thức thanh toán</Text>
+              <Text type="secondary" className="info-label">{t("orderHistory.paymentMethodLabel")}</Text>
               <Text strong className="info-value">{order.paymentMethod}</Text>
             </div>
             <div className="payment-col">
-              <Text type="secondary" className="info-label">Trạng thái</Text>
+              <Text type="secondary" className="info-label">{t("common.status")}</Text>
               <div className="info-value">
                 {isCancelled ? (
                   <Tag color="default">
-                    Đã hủy
+                    {t("orderHistory.statusCancelled")}
                   </Tag>
                 ) : order.paymentStatus === "UNPAID" && paymentMethod === "COD" ? (
                   <Tag color="warning">
-                    Thanh toán khi nhận hàng
+                    {t("orderHistory.paymentCODTag")}
                   </Tag>
                 ) : order.paymentStatus === "PENDING" ? (
                   <Tag color="warning">
-                    Chờ thanh toán
+                    {t("orderHistory.pendingPaymentTag")}
                   </Tag>
                 ) : order.paymentStatus === "PAID" ? (
                   <Tag
                     color="success"
                     icon={<CheckCircleOutlined />}
                   >
-                    Đã thanh toán
+                    {t("orderHistory.paymentPaid")}
                   </Tag>
                 ) : (
                   <Tag color="default">
-                    Chưa xác định
+                    {t("orderHistory.paymentUnknownTag")}
                   </Tag>
                 )}
               </div>
@@ -282,7 +284,7 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
 
         {/* Total Section */}
         <div className="total-section">
-          <Text strong className="total-label">Tổng cộng</Text>
+          <Text strong className="total-label">{t("orderHistory.grandTotal")}</Text>
           <Text strong className="total-value">{formatCurrency(order.totalPrice)}</Text>
         </div>
 
@@ -297,7 +299,7 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
               navigate(`/payment/${order.orderId}`);
             }}
           >
-            Thanh toán ngay
+            {t("orderHistory.payNowBtn")}
           </Button>
         )}
 
@@ -307,11 +309,11 @@ const OrderDetailDrawer = ({ visible, onClose, order }) => {
             <CustomerServiceOutlined className="help-icon" />
           </div>
           <div className="help-text">
-            <div className="help-title">Cần hỗ trợ?</div>
-            <div className="help-desc">Liên hệ với chúng tôi nếu bạn có bất kỳ câu hỏi nào về đơn hàng.</div>
+            <div className="help-title">{t("orderHistory.needHelpTitle")}</div>
+            <div className="help-desc">{t("orderHistory.needHelpDesc")}</div>
           </div>
           <Button className="contact-btn" icon={<MessageOutlined />}>
-            Liên hệ hỗ trợ
+            {t("orderHistory.contactSupportBtn")}
           </Button>
         </div>
 

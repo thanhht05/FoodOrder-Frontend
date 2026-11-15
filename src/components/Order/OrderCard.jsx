@@ -18,18 +18,14 @@ import {
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "../../i18n";
 
 const { Text } = Typography;
 
 const OrderCard = ({ order, onShowDetail }) => {
-
-  console.log("order", order)
+  const { t } = useTranslation();
   const { token } = theme.useToken();
   const navigate = useNavigate();
-
-
-
-
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat("vi-VN", {
@@ -40,7 +36,7 @@ const OrderCard = ({ order, onShowDetail }) => {
 
   const productColumns = [
     {
-      title: "Product",
+      title: t("orderHistory.colProduct"),
       dataIndex: "productName",
       key: "productName",
       render: (text, record) => (
@@ -58,21 +54,21 @@ const OrderCard = ({ order, onShowDetail }) => {
       ),
     },
     {
-      title: "Price",
+      title: t("orderHistory.colPrice"),
       dataIndex: "price",
       key: "price",
       align: "right",
       render: (price) => formatCurrency(price),
     },
     {
-      title: "Qty",
+      title: t("orderHistory.colQty"),
       dataIndex: "quantity",
       key: "quantity",
       align: "center",
       render: (qty) => <Text type="secondary">x{qty}</Text>,
     },
     {
-      title: "Subtotal",
+      title: t("orderHistory.colSubtotal"),
       responsive: ["md"],
       key: "subtotal",
       align: "right",
@@ -100,7 +96,7 @@ const OrderCard = ({ order, onShowDetail }) => {
           <Col xs={24} md={12} lg={8}>
             <Space size="middle" wrap>
               <span className="order-id">
-                Order ID: <strong>#{order.orderId}</strong>
+                {t("orderHistory.orderIdLabel")} <strong>#{order.orderId}</strong>
               </span>
               <span className="order-date">
                 <ClockCircleOutlined />{" "}
@@ -113,11 +109,11 @@ const OrderCard = ({ order, onShowDetail }) => {
         </Row>
         {isPendingPayment ? (
           <div style={{ marginTop: 12, color: token.colorWarning }}>
-            <Text type="warning">⚠ Đơn hàng đang chờ thanh toán</Text>
+            <Text type="warning">{t("orderHistory.warningPendingPayment")}</Text>
           </div>
         ) : isPending && (
           <div style={{ marginTop: 12, color: token.colorWarning }}>
-            <Text type="warning">⚠ Đơn hàng đang chờ xác nhận</Text>
+            <Text type="warning">{t("orderHistory.warningPendingConfirm")}</Text>
           </div>
         )}
       </div>
@@ -137,7 +133,7 @@ const OrderCard = ({ order, onShowDetail }) => {
         <Row justify="space-between" align="middle">
           <Col xs={24} sm={12} style={{ marginBottom: '16px' }}>
             <Space size="large">
-              <Text type="secondary">Tổng cộng:</Text>
+              <Text type="secondary">{t("orderHistory.totalAmountLabel")}</Text>
               <span
                 className="grand-total-price"
                 style={{ color: token.colorError }}
@@ -155,7 +151,7 @@ const OrderCard = ({ order, onShowDetail }) => {
                   onClick={() => window.location.href = `https://pay.payos.vn/web/${order.paymentLinkId}`}
                   style={{ backgroundColor: token.colorWarning }}
                 >
-                  💳 Thanh toán ngay
+                  💳 {t("orderHistory.payNowBtn")}
                 </Button>
               )}
               {isDelivering && (
@@ -164,10 +160,12 @@ const OrderCard = ({ order, onShowDetail }) => {
                   size="large"
                   onClick={() => onShowDetail && onShowDetail(order)}
                 >
-                  Theo dõi đơn hàng
+                  {t("orderHistory.trackOrderBtn")}
                 </Button>
               )}
-              <Button size="large" onClick={() => onShowDetail && onShowDetail(order)}>Xem chi tiết</Button>
+              <Button size="large" onClick={() => onShowDetail && onShowDetail(order)}>
+                {t("orderHistory.viewDetailBtn")}
+              </Button>
             </Space>
           </Col>
         </Row>

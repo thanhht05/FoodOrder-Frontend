@@ -3,12 +3,14 @@ import dayjs from "dayjs";
 import { PlusOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { useTranslation } from "../../../i18n";
 
 const ProductViewDetail = ({
   productDataDetail,
   openProductViewDetail,
   setOpenProductViewDetail,
 }) => {
+  const { t } = useTranslation();
   const onClose = () => {
     setOpenProductViewDetail(false);
   };
@@ -24,7 +26,6 @@ const ProductViewDetail = ({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState("");
   const [fileList, setFileList] = useState([]);
-  debugger
   useEffect(() => {
     if (productDataDetail) {
       let lstImg = [];
@@ -59,39 +60,39 @@ const ProductViewDetail = ({
   return (
     <>
       <Drawer
-        title="Chi tiết sản phẩm"
+        title={t("admin.product.detailDrawerTitle")}
         onClose={onClose}
         open={openProductViewDetail}
       >
         {/* Info */}
         <Descriptions bordered column={1} size="middle">
-          <Descriptions.Item label="Tên sản phẩm">
+          <Descriptions.Item label={t("admin.product.searchNameLabel")}>
             {productDataDetail?.name}
           </Descriptions.Item>
-          <Descriptions.Item label="Số lượng">
+          <Descriptions.Item label={t("admin.product.colQuantity")}>
             {productDataDetail?.quantity}
           </Descriptions.Item>
-          <Descriptions.Item label="Giá">
+          <Descriptions.Item label={t("admin.product.colPrice")}>
             {productDataDetail?.price}
           </Descriptions.Item>
 
-          <Descriptions.Item label="Danh mục">
-            {productDataDetail?.productCate.name}
+          <Descriptions.Item label={t("admin.product.colCategory")}>
+            {productDataDetail?.productCate?.name}
           </Descriptions.Item>
-          <Descriptions.Item label="Mô tả">
+          <Descriptions.Item label={t("admin.product.colDescription")}>
             {productDataDetail?.description}
           </Descriptions.Item>
 
-          <Descriptions.Item label="Cập nhật lúc">
+          <Descriptions.Item label={t("admin.product.colUpdatedAt")}>
             {dayjs(productDataDetail?.updatedAt).isValid()
               ? dayjs(productDataDetail?.updatedAt).format("DD/MM/YYYY HH:mm")
-              : "Sản phẩm chưa được cập nhật"}
+              : t("admin.product.notUpdatedYet")}
           </Descriptions.Item>
-          <Descriptions.Item label="Tạo lúc">
+          <Descriptions.Item label={t("admin.product.createdAtLabel")}>
             {dayjs(productDataDetail?.createdAt).format("DD/MM/YYYY HH:mm")}
           </Descriptions.Item>
         </Descriptions>
-        <Divider>Ảnh sản phẩm</Divider>
+        <Divider>{t("admin.product.productImagesSection")}</Divider>
 
         <Upload
           action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"

@@ -23,10 +23,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCartAPI } from "../../redux/thunk/addToCartAPI";
 import { useNavigate } from "react-router-dom";
 import { getCartAPI } from "../../redux/thunk/getCartThunk";
+import { useTranslation } from "../../i18n";
 const { Title, Text, Paragraph } = Typography;
 
 const ModalGallery = ({ images = [], productData }) => {
-
+  const { t } = useTranslation();
 
   const galleryRef = useRef(null);
 
@@ -53,14 +54,14 @@ const ModalGallery = ({ images = [], productData }) => {
       );
       dispatch(getCartAPI());
     } else {
-      message.warning("Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng");
+      message.warning(t("product.pleaseLoginToAdd"));
       navigate("/login");
       return;
     }
 
-    message.success("Thêm sản phẩm thành công");
+    message.success(t("product.addedToCartSuccess"));
   };
-  const variants = ["Nhỏ", "Vừa", "Lớn"]; // Mock data
+  const variants = [t("product.sizeSmall"), t("product.sizeMedium"), t("product.sizeLarge")];
 
 
   return !productData ? (
@@ -127,7 +128,7 @@ const ModalGallery = ({ images = [], productData }) => {
                     allowHalf
                     className="custom-rate"
                   />
-                  <Text type="secondary">(128 đánh giá)</Text>
+                  <Text type="secondary">{t("product.reviewsCount", { count: 128 })}</Text>
                 </Space>
               </Space>
             </div>
@@ -154,7 +155,7 @@ const ModalGallery = ({ images = [], productData }) => {
                 -20%
               </Tag>
               <div style={{ marginTop: "20px" }}>
-                Số lượng: &nbsp;
+                {t("product.quantity")}: &nbsp;
                 <InputNumber
                   min={1}
                   max={maxQuantityProduct}
@@ -164,7 +165,7 @@ const ModalGallery = ({ images = [], productData }) => {
               </div>
               {/* Phân loại giả lập */}
               <div className="variant-selection">
-                <Text strong>Lựa chọn size : &nbsp;</Text>
+                <Text strong>{t("product.selectSize")} &nbsp;</Text>
                 <Space className="variant-list" style={{ marginTop: 8 }}>
                   {variants.map((v, idx) => (
                     <Button
@@ -181,21 +182,18 @@ const ModalGallery = ({ images = [], productData }) => {
 
               <Paragraph
                 className="product-desc"
-                ellipsis={{ rows: 3, expandable: true, symbol: "Xem thêm" }}
+                ellipsis={{ rows: 3, expandable: true, symbol: t("product.seeMore") }}
               >
-                {productData?.description ||
-                  "Trải nghiệm âm thanh tuyệt đỉnh với công nghệ chống ồn chủ động (ANC). Thiết kế công thái học vừa vặn hoàn hảo, mang lại sự thoải mái trong suốt ngày dài sử dụng. Thời lượng pin lên đến 30 giờ liên tục."}
+                {productData?.description || t("product.noDescription")}
               </Paragraph>
 
               <div className="benefits-list">
                 <Space size="large">
                   <span className="benefit-item">
-                    <ThunderboltOutlined className="benefit-icon" /> Giao siêu
-                    tốc 2H
+                    <ThunderboltOutlined className="benefit-icon" /> {t("product.fastDelivery")}
                   </span>
                   <span className="benefit-item">
-                    <SafetyOutlined className="benefit-icon" /> Bảo hành 12
-                    tháng
+                    <SafetyOutlined className="benefit-icon" /> {t("product.qualityGuarantee")}
                   </span>
                 </Space>
               </div>
@@ -214,11 +212,11 @@ const ModalGallery = ({ images = [], productData }) => {
                 icon={<ShoppingCartOutlined style={{ fontSize: "20px" }} />}
                 className="btn-add-cart"
               >
-                THÊM VÀO GIỎ HÀNG
+                {t("product.addToCart").toUpperCase()}
               </Button>
             </div>
             <Text type="secondary" className="ship-note">
-              * Miễn phí vận chuyển cho đơn hàng từ 500k
+              {t("product.freeShipNote")}
             </Text>
           </div>
         </Col>

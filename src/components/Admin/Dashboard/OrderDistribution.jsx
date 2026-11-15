@@ -9,25 +9,17 @@ import {
 } from "recharts";
 import { Spin } from "antd";
 import { callCountOrderStatus } from '../../../services/api';
+import i18n, { useTranslation } from '../../../i18n';
 
 const COLORS = ['#52c41a', '#1890ff', '#faad14', '#f5222d', '#13c2c2', '#eb2f96'];
 
-const STATUS_MAP = {
-    'PENDING': 'Chờ duyệt',
-    'CONFIRMED': 'Đã xác nhận',
-    'SHIPPING': 'Đang giao',
-    'DELIVERED': 'Đã giao',
-    'COMPLETED': 'Thành công',
-    'CANCELLED': 'Đã hủy',
-};
-
-const STATUS_COLORS = {
-    'Chờ duyệt': '#faad14', // warning - yellow
-    'Đã xác nhận': '#1890ff', // processing - blue
-    'Đang giao': '#13c2c2', // cyan
-    'Đã giao': '#52c41a', // success - green
-    'Thành công': '#52c41a', // success - green
-    'Đã hủy': '#f5222d', // error - red
+const STATUS_CODE_COLORS = {
+    'PENDING': '#faad14',
+    'CONFIRMED': '#1890ff',
+    'SHIPPING': '#13c2c2',
+    'DELIVERED': '#52c41a',
+    'COMPLETED': '#52c41a',
+    'CANCELLED': '#f5222d',
 };
 
 const renderActiveShape = ({
@@ -125,7 +117,7 @@ const renderActiveShape = ({
                 fill="#333"
                 style={{ fontWeight: 500 }}
             >
-                {`${value} đơn`}
+                {`${value} ${i18n.t('admin.dashboard.ordersUnit')}`}
             </text>
 
             {/* Percentage */}
@@ -143,23 +135,30 @@ const renderActiveShape = ({
 };
 
 const OrderDistribution = () => {
+    const { t } = useTranslation();
     const [activeIndex, setActiveIndex] = useState(0);
-    const [data, setData] = useState([]);
+    const [rawData, setRawData] = useState([]);
     const [loading, setLoading] = useState(true);
     const isAnimationActive = true;
+
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case 'PENDING': return t('admin.dashboard.statusPending');
+            case 'CONFIRMED': return t('admin.dashboard.statusConfirmed');
+            case 'SHIPPING': return t('admin.dashboard.statusShipping');
+            case 'DELIVERED': return t('admin.dashboard.statusDelivered');
+            case 'COMPLETED': return t('admin.dashboard.statusCompleted');
+            case 'CANCELLED': return t('admin.dashboard.statusCancelled');
+            default: return status;
+        }
+    };
 
     useEffect(() => {
         const fetchOrderStatus = async () => {
             try {
                 const response = await callCountOrderStatus();
-
-
                 if (response.data) {
-                    const mappedData = response.data.map(item => ({
-                        name: STATUS_MAP[item.orderStatus] || item.orderStatus,
-                        value: item.count
-                    }));
-                    setData(mappedData);
+                    setRawData(response.data);
                 }
             } catch (error) {
                 console.error("Error fetching order status count:", error);
@@ -170,6 +169,12 @@ const OrderDistribution = () => {
 
         fetchOrderStatus();
     }, []);
+
+    const data = rawData.map(item => ({
+        rawStatus: item.orderStatus,
+        name: getStatusLabel(item.orderStatus),
+        value: item.count
+    }));
 
     const onPieEnter = (_, index) => {
         setActiveIndex(index);
@@ -188,7 +193,7 @@ const OrderDistribution = () => {
     if (data.length === 0) {
         return (
             <div style={{ width: '100%', height: '350px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <p>Không có dữ liệu</p>
+                <p>{t('admin.dashboard.noData')}</p>
             </div>
         );
     }
@@ -210,7 +215,7 @@ const OrderDistribution = () => {
                         onMouseEnter={onPieEnter}
                     >
                         {data.map((entry, index) => {
-                            const cellColor = STATUS_COLORS[entry.name] || COLORS[index % COLORS.length];
+                            const cellColor = STATUS_CODE_COLORS[entry.rawStatus] || COLORS[index % COLORS.length];
                             return <Cell key={`cell-${index}`} fill={cellColor} />;
                         })}
                     </Pie>
@@ -229,7 +234,7 @@ const OrderDistribution = () => {
             }}>
                 {data.map((entry, index) => {
                     const percent = totalOrders === 0 ? "0.0" : ((entry.value / totalOrders) * 100).toFixed(1);
-                    const dotColor = STATUS_COLORS[entry.name] || COLORS[index % COLORS.length];
+                    const dotColor = STATUS_CODE_COLORS[entry.rawStatus] || COLORS[index % COLORS.length];
                     return (
                         <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                             <div style={{

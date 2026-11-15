@@ -4,9 +4,11 @@ import Dragger from "antd/es/upload/Dragger";
 import { useState } from "react";
 import * as XLSX from "xlsx";
 import { callBulkCreateUser } from "../../../services/api";
+import { useTranslation } from "../../../i18n";
 
 const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
   const [dataExcel, setDataExcel] = useState([]);
+  const { t } = useTranslation();
 
   const handleOk = async () => {
     // add password for user
@@ -24,23 +26,18 @@ const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
       const { success, failed, total } = res.data;
 
       if (success.length === total) {
-        //  all users are imported
-        // console.log("All users created successfully");
-        message.success(`Tạo thành công ${total} user`);
+        message.success(t("admin.user.importAllSuccess", { total }));
         setDataExcel([]);
         await fetchUser();
         setOpenModalUpload(false);
       } else if (success.length > 0) {
-        // some user are successfully imported and failure
-        // console.log(`Success: ${success.length}, Failed: ${failed.length}`);
-        // console.log("Failed list:", failed);
         notification.warning({
-          message: "Tạo user một phần",
+          message: t("admin.user.importPartialTitle"),
           description: (
             <>
-              <div>✅ Thành công: {success.length}</div>
-              <div>❌ Thất bại: {failed.length}</div>
-              <div>Email lỗi: {failed.map((f) => f.email).join(", ")}</div>
+              <div>{t("admin.user.importSuccessCount", { count: success.length })}</div>
+              <div>{t("admin.user.importFailedCount", { count: failed.length })}</div>
+              <div>{t("admin.user.importFailedEmails", { emails: failed.map((f) => f.email).join(", ") })}</div>
             </>
           ),
           duration: 5,
@@ -49,14 +46,11 @@ const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
         await fetchUser();
         setOpenModalUpload(false);
       } else {
-        // all user are falure import
-        // console.log("All users failed");
-        // console.log("Reason:", failed);
         notification.error({
-          message: "Tạo user thất bại",
+          message: t("admin.user.importFailedTitle"),
           description: (
             <>
-              <div>CÓ lỗi xảy ra</div>
+              <div>{t("common.errorTitle")}</div>
               <div>{failed.map((f) => f.email).join(", ")}</div>
             </>
           ),
@@ -91,10 +85,8 @@ const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
       const { status } = info.file;
       if (status !== "uploading") {
         console.log(info.file);
-        // console.log("infor list", info.fileList[0].originFileObj);
       }
       if (status === "done") {
-        // console.log(info.fileList);
         if (info.fileList && info.fileList.length > 0) {
           const file = info.fileList[0].originFileObj;
           const reader = new FileReader();
@@ -110,9 +102,9 @@ const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
             if (json && json.length > 0) setDataExcel(json);
           };
         }
-        message.success(`${info.file.name} tải lên file thành công.`);
+        message.success(t("admin.user.fileUploadSuccess", { name: info.file.name }));
       } else if (status === "error") {
-        message.error(`${info.file.name} tải lên file thất bại.`);
+        message.error(t("admin.user.fileUploadFailed", { name: info.file.name }));
       }
     },
     onDrop(e) {
@@ -121,17 +113,17 @@ const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
   };
   const columns = [
     {
-      title: "Họ và tên",
+      title: t("admin.user.colFullName"),
       dataIndex: "fullName",
       key: "fullName",
     },
     {
-      title: "Email",
+      title: t("admin.user.colEmail"),
       dataIndex: "email",
       key: "email",
     },
     {
-      title: "Số điện thoại",
+      title: t("admin.user.colPhone"),
       dataIndex: "phone",
       key: "phone",
     },
@@ -139,11 +131,12 @@ const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
   return (
     <>
       <Modal
-        title="Nhập dữ liệu người dùng"
+        title={t("admin.user.importModalTitle")}
         closable={{ "aria-label": "Custom Close Button" }}
         open={openModalUpload}
         onOk={handleOk}
-        okText="Nhập dữ liệu"
+        okText={t("admin.user.importOkText")}
+        cancelText={t("common.cancel")}
         onCancel={handleCancel}
       >
         <Dragger {...propsUserUpload}>
@@ -151,16 +144,16 @@ const UserImport = ({ openModalUpload, setOpenModalUpload, fetchUser }) => {
             <InboxOutlined />
           </p>
           <p className="ant-upload-text">
-            Nhấp hoặc kéo thả file vào khu vực này để tải lên
+            {t("admin.user.importDragText")}
           </p>
           <p className="ant-upload-hint">
-            Hỗ trợ tải lên file đơn hoặc số lượng lớn. Nghiêm cấm tải lên dữ liệu công ty hoặc các tập tin bị cấm khác.
+            {t("admin.user.importHintText")}
           </p>
         </Dragger>
 
         <>
           <Table
-            title={() => <span>Dữ liệu upload</span>}
+            title={() => <span>{t("admin.user.importTableTitle")}</span>}
             dataSource={dataExcel}
             columns={columns}
           />

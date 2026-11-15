@@ -1,8 +1,10 @@
 import { Button, Col, Form, Input, Row, theme } from "antd";
+import { useTranslation } from "../../../i18n";
 
 const FormSearch = ({ handleSearch, setFilter }) => {
   const { token } = theme.useToken();
   const [form] = Form.useForm();
+  const { t } = useTranslation();
   const formStyle = {
     maxWidth: "none",
     background: token.colorFillAlter,
@@ -31,13 +33,13 @@ const FormSearch = ({ handleSearch, setFilter }) => {
     >
       <Row gutter={24}>
         <Col span={8}>
-          <Form.Item labelCol={{ span: 24 }} name={`fullName`} label={`Họ và tên`}>
-            <Input />
+          <Form.Item labelCol={{ span: 24 }} name={`fullName`} label={t("admin.user.searchFullNameLabel")}>
+            <Input placeholder={t("admin.user.searchFullNamePlaceholder")} />
           </Form.Item>
         </Col>
         <Col span={8}>
-          <Form.Item labelCol={{ span: 24 }} name={`email`} label={`Email`}>
-            <Input />
+          <Form.Item labelCol={{ span: 24 }} name={`email`} label={t("admin.user.searchEmailLabel")}>
+            <Input placeholder={t("admin.user.searchEmailPlaceholder")} />
           </Form.Item>
         </Col>
 
@@ -45,16 +47,16 @@ const FormSearch = ({ handleSearch, setFilter }) => {
           <Form.Item
             labelCol={{ span: 24 }}
             name={`phone`}
-            label={`Số điện thoại`}
+            label={t("admin.user.searchPhoneLabel")}
           >
-            <Input />
+            <Input placeholder={t("admin.user.searchPhonePlaceholder")} />
           </Form.Item>
         </Col>
       </Row>
       <Row>
         <Col span={24} style={{ textAlign: "right" }}>
           <Button type="primary" htmlType="submit">
-            Tìm kiếm
+            {t("common.search")}
           </Button>
           <Button
             style={{ margin: "0 8px" }}
@@ -63,7 +65,7 @@ const FormSearch = ({ handleSearch, setFilter }) => {
               setFilter("");
             }}
           >
-            Làm mới
+            {t("common.reset")}
           </Button>
           {/* <a
                         style={{ fontSize: 12 }}

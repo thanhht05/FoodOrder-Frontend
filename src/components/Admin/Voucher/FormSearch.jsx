@@ -1,6 +1,8 @@
 import { Button, Col, Form, Input, Row, theme } from "antd";
+import { useTranslation } from "../../../i18n";
 
 const FormSearch = (props) => {
+  const { t } = useTranslation();
   const { token } = theme.useToken();
   const [form] = Form.useForm();
   
@@ -37,16 +39,16 @@ const FormSearch = (props) => {
         <Col span={12}>
           <Form.Item
             name={`code`}
-            label={`Mã Voucher`}
+            label={t("admin.voucher.searchCodeLabel")}
           >
-            <Input placeholder="Nhập mã voucher" />
+            <Input placeholder={t("admin.voucher.searchCodePlaceholder")} />
           </Form.Item>
         </Col>
       </Row>
       <Row>
         <Col span={24} style={{ textAlign: "right" }}>
           <Button type="primary" htmlType="submit">
-            Tìm kiếm
+            {t("common.search")}
           </Button>
           <Button
             style={{ margin: "0 8px" }}
@@ -54,7 +56,7 @@ const FormSearch = (props) => {
               onReset();
             }}
           >
-            Làm mới
+            {t("common.reset")}
           </Button>
         </Col>
       </Row>

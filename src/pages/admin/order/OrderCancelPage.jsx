@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { message, Spin, Drawer, Table, Button } from 'antd';
 import { callFetchOrders, callFetchOrderDetails } from '../../../services/api';
 import './order.scss';
+import { useTranslation } from '../../../i18n';
 
 const OrderCancelPage = () => {
+  const { t } = useTranslation();
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,7 +26,7 @@ const OrderCancelPage = () => {
         const orderData = Array.isArray(res.data) ? res.data : (res.data.data || res.data);
         const mappedTables = orderData.map(order => ({
           id: order.orderId,
-          customer: order.user ? order.user.fullName : `Bàn ${order.tableId < 10 ? '0' + order.tableId : order.tableId}`,
+          customer: order.user ? order.user.fullName : t('admin.order.tablePrefix', { id: order.tableId < 10 ? '0' + order.tableId : order.tableId }),
           status: order.status,
           orderTime: formatTime(order.orderDate),
           date: formatDate(order.orderDate),
@@ -33,11 +35,11 @@ const OrderCancelPage = () => {
         }));
         setTables(mappedTables);
       } else {
-        message.error("Không thể lấy danh sách đơn hàng đã hủy");
+        message.error(t("admin.order.fetchOrdersError"));
       }
     } catch (error) {
       console.error(error);
-      message.error("Có lỗi xảy ra khi lấy danh sách đơn hàng đã hủy");
+      message.error(t("admin.order.fetchOrdersError"));
     } finally {
       setLoading(false);
     }
@@ -51,11 +53,11 @@ const OrderCancelPage = () => {
       if (res && res.data) {
         setSelectedOrder(res.data);
       } else {
-        message.error("Không thể lấy chi tiết đơn hàng");
+        message.error(t("admin.order.fetchOrderDetailsError"));
       }
     } catch (error) {
       console.error(error);
-      message.error("Lỗi khi lấy chi tiết đơn hàng");
+      message.error(t("admin.order.fetchOrderDetailsError"));
     } finally {
       setLoadingDetails(false);
     }
@@ -73,34 +75,34 @@ const OrderCancelPage = () => {
     return date.toLocaleDateString('vi-VN');
   };
 
-  const getStatusLabel = (status) => 'Đã hủy';
+  const getStatusLabel = (status) => t('admin.order.tabCancelled');
   const getStatusClass = (status) => 'status-occupied'; // Red style for cancelled
 
   const columns = [
     {
-      title: 'Order',
+      title: t('admin.order.colOrderId'),
       dataIndex: 'id',
       key: 'id',
       render: (text) => <strong>#{text}</strong>,
     },
     {
-      title: 'Customer / Table',
+      title: t('admin.order.colCustomer'),
       dataIndex: 'customer',
       key: 'customer',
     },
     {
-      title: 'Date',
+      title: t('admin.order.colCreatedAt'),
       dataIndex: 'date',
       key: 'date',
     },
     {
-      title: 'Total',
+      title: t('admin.order.colTotalPrice'),
       dataIndex: 'total',
       key: 'total',
       render: (total) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total),
     },
     {
-      title: 'Status',
+      title: t('admin.order.colOrderStatus'),
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
@@ -111,10 +113,10 @@ const OrderCancelPage = () => {
       )
     },
     {
-      title: 'Action',
+      title: t('admin.order.colActions'),
       key: 'action',
       render: (_, record) => (
-        <Button type="link" onClick={() => handleCardClick(record.id)}>View</Button>
+        <Button type="link" onClick={() => handleCardClick(record.id)}>{t('admin.order.detailBtn')}</Button>
       ),
     },
   ];
@@ -122,7 +124,7 @@ const OrderCancelPage = () => {
   return (
     <div className="manage-order-page">
       <div className="header-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h2>Đơn hàng đã hủy</h2>
+        <h2>{t('admin.order.cancelledOrdersTitle')}</h2>
       </div>
 
       {loading ? (
@@ -141,14 +143,14 @@ const OrderCancelPage = () => {
 
       {/* Order Details Drawer */}
       <Drawer
-        title={selectedOrder ? `Order #${selectedOrder.orderId}` : 'Chi tiết đơn hàng'}
+        title={selectedOrder ? t('admin.order.modalDetailTitle', { id: selectedOrder.orderId }) : t('admin.order.detailBtn')}
         placement="right"
         onClose={() => setIsDrawerOpen(false)}
         open={isDrawerOpen}
         width={500}
         footer={
           <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <Button onClick={() => setIsDrawerOpen(false)}>Đóng</Button>
+            <Button onClick={() => setIsDrawerOpen(false)}>{t('common.close')}</Button>
           </div>
         }
       >
@@ -157,7 +159,7 @@ const OrderCancelPage = () => {
         ) : selectedOrder ? (
           <div className="order-drawer-content">
             <div className="drawer-status">
-              <div className="status-title">Trạng thái</div>
+              <div className="status-title">{t('common.status')}</div>
               <div className={`status-badge ${getStatusClass(selectedOrder.status)}`} style={{ padding: '4px 10px', borderRadius: '9999px', display: 'inline-flex', alignItems: 'center', fontSize: '13px', fontWeight: 600, border: '1px solid currentColor' }}>
                 <span className="dot" style={{ width: '8px', height: '8px', borderRadius: '50%', marginRight: '6px', background: 'currentColor' }}></span>
                 {getStatusLabel(selectedOrder.status)}
@@ -165,30 +167,30 @@ const OrderCancelPage = () => {
               
               <div className="timeline-container">
                 <div className={`timeline-step cancelled`}>
-                  🟡 Pending
+                  🟡 {t('admin.order.tabPending')}
                 </div>
                 <div className={`timeline-step cancelled`}>
-                  🔴 Cancelled
+                  🔴 {t('admin.order.tabCancelled')}
                 </div>
               </div>
             </div>
 
             <div className="info-section">
               <div className="info-block">
-                <div className="info-title">Khách hàng / Bàn</div>
+                <div className="info-title">{t('admin.order.colCustomer')}</div>
                 <div className="info-content">
-                  {selectedOrder.user ? selectedOrder.user.fullName : `Bàn ${selectedOrder.tableId}`}
+                  {selectedOrder.user ? selectedOrder.user.fullName : t('admin.order.tablePrefix', { id: selectedOrder.tableId })}
                   {selectedOrder.user?.phone && <div>📞 {selectedOrder.user.phone}</div>}
                 </div>
               </div>
               <div className="info-block">
-                <div className="info-title">Thông tin giao hàng</div>
+                <div className="info-title">{t('orderHistory.recipientInfoTitle')}</div>
                 <div className="info-content">
-                  {selectedOrder.user?.address || 'Tại quán'}
+                  {selectedOrder.user?.address || t('admin.order.dineIn')}
                 </div>
               </div>
               <div className="info-block">
-                <div className="info-title">Thanh toán</div>
+                <div className="info-title">{t('admin.order.colPayment')}</div>
                 <div className="info-content">
                   {selectedOrder.paymentStatus}
                 </div>
@@ -196,7 +198,7 @@ const OrderCancelPage = () => {
             </div>
 
             <div className="products-section">
-              <div className="products-title">Sản phẩm</div>
+              <div className="products-title">{t('admin.order.colProduct')}</div>
               {selectedOrder.items?.map(item => (
                 <div className="product-item" key={item.productId}>
                   <div className="product-name">{item.productName}</div>
@@ -210,17 +212,17 @@ const OrderCancelPage = () => {
 
             <div className="summary-section">
               <div className="summary-row">
-                <span>Tổng phụ</span>
+                <span>{t('admin.order.subtotalLabel')}</span>
                 <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedOrder.totalPrice)}</span>
               </div>
               <div className="summary-row total">
-                <span>Tổng cộng</span>
+                <span>{t('admin.order.totalLabel')}</span>
                 <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedOrder.totalPrice)}</span>
               </div>
             </div>
           </div>
         ) : (
-          <p>Không có chi tiết.</p>
+          <p>{t('admin.order.noDetails')}</p>
         )}
       </Drawer>
     </div>

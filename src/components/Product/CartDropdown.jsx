@@ -1,10 +1,12 @@
 import { Button } from "antd";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "../../i18n";
 
 const CartDropdown = () => {
   const cart = useSelector((state) => state.cart.items);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
@@ -63,7 +65,7 @@ const CartDropdown = () => {
         borderRadius: 8,
       }}
     >
-      <h4 style={{ marginBottom: 10 }}>Giỏ hàng</h4>
+      <h4 style={{ marginBottom: 10 }}>{t("cart.stepCart")}</h4>
 
       {/* LIST ITEM */}
       <div
@@ -73,7 +75,7 @@ const CartDropdown = () => {
         }}
       >
         {cart.length === 0 ? (
-          <p style={{ textAlign: "center" }}>Giỏ hàng trống</p>
+          <p style={{ textAlign: "center" }}>{t("product.emptyCart")}</p>
         ) : (
           cart.map((item) => (
             <div
@@ -144,7 +146,7 @@ const CartDropdown = () => {
               fontWeight: 500,
             }}
           >
-            <span>Tổng:</span>
+            <span>{t("cart.subtotal")}</span>
             <span style={{ color: "#ff4d4f" }}>{total.toLocaleString()}₫</span>
           </div>
 
@@ -160,7 +162,7 @@ const CartDropdown = () => {
             }}
             onClick={() => navigate("/cart")}
           >
-            Xem giỏ hàng
+            {t("product.viewCart")}
           </Button>
         </>
       )}

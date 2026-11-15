@@ -8,6 +8,7 @@ import SockJS from "sockjs-client";
 import "./paymentPage.scss";
 import { clearCart } from "../../redux/slices/cart/CartSlice";
 import { useDispatch } from "react-redux";
+import { useTranslation } from "../../i18n";
 const { Title, Text } = Typography;
 
 const PaymentPage = () => {
@@ -17,6 +18,7 @@ const PaymentPage = () => {
   const { orderId } = useParams();
   const [orderTotal, setOrderTotal] = useState(location.state?.total || 1250000);
   const dispatch = useDispatch()
+  const { t } = useTranslation();
 
   useEffect(() => {
     // If we want to fetch order details to get the exact total amount in case it's not passed via state
@@ -63,7 +65,7 @@ const PaymentPage = () => {
             try {
               const data = JSON.parse(msg.body);
               if (data.status === "PAID") {
-                message.success("Thanh toán thành công");
+                message.success(t("payment.confirmedPaidSuccess"));
                 dispatch(clearCart())
                 navigate("/order-history");
               }
@@ -94,18 +96,18 @@ const PaymentPage = () => {
     try {
       const res = await callPayOrder();
       if (res?.data) {
-        message.success("Thanh toán thành công");
+        message.success(t("payment.confirmedPaidSuccess"));
         navigate("/order-history");
       } else {
         // Handle case where API might succeed but no data returned
-        message.success("Thanh toán thành công");
+        message.success(t("payment.confirmedPaidSuccess"));
 
         navigate("/order-history");
       }
     } catch (error) {
       notification.error({
-        message: "Lỗi thanh toán",
-        description: error?.response?.data?.message || error.message || "Thanh toán thất bại",
+        message: t("payment.paymentErrorTitle"),
+        description: error?.response?.data?.message || error.message || t("common.errorTitle"),
       });
     } finally {
       setLoading(false);
@@ -116,11 +118,11 @@ const PaymentPage = () => {
     <div className="premium-payment-container">
       <Card className="payment-card" bordered={false}>
         <Title level={3} className="section-title">
-          Thanh toán đơn hàng #{orderId}
+          {t("payment.paymentTitle", { id: orderId })}
         </Title>
 
         <div style={{ textAlign: "center", marginBottom: "20px" }}>
-          <Text type="secondary" style={{ fontSize: "16px" }}>Tổng số tiền cần thanh toán:</Text><br />
+          <Text type="secondary" style={{ fontSize: "16px" }}>{t("payment.totalToPayLabel")}</Text><br />
           <Text strong style={{ fontSize: "24px", color: "#f5222d" }}>
             {new Intl.NumberFormat("vi-VN", {
               style: "currency",
@@ -132,7 +134,7 @@ const PaymentPage = () => {
         <div className="qr-payment-box">
           <div className="qr-header">
             <SafetyCertificateOutlined className="qr-icon" />
-            <Text strong>Quét mã để thanh toán</Text>
+            <Text strong>{t("payment.scanToPayTitle")}</Text>
           </div>
           <div className="qr-code-wrapper" style={{ minHeight: 220, display: "flex", justifyContent: "center", alignItems: "center" }}>
             {qrLoading && !qrError && (
@@ -140,15 +142,15 @@ const PaymentPage = () => {
             )}
             {qrError ? (
               <Alert
-                message="Không thể tải mã QR"
-                description="Vui lòng sử dụng thông tin chuyển khoản bên dưới."
+                message={t("payment.qrLoadErrorTitle")}
+                description={t("payment.qrLoadErrorDesc")}
                 type="error"
                 showIcon
               />
             ) : (
               <img
                 src={qrUrl}
-                alt="QR thanh toán VietQR"
+                alt={t("payment.qrAlt")}
                 style={{ width: "100%", maxWidth: 300, height: "auto", display: qrLoading ? "none" : "block" }}
                 onLoad={() => setQrLoading(false)}
                 onError={() => {
@@ -159,20 +161,20 @@ const PaymentPage = () => {
             )}
           </div>
           <div className="bank-info">
-            <Text type="secondary">Ngân hàng:</Text> <Text strong>MB Bank</Text>
+            <Text type="secondary">{t("payment.bankLabel")}</Text> <Text strong>MB Bank</Text>
             <br />
-            <Text type="secondary">Chủ TK:</Text> <Text strong>NGUYEN HUU THANH</Text>
+            <Text type="secondary">{t("payment.recipientLabel")}</Text> <Text strong>NGUYEN HUU THANH</Text>
             <br />
-            <Text type="secondary">Số TK:</Text>{" "}
+            <Text type="secondary">{t("payment.accountNumberLabel")}</Text>{" "}
             <Text strong className="highlight">
               0898173004
             </Text>
             <br />
-            <Text type="secondary">Nội dung:</Text>{" "}
+            <Text type="secondary">{t("payment.transferContentLabel")}</Text>{" "}
             <Text strong className="highlight">order{orderId}</Text>
           </div>
           <Text className="qr-instruction">
-            Mở ứng dụng ngân hàng và quét mã QR. Sau khi thanh toán thành công, vui lòng nhấn nút bên dưới.
+            {t("payment.qrInstruction")}
           </Text>
         </div>
 
@@ -184,7 +186,7 @@ const PaymentPage = () => {
           onClick={handlePayment}
           loading={loading}
         >
-          ĐANG CHỜ THANH TOÁN
+          {t("payment.waitingPayment").toUpperCase()}
         </Button>
       </Card>
     </div>

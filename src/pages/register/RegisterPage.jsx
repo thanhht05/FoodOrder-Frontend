@@ -19,6 +19,7 @@ import { doLoginAction } from "../../redux/slices/account/accountSlice";
 import { callRegister, callGoogleLogin } from "../../services/api";
 import { getCartAPI } from "../../redux/thunk/getCartThunk";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import { useTranslation } from "../../i18n";
 
 const { Title, Text } = Typography;
 
@@ -27,6 +28,7 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isSubmit, setIsSubmit] = useState(false);
+  const { t } = useTranslation();
 
   const onFinish = async (values) => {
     const { email, fullName, phone, password } = values;
@@ -34,17 +36,17 @@ const RegisterPage = () => {
     try {
       const res = await callRegister(email, fullName, phone, password);
       if (res.data) {
-        message.success("Tạo tài khoản thành công!");
+        message.success(res.message || t("apiSuccess.SUC_REGISTER"));
         navigate("/login");
       } else {
         notification.error({
-          message: "Có lỗi xảy ra",
+          message: t("common.errorTitle"),
           description: res.message,
         });
       }
     } catch (error) {
       notification.error({
-        message: "Đăng ký thất bại",
+        message: t("auth.registerErrorTitle"),
         description: error?.response?.data?.message || error.message,
       });
     } finally {
@@ -58,8 +60,8 @@ const RegisterPage = () => {
       const idToken = response.credential;
       if (!idToken) {
         notification.error({
-          message: "Lỗi đăng ký Google",
-          description: "Không nhận được token xác thực từ Google",
+          message: t("auth.googleErrorTitle"),
+          description: t("auth.googleNoToken"),
         });
         return;
       }
@@ -76,7 +78,7 @@ const RegisterPage = () => {
           // ignore cart errors if empty
         }
 
-        message.success("Đăng nhập bằng Google thành công!");
+        message.success(res.message || t("apiSuccess.SUC_GOOGLE_LOGIN"));
 
         if (res.data.userLogin?.role?.name === "ADMIN") {
           navigate("/admin");
@@ -85,13 +87,13 @@ const RegisterPage = () => {
         }
       } else {
         notification.error({
-          message: "Lỗi đăng ký Google",
-          description: res.message || "Xác thực tài khoản Google thất bại",
+          message: t("auth.googleErrorTitle"),
+          description: res.message || t("auth.googleAuthFailed"),
         });
       }
     } catch (error) {
       notification.error({
-        message: "Đăng nhập Google thất bại",
+        message: t("auth.googleLoginFailedTitle"),
         description: error?.response?.data?.message || error.message,
       });
     } finally {
@@ -146,17 +148,16 @@ const RegisterPage = () => {
             <div className="hero-top">
               <div className="brand-logo">AMU</div>
               <Link to="/" className="back-btn">
-                <ArrowLeftOutlined /> Quay lại trang chủ
+                <ArrowLeftOutlined /> {t("auth.backToHome")}
               </Link>
             </div>
 
             <div className="hero-main">
               <Title level={1} className="hero-title">
-                Khám phá thế giới <br />
-                <span>ẩm thực</span> tuyệt vời.
+                {t("auth.registerHeroTitle")}
               </Title>
               <Text className="hero-subtitle">
-                Gia nhập cộng đồng 10,000+ người sành ăn ngay hôm nay.
+                {t("auth.registerHeroDesc")}
               </Text>
             </div>
 
@@ -167,7 +168,7 @@ const RegisterPage = () => {
                 <span className="dot"></span>
               </div>
               <Text className="copyright">
-                © 2026 AMU Team. Bảo lưu mọi quyền.
+                © 2026 AMU Team. All rights reserved.
               </Text>
             </div>
           </div>
@@ -177,9 +178,9 @@ const RegisterPage = () => {
         <Col xs={24} lg={12} className="form-section">
           <div className="form-card">
             <div className="form-header">
-              <Title level={2}>Tạo tài khoản</Title>
+              <Title level={2}>{t("auth.registerTitle")}</Title>
               <Text type="secondary">
-                Đã có tài khoản? <Link to="/login">Đăng nhập ngay</Link>
+                {t("auth.alreadyHaveAccount")} <Link to="/login">{t("auth.loginNow")}</Link>
               </Text>
             </div>
 
@@ -194,21 +195,21 @@ const RegisterPage = () => {
               <Row gutter={16}>
                 <Col span={24}>
                   <Form.Item
-                    label="Họ và tên"
+                    label={t("auth.fullNameLabel")}
                     name="fullName"
-                    rules={[{ required: true, message: "Vui lòng nhập tên!" }]}
+                    rules={[{ required: true, message: t("auth.fullNameRequired") }]}
                   >
-                    <Input placeholder="Nguyễn Văn A" size="large" />
+                    <Input placeholder={t("auth.fullNamePlaceholder")} size="large" />
                   </Form.Item>
                 </Col>
 
                 <Col span={24}>
                   <Form.Item
-                    label="Email"
+                    label={t("auth.emailLabel")}
                     name="email"
                     rules={[
-                      { required: true, message: "Vui lòng nhập Email!" },
-                      { type: "email", message: "Email không hợp lệ!" },
+                      { required: true, message: t("auth.emailRequired") },
+                      { type: "email", message: t("auth.emailInvalid") },
                     ]}
                   >
                     <Input placeholder="example@mail.com" size="large" />
@@ -217,13 +218,13 @@ const RegisterPage = () => {
 
                 <Col span={24}>
                   <Form.Item
-                    label="Số điện thoại"
+                    label={t("auth.phoneLabel")}
                     name="phone"
                     rules={[
-                      { required: true, message: "Vui lòng nhập SĐT!" },
+                      { required: true, message: t("auth.phoneRequired") },
                       {
                         pattern: /^[0-9]{10}$/,
-                        message: "SĐT phải có 10 chữ số!",
+                        message: t("auth.phoneTenDigits"),
                       },
                     ]}
                   >
@@ -233,10 +234,10 @@ const RegisterPage = () => {
 
                 <Col span={24}>
                   <Form.Item
-                    label="Mật khẩu"
+                    label={t("auth.passwordLabel")}
                     name="password"
                     rules={[
-                      { required: true, message: "Vui lòng nhập mật khẩu!" },
+                      { required: true, message: t("auth.passwordRequired") },
                     ]}
                   >
                     <Input.Password placeholder="••••••••" size="large" />
@@ -245,7 +246,7 @@ const RegisterPage = () => {
 
                 <Col span={24}>
                   <Form.Item name="remember" valuePropName="checked">
-                    <Checkbox>Tôi đồng ý với điều khoản dịch vụ</Checkbox>
+                    <Checkbox>{t("auth.agreeTerms")}</Checkbox>
                   </Form.Item>
                 </Col>
 
@@ -258,13 +259,13 @@ const RegisterPage = () => {
                     loading={isSubmit}
                     className="submit-btn"
                   >
-                    Đăng ký ngay
+                    {t("auth.registerNow")}
                   </Button>
                 </Col>
               </Row>
 
               <div className="divider-text">
-                <span>Hoặc đăng ký bằng</span>
+                <span>{t("auth.orRegisterWith")}</span>
               </div>
 
               <div className="social-login">
@@ -280,7 +281,7 @@ const RegisterPage = () => {
                       if (window.google?.accounts?.id) {
                         window.google.accounts.id.prompt();
                       } else {
-                        message.warning("Google Sign-In đang khởi tạo, vui lòng thử lại sau giây lát.");
+                        message.warning(t("auth.googleLoadingWarning"));
                       }
                     }}
                   >

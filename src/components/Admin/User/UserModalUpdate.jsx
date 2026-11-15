@@ -1,6 +1,7 @@
 import { Divider, Form, Input, message, Modal, notification } from "antd";
 import { useEffect, useState } from "react";
 import { callUpdateAUser } from "../../../services/api";
+import { useTranslation } from "../../../i18n";
 
 const UserModalUpdate = ({
   openModalUpdateUser,
@@ -11,6 +12,7 @@ const UserModalUpdate = ({
 }) => {
   const [form] = Form.useForm();
   const [isSubmit, setIsSubmit] = useState(false);
+  const { t } = useTranslation();
 
   const handleCancel = () => {
     setOpenModalUpdateUser(false);
@@ -25,12 +27,12 @@ const UserModalUpdate = ({
     setIsSubmit(true);
     const res = await callUpdateAUser(id, fullName, phone, point);
     if (res && res.data) {
-      message.success("Cập nhật người dùng thành công");
+      message.success(res.message || t("admin.user.updateSuccess"));
       setOpenModalUpdateUser(false);
       await fetchUser();
     } else {
       notification.error({
-        message: "Đã có lỗi xảy ra",
+        message: t("common.errorTitle"),
         description: res.message,
       });
     }
@@ -39,14 +41,15 @@ const UserModalUpdate = ({
   return (
     <>
       <Modal
-        title="Cập nhật người dùng"
+        title={t("admin.user.updateModalTitle")}
         closable={{ "aria-label": "Custom Close Button" }}
         open={openModalUpdateUser}
         onOk={() => {
           form.submit();
         }}
         maskClosable={false}
-        okText={"Cập nhật"}
+        okText={t("common.update")}
+        cancelText={t("common.cancel")}
         onCancel={handleCancel}
         confirmLoading={isSubmit}
       >
@@ -57,31 +60,31 @@ const UserModalUpdate = ({
           </Form.Item>
           <Form.Item
             name="email"
-            label="Email"
-            rules={[{ required: true, message: "Vui lòng nhập email!" }]}
+            label={t("admin.user.colEmail")}
+            rules={[{ required: true, message: t("auth.emailRequired") }]}
           >
             <Input disabled />
           </Form.Item>
           <Form.Item
             name="fullName"
-            label="Họ và tên"
-            rules={[{ required: true, message: "Vui lòng nhập họ và tên!" }]}
+            label={t("admin.user.colFullName")}
+            rules={[{ required: true, message: t("auth.fullNameRequired") }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             validateTrigger="onBlur"
             name="point"
-            label="Điểm"
-            rules={[{ required: true, message: "Vui lòng nhập điểm" }]}
+            label={t("admin.user.pointLabel")}
+            rules={[{ required: true, message: t("admin.user.pointRequired") }]}
           >
             <Input />
           </Form.Item>
 
           <Form.Item
             name="phone"
-            label="Số điện thoại"
-            rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}
+            label={t("admin.user.colPhone")}
+            rules={[{ required: true, message: t("auth.phoneRequired") }]}
           >
             <Input />
           </Form.Item>

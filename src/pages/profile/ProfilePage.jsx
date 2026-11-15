@@ -2,45 +2,47 @@ import React from "react";
 import { Tabs, Form, Input, Button, message } from "antd";
 import { callChangePassword } from "../../services/api";
 import "./ProfilePage.scss";
+import { useTranslation } from "../../i18n";
 
 const ProfilePage = () => {
   const [form] = Form.useForm();
+  const { t } = useTranslation();
 
   const onFinishChangePassword = async (values) => {
     const { oldPassword, newPassword, confirmPassword } = values;
 
     if (newPassword !== confirmPassword) {
-      message.error("Mật khẩu mới và xác nhận mật khẩu không khớp!");
+      message.error(t("profile.confirmPasswordMismatch"));
       return;
     }
 
     try {
       const res = await callChangePassword(oldPassword, newPassword, confirmPassword);
       if (res && res.data) {
-        message.success("Đổi mật khẩu thành công!");
+        message.success(res.message || t("profile.changePasswordSuccess"));
         form.resetFields();
       } else {
-        message.error(res?.message || "Đã có lỗi xảy ra");
+        message.error(res?.message || t("common.errorTitle"));
       }
     } catch (error) {
-      message.error("Đổi mật khẩu thất bại. Vui lòng thử lại!");
+      message.error(error?.response?.data?.message || t("profile.changePasswordFailed"));
     }
   };
 
   const items = [
     {
       key: "1",
-      label: "Thông tin người dùng",
+      label: t("profile.tabPersonalInfo"),
       children: (
         <div className="user-info-placeholder">
-          <h3>Thông tin cá nhân</h3>
-          <p>Tính năng đang được phát triển...</p>
+          <h3>{t("profile.tabPersonalInfo")}</h3>
+          <p>{t("profile.featureDeveloping")}</p>
         </div>
       ),
     },
     {
       key: "2",
-      label: "Đổi mật khẩu",
+      label: t("profile.tabChangePassword"),
       children: (
         <div className="change-password-container">
           <Form
@@ -51,45 +53,45 @@ const ProfilePage = () => {
             autoComplete="off"
           >
             <Form.Item
-              label="Mật khẩu hiện tại"
+              label={t("profile.currentPasswordLabel")}
               name="oldPassword"
-              rules={[{ required: true, message: "Vui lòng nhập mật khẩu hiện tại!" }]}
+              rules={[{ required: true, message: t("profile.currentPasswordRequired") }]}
             >
-              <Input.Password placeholder="Mật khẩu hiện tại" />
+              <Input.Password placeholder={t("profile.currentPasswordPlaceholder")} />
             </Form.Item>
 
             <Form.Item
-              label="Mật khẩu mới"
+              label={t("profile.newPasswordLabel")}
               name="newPassword"
               rules={[
-                { required: true, message: "Vui lòng nhập mật khẩu mới!" },
-                { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự!" }
+                { required: true, message: t("profile.newPasswordRequired") },
+                { min: 6, message: t("profile.newPasswordMin") }
               ]}
             >
-              <Input.Password placeholder="Mật khẩu mới" />
+              <Input.Password placeholder={t("profile.newPasswordPlaceholder")} />
             </Form.Item>
 
             <Form.Item
-              label="Xác nhận mật khẩu mới"
+              label={t("profile.confirmPasswordLabel")}
               name="confirmPassword"
               rules={[
-                { required: true, message: "Vui lòng xác nhận mật khẩu mới!" },
+                { required: true, message: t("profile.confirmPasswordRequired") },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
                     if (!value || getFieldValue('newPassword') === value) {
                       return Promise.resolve();
                     }
-                    return Promise.reject(new Error('Mật khẩu xác nhận không khớp!'));
+                    return Promise.reject(new Error(t("profile.confirmPasswordMismatch")));
                   },
                 }),
               ]}
             >
-              <Input.Password placeholder="Xác nhận mật khẩu mới" />
+              <Input.Password placeholder={t("profile.confirmPasswordPlaceholder")} />
             </Form.Item>
 
             <Form.Item>
               <Button type="primary" htmlType="submit">
-                Cập nhật mật khẩu
+                {t("profile.updatePasswordBtn")}
               </Button>
             </Form.Item>
           </Form>

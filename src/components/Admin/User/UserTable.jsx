@@ -23,8 +23,10 @@ import UserModalCreate from "./UserModalCreate";
 import UserModalUpdate from "./UserModalUpdate";
 import UserImport from "./UserImport";
 import dayjs from "dayjs";
+import { useTranslation } from "../../../i18n";
 
 const UserTable = () => {
+  const { t } = useTranslation();
   const [listUser, setListUser] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const pageSize = 5;
@@ -78,7 +80,7 @@ const UserTable = () => {
   }, [currentPage, pageSize, filter, sortQuery]);
   const columns = [
     {
-      title: "ID",
+      title: t("admin.user.colId"),
       dataIndex: "id",
       key: "naidme",
       render: (_, record) => (
@@ -93,23 +95,23 @@ const UserTable = () => {
       ),
     },
     {
-      title: "Họ và tên",
+      title: t("admin.user.colFullName"),
       dataIndex: "fullName",
       key: "fullName",
       sorter: true,
     },
     {
-      title: "Email",
+      title: t("admin.user.colEmail"),
       dataIndex: "email",
       key: "email",
     },
     {
-      title: "Số điện thoại",
+      title: t("admin.user.colPhone"),
       key: "phone",
       dataIndex: "phone",
     },
     {
-      title: "Ngày cập nhật",
+      title: t("admin.product.colUpdatedAt"),
       dataIndex: "updatedAt",
       key: "updatedAt",
       sorter: true,
@@ -117,10 +119,10 @@ const UserTable = () => {
       render: (updatedAt) =>
         dayjs(updatedAt).isValid()
           ? dayjs(updatedAt).format("DD/MM/YYYY HH:mm")
-          : "Người dùng chưa được cập nhật",
+          : t("admin.user.notUpdatedYet"),
     },
     {
-      title: "Thao tác",
+      title: t("admin.user.colActions"),
       key: "action",
       render: (_, record) => {
         return (
@@ -131,16 +133,16 @@ const UserTable = () => {
                 setUserDataUpdate(record);
               }}
             >
-              Cập nhật
+              {t("common.update")}
             </a>
             <Popconfirm
-              title="Xóa người dùng"
-              description="Bạn có chắc chắn muốn xóa người dùng này không?"
+              title={t("admin.user.deleteTitle")}
+              description={t("admin.user.deleteConfirmDesc")}
               onConfirm={() => handleDeleteUser(record.id)}
-              okText="Có"
-              cancelText="Không"
+              okText={t("common.yes")}
+              cancelText={t("common.no")}
             >
-              <a style={{ marginLeft: "8px" }}>Xóa</a>
+              <a style={{ marginLeft: "8px" }}>{t("common.delete")}</a>
             </Popconfirm>
           </>
         );
@@ -154,10 +156,10 @@ const UserTable = () => {
   const renderHeader = () => {
     return (
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <span>Danh sách người dùng</span>
+        <span>{t("admin.user.tableTitle")}</span>
         <span style={{ display: "flex", gap: 15 }}>
           <Button icon={<ExportOutlined />} type="primary">
-            Xuất file
+            {t("common.exportData")}
           </Button>
 
           <Button
@@ -165,7 +167,7 @@ const UserTable = () => {
             icon={<CloudUploadOutlined />}
             type="primary"
           >
-            Nhập file
+            {t("common.importData")}
           </Button>
 
           <Button
@@ -173,7 +175,7 @@ const UserTable = () => {
             type="primary"
             onClick={() => setOpenModalCreateUser(true)}
           >
-            Thêm mới
+            {t("common.add")}
           </Button>
         </span>
       </div>
@@ -182,11 +184,11 @@ const UserTable = () => {
   const handleDeleteUser = async (userID) => {
     const res = await callDeleteUser(userID);
     if (res && res.data) {
-      message.success("Xóa user thành công");
+      message.success(res.message || t("admin.user.deleteSuccess"));
       fetchUser();
     } else {
       notification.error({
-        message: "Có lỗi xảy ra",
+        message: t("common.errorTitle"),
         description: res.message,
       });
     }

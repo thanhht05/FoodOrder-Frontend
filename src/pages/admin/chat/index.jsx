@@ -6,8 +6,10 @@ import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import { callFetchAllConversations, callFetchAdminMessages, callMarkMessagesAsRead, callCloseConversation } from "../../../services/api";
 import "./chat.scss";
+import { useTranslation } from "../../../i18n";
 
 const AdminChatPage = () => {
+  const { t } = useTranslation();
   const [conversations, setConversations] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -49,7 +51,7 @@ const AdminChatPage = () => {
       }
     } catch (error) {
       console.error(error);
-      message.error("Lỗi khi tải danh sách hội thoại");
+      message.error(t("admin.chat.loadConversationsError"));
     } finally {
       setLoadingConv(false);
     }
@@ -121,7 +123,7 @@ const AdminChatPage = () => {
       }
     } catch (error) {
       console.error(error);
-      message.error("Lỗi khi tải lịch sử tin nhắn");
+      message.error(t("admin.chat.loadHistoryError"));
     } finally {
       setLoadingMessages(false);
     }
@@ -169,7 +171,7 @@ const AdminChatPage = () => {
     try {
       const res = await callCloseConversation(activeConversation.id);
       if (res && res.data) {
-        message.success("Đã kết thúc hội thoại");
+        message.success(t("admin.chat.closedConversationMsg"));
         if (stompClientRef.current && stompClientRef.current.connected) {
           stompClientRef.current.publish({
             destination: `/app/chat/${activeConversation.id}`,
@@ -184,7 +186,7 @@ const AdminChatPage = () => {
       }
     } catch (error) {
       console.error(error);
-      message.error("Lỗi khi kết thúc hội thoại");
+      message.error(t("admin.chat.closeConversationError"));
     }
   };
 
@@ -207,28 +209,28 @@ const AdminChatPage = () => {
     <div className="admin-chat-container">
       <div className="chat-sidebar">
         <div className="sidebar-header">
-          <h3>Hội thoại</h3>
-          <Button type="primary" size="small" onClick={fetchConversations}>Làm mới</Button>
+          <h3>{t("admin.chat.conversationsTitle")}</h3>
+          <Button type="primary" size="small" onClick={fetchConversations}>{t("common.reset")}</Button>
         </div>
         <div className="conversation-tabs" style={{ display: 'flex', borderBottom: '1px solid #f0f0f0', background: '#fff' }}>
           <div
             style={{ flex: 1, textAlign: 'center', padding: '12px 0', cursor: 'pointer', borderBottom: activeTabConv === 'OPEN' ? '2px solid #1890ff' : 'none', color: activeTabConv === 'OPEN' ? '#1890ff' : '#8c8c8c', fontWeight: activeTabConv === 'OPEN' ? 600 : 400 }}
             onClick={() => setActiveTabConv('OPEN')}
           >
-            Đang hoạt động
+            {t("admin.chat.tabActive")}
           </div>
           <div
             style={{ flex: 1, textAlign: 'center', padding: '12px 0', cursor: 'pointer', borderBottom: activeTabConv === 'CLOSED' ? '2px solid #1890ff' : 'none', color: activeTabConv === 'CLOSED' ? '#1890ff' : '#8c8c8c', fontWeight: activeTabConv === 'CLOSED' ? 600 : 400 }}
             onClick={() => setActiveTabConv('CLOSED')}
           >
-            Đã đóng
+            {t("admin.chat.tabClosed")}
           </div>
         </div>
         <div className="conversation-list">
           {loadingConv ? (
             <div className="loading-center"><Spin /></div>
           ) : conversations.filter(c => (c.status || 'OPEN') === activeTabConv).length === 0 ? (
-            <div className="empty-list">Chưa có hội thoại</div>
+            <div className="empty-list">{t("admin.chat.noConversations")}</div>
           ) : (
             conversations.filter(c => (c.status || 'OPEN') === activeTabConv).map((conv) => (
               <div
@@ -238,9 +240,9 @@ const AdminChatPage = () => {
               >
                 <Avatar icon={<UserOutlined />} className="avatar" />
                 <div className="conv-info">
-                  <div className="conv-name">Người dùng: #{conv.userId}</div>
+                  <div className="conv-name">{t("admin.chat.userLabel", { id: conv.userId })}</div>
                   <div className="conv-meta">
-                    Trạng thái: <span className={`status ${conv.status?.toLowerCase() || 'open'}`}>{conv.status || 'OPEN'}</span>
+                    {t("common.status")}: <span className={`status ${conv.status?.toLowerCase() || 'open'}`}>{conv.status || 'OPEN'}</span>
                   </div>
                 </div>
               </div>
@@ -253,10 +255,10 @@ const AdminChatPage = () => {
         {activeConversation ? (
           <>
             <div className="chat-header">
-              <h3>Đang chat với Người dùng #{activeConversation.userId}</h3>
+              <h3>{t("admin.chat.chattingWithUser", { id: activeConversation.userId })}</h3>
               {activeConversation.status !== 'CLOSED' && (
                 <Button type="primary" danger onClick={handleCloseConversation}>
-                  Kết thúc
+                  {t("admin.chat.endChatBtn")}
                 </Button>
               )}
             </div>
@@ -265,7 +267,7 @@ const AdminChatPage = () => {
               {loadingMessages ? (
                 <div className="loading-center"><Spin /></div>
               ) : messages.length === 0 ? (
-                <div className="empty-messages">Bắt đầu trò chuyện...</div>
+                <div className="empty-messages">{t("admin.chat.startConversationPrompt")}</div>
               ) : (
                 (() => {
                   const lastAdminMsgId = [...messages].reverse().find(m => m.senderId === adminUser.id)?.id;
@@ -278,7 +280,7 @@ const AdminChatPage = () => {
                       <div key={msg.id} className={`message-row ${isAdmin ? 'admin' : 'user'}`}>
                         {msg.content === "SYSTEM_CONVERSATION_CLOSED" ? (
                           <div className="system-message" style={{ width: '100%', textAlign: 'center', color: '#8c8c8c', fontSize: '12px', margin: '10px 0' }}>
-                            Hội thoại đã kết thúc
+                            {t("admin.chat.conversationEndedText")}
                           </div>
                         ) : (
                           <div className="message-container" style={{ display: 'flex', flexDirection: 'column', alignItems: isAdmin ? 'flex-end' : 'flex-start' }}>
@@ -287,7 +289,7 @@ const AdminChatPage = () => {
                             </div>
                             {isLastAdminMsg && msg.isRead && (
                               <div className="read-receipt" style={{ fontSize: '11px', color: '#8c8c8c', marginTop: '4px', paddingRight: '4px' }}>
-                                Đã xem
+                                {t("chat.seenStatus")}
                               </div>
                             )}
                           </div>
@@ -305,7 +307,7 @@ const AdminChatPage = () => {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onPressEnter={handleSend}
-                placeholder={activeConversation.status === 'CLOSED' ? "Hội thoại đã kết thúc" : "Nhập tin nhắn..."}
+                placeholder={activeConversation.status === 'CLOSED' ? t("admin.chat.conversationEndedText") : t("admin.chat.inputPlaceholder")}
                 bordered={false}
                 className="input-field"
                 disabled={activeConversation.status === 'CLOSED'}
@@ -323,7 +325,7 @@ const AdminChatPage = () => {
         ) : (
           <div className="empty-chat">
             <MessageOutlined className="empty-icon" />
-            <p>Chọn một cuộc hội thoại để bắt đầu</p>
+            <p>{t("admin.chat.selectConversationPrompt")}</p>
           </div>
         )}
       </div>

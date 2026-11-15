@@ -8,6 +8,7 @@ import {
   Divider,
 } from "antd";
 import dayjs from "dayjs";
+import { useTranslation } from "../../../i18n";
 const UserViewDetail = ({
   openViewDetail,
   setOpenViewDetail,
@@ -15,6 +16,7 @@ const UserViewDetail = ({
   setUserDataDetail,
 }) => {
   const { Title, Text } = Typography;
+  const { t } = useTranslation();
 
   const onClose = () => {
     setOpenViewDetail(false);
@@ -22,40 +24,40 @@ const UserViewDetail = ({
   };
   return (
     <>
-      <Drawer title="Chi tiết người dùng" onClose={onClose} open={openViewDetail}>
+      <Drawer title={t("admin.user.detailDrawerTitle")} onClose={onClose} open={openViewDetail}>
         {/* Header */}
         <Space align="center" style={{ marginBottom: 20 }}>
           {/* <Avatar size={64} icon={<UserOutlined />} /> */}
-          <h2>Ảnh đại diện người dùng</h2> <br />
+          <h2>{t("admin.user.avatarHeader")}</h2> <br />
         </Space>
 
         <Divider />
 
         {/* Info */}
         <Descriptions bordered column={1} size="middle">
-          <Descriptions.Item label="ID">{userDataDetail?.id}</Descriptions.Item>
-          <Descriptions.Item label="Họ và tên">
+          <Descriptions.Item label={t("admin.user.colId")}>{userDataDetail?.id}</Descriptions.Item>
+          <Descriptions.Item label={t("admin.user.colFullName")}>
             {userDataDetail?.fullName}
           </Descriptions.Item>
-          <Descriptions.Item label="Email">
+          <Descriptions.Item label={t("admin.user.colEmail")}>
             {userDataDetail?.email}
           </Descriptions.Item>
 
-          <Descriptions.Item label="Số điện thoại">
+          <Descriptions.Item label={t("admin.user.colPhone")}>
             {userDataDetail?.phone}
           </Descriptions.Item>
-          <Descriptions.Item label="Điểm">
+          <Descriptions.Item label={t("admin.user.pointLabel")}>
             {userDataDetail?.point}
           </Descriptions.Item>
-          <Descriptions.Item label="Vai trò">
+          <Descriptions.Item label={t("admin.user.colRole")}>
             {userDataDetail?.roleUser.name}
           </Descriptions.Item>
-          <Descriptions.Item label="Cập nhật lúc">
+          <Descriptions.Item label={t("admin.voucher.updatedAtLabel")}>
             {dayjs(userDataDetail?.updatedAt).isValid()
               ? dayjs(userDataDetail?.updatedAt).format("DD/MM/YYYY HH:mm")
-              : "Người dùng chưa được cập nhật"}
+              : t("admin.user.notUpdatedYet")}
           </Descriptions.Item>
-          <Descriptions.Item label="Tạo lúc">
+          <Descriptions.Item label={t("admin.voucher.createdAtLabel")}>
             {dayjs(userDataDetail?.createdAt).format("DD/MM/YYYY HH:mm")}
           </Descriptions.Item>
         </Descriptions>

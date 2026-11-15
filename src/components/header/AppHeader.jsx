@@ -16,6 +16,7 @@ import {
   HistoryOutlined,
   SettingOutlined,
   SearchOutlined,
+  GlobalOutlined,
 } from "@ant-design/icons";
 import "./AppHeader.scss";
 import { useSelector, useDispatch } from "react-redux";
@@ -26,7 +27,7 @@ import { doLogoutAction } from "../../redux/slices/account/accountSlice";
 import { useState } from "react";
 import { clearCart } from "../../redux/slices/cart/CartSlice";
 import CartDropdown from "../Product/CartDropdown";
-// import { useEffect, useState } from "react";
+import { useTranslation } from "../../i18n";
 
 const { Header: AntHeader } = Layout;
 const { Text } = Typography;
@@ -37,6 +38,7 @@ const AppHeader = () => {
   const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { t, i18n, language } = useTranslation();
 
   const handleLogout = async () => {
     const res = await callLogout();
@@ -48,8 +50,11 @@ const AppHeader = () => {
     }
   };
 
+  const toggleLanguage = () => {
+    i18n.changeLanguage(language === "en" ? "vie" : "en");
+  };
+
   const [value, setValue] = useState("");
-  // const [debouncedValue, setDebouncedValue] = useState("");
   const handleSearch = () => {
     if (value) {
       navigate(`/?search=${value}`);
@@ -57,38 +62,23 @@ const AppHeader = () => {
       navigate("/");
     }
   };
-  // ⏳ debounce 5 giây
-  // useEffect(() => {
-  //   const timer = setTimeout(() => {
-  //     setDebouncedValue(value);
-  //   }, 3000);
-
-  //   return () => clearTimeout(timer); // cleanup
-  // }, [value]);
-
-  // // 🎯 gọi search khi debounce xong
-  // useEffect(() => {
-  //   if (debouncedValue) {
-  //     handleSearch(debouncedValue);
-  //   }
-  // }, [debouncedValue]);
 
   const userMenuItems = [
     {
       key: "1",
-      label: <Link to="/profile">Hồ sơ</Link>,
+      label: <Link to="/profile">{t("header.profile")}</Link>,
       icon: <UserOutlined />,
     },
     {
       key: "2",
-      label: <Link to="/order-history">Đơn hàng</Link>,
+      label: <Link to="/order-history">{t("header.orders")}</Link>,
       icon: <HistoryOutlined />,
     },
-    { key: "3", label: "Cài đặt", icon: <SettingOutlined /> },
+    { key: "3", label: t("header.settings"), icon: <SettingOutlined /> },
     { type: "divider" },
     {
       key: "4",
-      label: "Đăng xuất",
+      label: t("header.logout"),
       icon: <LogoutOutlined />,
       danger: true,
       onClick: handleLogout,
@@ -111,13 +101,13 @@ const AppHeader = () => {
             <div style={{ display: "flex" }}>
               <Input
                 onChange={(e) => setValue(e.target.value)}
-                placeholder="Tìm món ngon..."
+                placeholder={t("header.searchPlaceholder")}
                 suffix={<SearchOutlined />}
                 size="large"
                 onPressEnter={handleSearch}
                 className="custom-input"
               />
-              <Button onClick={handleSearch}>Tìm kiếm</Button>
+              <Button onClick={handleSearch}>{t("header.searchBtn")}</Button>
             </div>
           </Col>
 
@@ -128,6 +118,15 @@ const AppHeader = () => {
               <div className="mobile-search-icon">
                 <SearchOutlined />
               </div>
+
+              <Button
+                size="small"
+                icon={<GlobalOutlined />}
+                onClick={toggleLanguage}
+                style={{ fontWeight: 600 }}
+              >
+                {language === "en" ? "ENG" : "VIE"}
+              </Button>
 
               <Dropdown
                 trigger={["hover"]}
@@ -151,7 +150,7 @@ const AppHeader = () => {
                     <div className="profile-trigger">
                       {/* Note the 'hide-on-mobile' class here */}
                       <div className="user-meta hide-on-mobile">
-                        <Text className="welcome">Xin chào,</Text>
+                        <Text className="welcome">{t("header.welcome")}</Text>
                         <Text strong className="name">
                           {user.fullName}
                         </Text>
@@ -169,7 +168,7 @@ const AppHeader = () => {
                     shape="round"
                     onClick={() => navigate("/login")}
                   >
-                    Đăng nhập
+                    {t("header.login")}
                   </Button>
                 )}
               </div>

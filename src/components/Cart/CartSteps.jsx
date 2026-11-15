@@ -5,9 +5,11 @@ import {
   CheckCircleOutlined,
 } from "@ant-design/icons";
 import { useLocation } from "react-router-dom";
+import { useTranslation } from "../../i18n";
 
 const CartSteps = () => {
   const location = useLocation();
+  const { t } = useTranslation();
 
   const getCurrentStep = () => {
     if (location.pathname.includes("checkout")) return 1;
@@ -20,9 +22,9 @@ const CartSteps = () => {
       size="small"
       current={getCurrentStep()}
       items={[
-        { title: "Giỏ hàng", icon: <ShoppingCartOutlined /> },
-        { title: "Thanh toán", icon: <CreditCardOutlined /> },
-        { title: "Hoàn tất", icon: <CheckCircleOutlined /> },
+        { title: t("cart.stepCart"), icon: <ShoppingCartOutlined /> },
+        { title: t("cart.stepCheckout"), icon: <CreditCardOutlined /> },
+        { title: t("cart.stepPayment"), icon: <CheckCircleOutlined /> },
       ]}
     />
   );

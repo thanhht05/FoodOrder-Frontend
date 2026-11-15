@@ -1,6 +1,8 @@
 import { Button, Col, Form, Input, Row, theme } from "antd";
+import { useTranslation } from "../../../i18n";
 
 const FormSearch = ({ handleSearch, setFilter }) => {
+  const { t } = useTranslation();
   const { token } = theme.useToken();
   const [form] = Form.useForm();
   const formStyle = {
@@ -30,22 +32,22 @@ const FormSearch = ({ handleSearch, setFilter }) => {
     >
       <Row gutter={24}>
         <Col span={8}>
-          <Form.Item labelCol={{ span: 24 }} name={`keyword`} label={`Từ khóa`}>
-            <Input />
+          <Form.Item labelCol={{ span: 24 }} name={`keyword`} label={t("admin.product.keywordLabel")}>
+            <Input placeholder={t("admin.product.searchNamePlaceholder")} />
           </Form.Item>
         </Col>
         <Col span={8}>
           <Form.Item
             labelCol={{ span: 24 }}
             name={`category`}
-            label={`Danh mục`}
+            label={t("admin.product.searchCategoryLabel")}
           >
-            <Input />
+            <Input placeholder={t("admin.product.searchCategoryPlaceholder")} />
           </Form.Item>
         </Col>
 
         <Col span={8}>
-          <Form.Item labelCol={{ span: 24 }} name={`price`} label={`Giá`}>
+          <Form.Item labelCol={{ span: 24 }} name={`price`} label={t("admin.product.colPrice")}>
             <Input />
           </Form.Item>
         </Col>
@@ -53,7 +55,7 @@ const FormSearch = ({ handleSearch, setFilter }) => {
       <Row>
         <Col span={24} style={{ textAlign: "right" }}>
           <Button type="primary" htmlType="submit">
-            Tìm kiếm
+            {t("common.search")}
           </Button>
           <Button
             style={{ margin: "0 8px" }}
@@ -62,16 +64,8 @@ const FormSearch = ({ handleSearch, setFilter }) => {
               setFilter("");
             }}
           >
-            Làm mới
+            {t("common.reset")}
           </Button>
-          {/* <a
-                        style={{ fontSize: 12 }}
-                        onClick={() => {
-                            setExpand(!expand);
-                        }}
-                    >
-                        {expand ? <UpOutlined /> : <DownOutlined />} Collapse
-                    </a> */}
         </Col>
       </Row>
     </Form>

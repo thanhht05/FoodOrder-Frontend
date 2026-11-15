@@ -1,12 +1,10 @@
 import axios from "axios";
 import { forceLogout, isForceLogoutError } from "./forceLogout";
+import i18n, { translateApiError, translateApiSuccess } from "../i18n";
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_BACKEND_URL,
   withCredentials: true,
-
-  //   timeout: 1000,
-  //   headers: { "X-Custom-Header": "foobar" },
 });
 
 const handleRefreshToken = async () => {
@@ -17,6 +15,7 @@ const handleRefreshToken = async () => {
     return null;
   }
 };
+
 // Add a request interceptor
 instance.interceptors.request.use(
   function (config) {
@@ -29,17 +28,22 @@ instance.interceptors.request.use(
       config.headers.Authorization =
         "Bearer " + window.localStorage.getItem("access_token");
     }
+    config.headers["Accept-Language"] = i18n.language === "en" ? "en" : "vi";
     return config;
   },
   function (error) {
-    // Do something with the request error
     return Promise.reject(error);
   },
 );
+
 const NO_RETRY_HEADER = "x-no-retry";
-// Add a response interceptor
+
+// Add a response interceptor (tự động dịch message thành công & lỗi tại 1 chỗ duy nhất)
 instance.interceptors.response.use(
   function (response) {
+    if (response?.data) {
+      translateApiSuccess(response.data);
+    }
     if (response.data && response.data.data) {
       return response.data;
     }
@@ -47,6 +51,10 @@ instance.interceptors.response.use(
   },
   async function (error) {
     const originalRequest = error.config;
+
+    if (error.response?.data) {
+      translateApiError(error.response.data);
+    }
 
     // Phiên bị vô hiệu (đăng nhập ở trình duyệt khác / đổi mật khẩu):
     // xử lý trước bước refresh token vì refresh cũng sẽ thất bại.
@@ -70,47 +78,19 @@ instance.interceptors.response.use(
         if (accessToken) {
           localStorage.setItem("access_token", accessToken);
 
-          originalRequest.headers.Authorization =
-            `Bearer ${accessToken}`;
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
 
           return instance.request(originalRequest);
         }
       } catch (refreshError) {
         localStorage.removeItem("access_token");
 
-
-
         return Promise.reject(refreshError);
       }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
-// instance.interceptors.response.use(
-//   (response) => {
-//     return {
-//       success: true,
-//       data: response.data,
-//     };
-//   },
-//   (error) => {
-//     return {
-//       success: false,
-//       data: error.response?.data,
-//       message: error.response?.data?.message,
-//       status: error.response?.status,
-//     };
-//   }
-// );
-// const res = await callCreateAUser(...);
 
-// if (res.success) {
-//   message.success("Create a user successfully");
-// } else {
-//   notification.error({
-//     message: "Create user failed",
-//     description: res.message,
-//   });
-// }
 export default instance;

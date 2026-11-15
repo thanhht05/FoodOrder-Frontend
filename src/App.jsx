@@ -1,10 +1,10 @@
 import {
-  BrowserRouter,
-  Routes,
-  Route,
-  createBrowserRouter,
-  RouterProvider,
-  Outlet,
+	BrowserRouter,
+	Routes,
+	Route,
+	createBrowserRouter,
+	RouterProvider,
+	Outlet,
 } from "react-router-dom";
 import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/register/RegisterPage";
@@ -37,207 +37,212 @@ import AdminChatPage from "./pages/admin/chat";
 import DashboardPage from "./pages/admin/dashboard";
 import ManageVoucherPage from "./pages/admin/voucher";
 import useSessionGuard from "./hooks/useSessionGuard";
+import { ConfigProvider } from "antd";
+import viVN from "antd/locale/vi_VN";
+import enUS from "antd/locale/en_US";
+import { useTranslation } from "./i18n";
 
 const Layout = () => {
-  return (
-    <div className="layout">
-      <AppHeader />
-      <Outlet />
-      <Footer />
-      <ChatWidget />
-    </div>
-  );
+	return (
+		<div className="layout">
+			<AppHeader />
+			<Outlet />
+			<Footer />
+			<ChatWidget />
+		</div>
+	);
 };
 
 function App() {
-  const dispatch = useDispatch();
+	const dispatch = useDispatch();
+	const { language } = useTranslation();
 
-  const isLoading = useSelector((state) => state.account.isLoading);
+	const isLoading = useSelector((state) => state.account.isLoading);
 
-  // Single active session: tự đăng xuất khi tài khoản đăng nhập ở trình duyệt khác
-  useSessionGuard();
-  const getAccount = async () => {
-    if (
-      window.location.pathname === "/login" ||
-      window.location.pathname === "/register"
-    ) {
-      dispatch(doSetLoadingAction(false));
-      return;
-    }
+	// Single active session: tự đăng xuất khi tài khoản đăng nhập ở trình duyệt khác
+	useSessionGuard();
+	const getAccount = async () => {
+		if (
+			window.location.pathname === "/login" ||
+			window.location.pathname === "/register"
+		) {
+			dispatch(doSetLoadingAction(false));
+			return;
+		}
 
-    try {
-      const res = await callGetAccount();
-      if (res?.data) {
-        dispatch(doGetAccountAction(res.data));
-        dispatch(getCartAPI());
-      }
-    } catch (error) {
-      console.error("Get account failed:", error);
-      // Khi callGetAccount lỗi, có thể dispatch thêm action reset user nếu cần
-    } finally {
-      // Khối này LUÔN CHẠY bất kể API thành công hay gặp lỗi (400, 401, 500)
-      dispatch(doSetLoadingAction(false));
-    }
-  };
+		try {
+			const res = await callGetAccount();
+			if (res?.data) {
+				dispatch(doGetAccountAction(res.data));
+				dispatch(getCartAPI());
+			}
+		} catch (error) {
+			console.error("Get account failed:", error);
+			// Khi callGetAccount lỗi, có thể dispatch thêm action reset user nếu cần
+		} finally {
+			// Khối này LUÔN CHẠY bất kể API thành công hay gặp lỗi (400, 401, 500)
+			dispatch(doSetLoadingAction(false));
+		}
+	};
 
-  useEffect(() => {
-    getAccount();
+	useEffect(() => {
+		getAccount();
 
-  }, []);
-  const router = createBrowserRouter([
-    {
-      path: "/",
-      element: <Layout />,
-      errorElement: <NotFound />,
-      children: [
-        {
-          index: true,
-          element: <Home />,
-        },
-        {
-          path: "contact",
-          element: <Contact />,
-        },
-        {
-          path: "product/:slug",
-          element: <ProductPage />,
-        },
-        {
-          path: "cart",
-          element: (
-            <ProtectedRoute> // check user đã login chưa
-              <CartPage />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "checkout",
-          element: (
-            <ProtectedRoute>
-              <CheckoutPage />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "payment/success",
-          element: (
-            <ProtectedRoute>
-              <PaymentSuccess />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "payment/cancel",
-          element: (
-            <ProtectedRoute>
-              <PaymentCancel />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "payment/:orderId",
-          element: (
-            <ProtectedRoute>
-              <PaymentPage />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "order-history",
-          element: (
-            <ProtectedRoute>
-              <OrderHistory />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "profile",
-          element: (
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          ),
-        },
-      ],
-    },
-    {
-      path: "/admin",
-      element: <LayoutAdmin />,
-      errorElement: <NotFound />,
-      children: [
-        {
-          index: true,
-          element: (
-            <ProtectedRoute roles={["ADMIN"]}>  check user đã login chưa  và có role là admin không
-              <DashboardPage />
-            </ProtectedRoute>
-          ),
-        },
+	}, []);
+	const router = createBrowserRouter([
+		{
+			path: "/",
+			element: <Layout />,
+			errorElement: <NotFound />,
+			children: [
+				{
+					index: true,
+					element: <Home />,
+				},
+				{
+					path: "contact",
+					element: <Contact />,
+				},
+				{
+					path: "product/:slug",
+					element: <ProductPage />,
+				},
+				{
+					path: "cart",
+					element: (
+						<ProtectedRoute>
+							<CartPage />
+						</ProtectedRoute>
+					),
+				},
+				{
+					path: "checkout",
+					element: (
+						<ProtectedRoute>
+							<CheckoutPage />
+						</ProtectedRoute>
+					),
+				},
+				{
+					path: "payment/success",
+					element: (
+						<ProtectedRoute>
+							<PaymentSuccess />
+						</ProtectedRoute>
+					),
+				},
+				{
+					path: "payment/cancel",
+					element: (
+						<ProtectedRoute>
+							<PaymentCancel />
+						</ProtectedRoute>
+					),
+				},
+				{
+					path: "payment/:orderId",
+					element: (
+						<ProtectedRoute>
+							<PaymentPage />
+						</ProtectedRoute>
+					),
+				},
+				{
+					path: "order-history",
+					element: (
+						<ProtectedRoute>
+							<OrderHistory />
+						</ProtectedRoute>
+					),
+				},
+				{
+					path: "profile",
+					element: (
+						<ProtectedRoute>
+							<ProfilePage />
+						</ProtectedRoute>
+					),
+				},
+			],
+		},
+		{
+			path: "/admin",
+			element: <LayoutAdmin />,
+			errorElement: <NotFound />,
+			children: [
+				{
+					index: true,
+					element: (
+						<ProtectedRoute roles={ ["ADMIN"] }>
+							<DashboardPage />
+						</ProtectedRoute>
+					),
+				},
 
-        {
-          path: "user",
-          element: (
-            <ProtectedRoute roles={["ADMIN"]}>
-              <ManageUserPage />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "product",
-          element: (
-            <ProtectedRoute roles={["ADMIN"]}>
-              <ManageProductPage />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "voucher",
-          element: (
-            <ProtectedRoute roles={["ADMIN"]}>
-              <ManageVoucherPage />
-            </ProtectedRoute>
-          ),
-        },
-        {
-          path: "order",
-          element: (
-            <ProtectedRoute roles={["ADMIN"]}>
-              <ManageOrderPage />
-            </ProtectedRoute>
-          ),
-        },
+				{
+					path: "user",
+					element: (
+						<ProtectedRoute roles={ ["ADMIN"] }>
+							<ManageUserPage />
+						</ProtectedRoute>
+					),
+				},
+				{
+					path: "product",
+					element: (
+						<ProtectedRoute roles={ ["ADMIN"] }>
+							<ManageProductPage />
+						</ProtectedRoute>
+					),
+				},
+				{
+					path: "voucher",
+					element: (
+						<ProtectedRoute roles={ ["ADMIN"] }>
+							<ManageVoucherPage />
+						</ProtectedRoute>
+					),
+				},
+				{
+					path: "order",
+					element: (
+						<ProtectedRoute roles={ ["ADMIN"] }>
+							<ManageOrderPage />
+						</ProtectedRoute>
+					),
+				},
 
-        {
-          path: "chat",
-          element: (
-            <ProtectedRoute roles={["ADMIN"]}>
-              <AdminChatPage />
-            </ProtectedRoute>
-          ),
-        },
-      ],
-    },
-    {
-      path: "/register",
-      element: <RegisterPage />,
-    },
-    {
-      path: "/login",
-      element: <LoginPage />,
-    },
-  ]);
-  return (
-    <>
-      {isLoading == false ||
-        window.location.pathname === "/login" ||
-        window.location.pathname === "/register" ||
-        window.location.pathname === "/" ? (
-        <RouterProvider router={router} />
-      ) : (
-        <Loading />
-      )}
-    </>
-  );
+				{
+					path: "chat",
+					element: (
+						<ProtectedRoute roles={ ["ADMIN"] }>
+							<AdminChatPage />
+						</ProtectedRoute>
+					),
+				},
+			],
+		},
+		{
+			path: "/register",
+			element: <RegisterPage />,
+		},
+		{
+			path: "/login",
+			element: <LoginPage />,
+		},
+	]);
+	return (
+		<ConfigProvider locale={ language === "en" ? enUS : viVN }>
+			{ isLoading == false ||
+				window.location.pathname === "/login" ||
+				window.location.pathname === "/register" ||
+				window.location.pathname === "/" ? (
+				<RouterProvider router={ router } />
+			) : (
+				<Loading />
+			) }
+		</ConfigProvider>
+	);
 }
 
 export default App;

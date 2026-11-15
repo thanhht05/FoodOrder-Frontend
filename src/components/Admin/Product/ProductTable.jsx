@@ -20,8 +20,10 @@ import FormSearch from "./FormSearch";
 import ProductViewDetail from "./ProductViewDetail";
 import ProductModalCreate from "./ProductModalCreate";
 import ProductModalUpdate from "./ProductModalUpdate";
+import { useTranslation } from "../../../i18n";
 
 const ProductTable = () => {
+  const { t } = useTranslation();
   const [openProductViewDetail, setOpenProductViewDetail] = useState(false);
   const [productDataDetail, setProductDataDetail] = useState(null);
 
@@ -61,10 +63,10 @@ const ProductTable = () => {
   const handleDeleteProduct = async (id) => {
     const res = await callDeleteProduct(id);
     if (res && res.data) {
-      message.success("Xóa sản phẩm thành công");
+      message.success(t("admin.product.deleteSuccess"));
     } else {
       notification.error({
-        message: "Có lỗi xảy ra",
+        message: t("common.errorOccurred"),
         description: res.message,
       });
     }
@@ -74,10 +76,10 @@ const ProductTable = () => {
   const handleUpdateStatus = async (id) => {
     const res = await callUpdateProductStatus(id);
     if (res && res.data) {
-      message.success("Cập nhật trạng thái thành công");
+      message.success(t("admin.product.updateSuccess"));
     } else {
       notification.error({
-        message: "Có lỗi xảy ra",
+        message: t("common.errorOccurred"),
         description: res.message,
       });
     }
@@ -86,7 +88,7 @@ const ProductTable = () => {
 
   const columns = [
     {
-      title: "ID",
+      title: t("admin.product.colId"),
       dataIndex: "id",
       key: "naidme",
       render: (_, record) => (
@@ -100,25 +102,25 @@ const ProductTable = () => {
       ),
     },
     {
-      title: "Tên sản phẩm",
+      title: t("admin.product.searchNameLabel"),
       dataIndex: "name",
       key: "name",
       sorter: true,
     },
     {
-      title: "Giá",
+      title: t("admin.product.colPrice"),
       dataIndex: "price",
       key: "price",
       sorter: true,
     },
     {
-      title: "Số lượng",
+      title: t("admin.product.colQuantity"),
       key: "quantity",
       dataIndex: "quantity",
       sorter: true,
     },
     {
-      title: "Ngày cập nhật",
+      title: t("admin.product.colUpdatedAt"),
       dataIndex: "updatedAt",
       key: "updatedAt",
       sorter: true,
@@ -126,13 +128,12 @@ const ProductTable = () => {
       render: (updatedAt) =>
         dayjs(updatedAt).isValid()
           ? dayjs(updatedAt).format("DD/MM/YYYY HH:mm")
-          : "Sản phẩm chưa được cập nhật",
+          : t("admin.product.notUpdatedYet"),
     },
     {
-      title: "Thao tác",
+      title: t("admin.product.colActions"),
       key: "action",
       render: (_, record) => {
-        console.log("record", record)
         return (
           <>
             <a
@@ -140,22 +141,21 @@ const ProductTable = () => {
                 (setOpenModalUpdateProduct(true), setProductDataUpdate(record));
               }}
             >
-              Cập nhật
+              {t("common.update")}
             </a>
             <Switch
               style={{ marginLeft: "8px" }}
               checked={record.productStatus === "ACTIVE" ? true : false}
               onChange={() => handleUpdateStatus(record.id)}
-
             />
             <Popconfirm
-              title="Xóa sản phẩm"
-              description="Bạn có chắc chắn muốn xóa sản phẩm này không?"
+              title={t("admin.product.deleteTitle")}
+              description={t("admin.product.deleteConfirmDesc")}
               onConfirm={() => handleDeleteProduct(record.id)}
-              okText="Có"
-              cancelText="Không"
+              okText={t("common.yes")}
+              cancelText={t("common.no")}
             >
-              <a style={{ marginLeft: "8px", color: "red" }}>Xóa</a>
+              <a style={{ marginLeft: "8px", color: "red" }}>{t("common.delete")}</a>
             </Popconfirm>
           </>
         );
@@ -182,18 +182,17 @@ const ProductTable = () => {
   const renderHeader = () => {
     return (
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <span>Danh sách sản phẩm</span>
+        <span>{t("admin.product.tableTitle")}</span>
         <span style={{ display: "flex", gap: 15 }}>
           <Button icon={<ExportOutlined />} type="primary">
-            Xuất file
+            {t("common.exportFile")}
           </Button>
 
           <Button
-            // onClick={() => setOpenMOdalUpload(true)}
             icon={<CloudUploadOutlined />}
             type="primary"
           >
-            Nhập file
+            {t("common.importFile")}
           </Button>
 
           <Button
@@ -201,7 +200,7 @@ const ProductTable = () => {
             type="primary"
             onClick={() => setOpenModalCreateProduct(true)}
           >
-            Thêm mới
+            {t("common.addNew")}
           </Button>
         </span>
       </div>

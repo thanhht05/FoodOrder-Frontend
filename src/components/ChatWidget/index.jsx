@@ -12,6 +12,7 @@ import { callChatAI, callCreateConversation, callFetchAdminMessages, callMarkMes
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import "./chat.scss";
+import { useTranslation } from "../../i18n";
 
 // Simple markdown formatter to handle **bold** text
 const formatText = (text) => {
@@ -26,6 +27,7 @@ const formatText = (text) => {
 };
 
 const ChatWidget = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState("ai"); // 'ai' or 'admin'
@@ -36,7 +38,7 @@ const ChatWidget = () => {
     {
       id: 1,
       sender: "agent",
-      text: "Xin chào! Cảm ơn bạn đã ghé thăm. Tôi có thể giúp gì cho bạn hôm nay? (VD: Hỗ trợ thanh toán, Kiểm tra đơn hàng...)",
+      textKey: "chat.aiWelcome",
     },
   ]);
   const [isTypingAI, setIsTypingAI] = useState(false);
@@ -124,7 +126,7 @@ const ChatWidget = () => {
                 const data = JSON.parse(msg.body);
                 if (data.content === "SYSTEM_CONVERSATION_CLOSED") {
                   setConversationStatus("CLOSED");
-                  message.info("Admin đã kết thúc cuộc trò chuyện.");
+                  message.info(t("chat.adminClosedChat"));
                   return;
                 }
 
@@ -162,7 +164,7 @@ const ChatWidget = () => {
   useEffect(() => {
     const token = window.localStorage.getItem("access_token") || "";
     if (isOpen && activeTab === "admin" && !token) {
-      message.warning("Vui lòng đăng nhập để chat với Admin");
+      message.warning(t("chat.pleaseLoginToChatAdmin"));
       setActiveTab("ai");
     }
 
@@ -206,7 +208,7 @@ const ChatWidget = () => {
         {
           id: Date.now() + 1,
           sender: "agent",
-          text: "Xin lỗi, đã có lỗi xảy ra khi xử lý yêu cầu của bạn. Vui lòng thử lại sau.",
+          text: t("chat.aiErrorMsg"),
         },
       ]);
     } finally {
@@ -216,7 +218,7 @@ const ChatWidget = () => {
 
   const handleSendAdmin = (userText) => {
     if (!conversationId || !stompClientRef.current || !stompClientRef.current.connected) {
-      message.error("Đang kết nối đến Admin, vui lòng thử lại sau.");
+      message.error(t("chat.connectingToAdminError"));
       return;
     }
 
@@ -309,26 +311,26 @@ const ChatWidget = () => {
         <div className="chat-header">
           <div className="header-title">
             <span className="status-indicator"></span>
-            Hỗ Trợ Trực Tuyến
+            {t("chat.onlineSupportTitle")}
           </div>
           <div className="header-actions">
             {isExpanded ? (
               <ShrinkOutlined
                 className="action-btn"
                 onClick={() => setIsExpanded(false)}
-                title="Thu nhỏ"
+                title={t("chat.shrinkTitle")}
               />
             ) : (
               <ExpandAltOutlined
                 className="action-btn"
                 onClick={() => setIsExpanded(true)}
-                title="Phóng to"
+                title={t("chat.expandTitle")}
               />
             )}
             <CloseOutlined
               className="action-btn close-btn"
               onClick={() => setIsOpen(false)}
-              title="Đóng"
+              title={t("chat.closeTitle")}
             />
           </div>
         </div>
@@ -339,13 +341,13 @@ const ChatWidget = () => {
             className={`chat-tab ${activeTab === 'ai' ? 'active' : ''}`}
             onClick={() => setActiveTab('ai')}
           >
-            Chat với AI
+            {t("chat.tabAi")}
           </div>
           <div
             className={`chat-tab ${activeTab === 'admin' ? 'active' : ''}`}
             onClick={() => setActiveTab('admin')}
           >
-            Chat với Admin
+            {t("chat.tabAdmin")}
           </div>
         </div>
 
@@ -355,9 +357,9 @@ const ChatWidget = () => {
               return (
                 <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%', gap: '10px' }}>
                   <MessageOutlined style={{ fontSize: '40px', color: '#1677ff' }} />
-                  <div style={{ color: '#666' }}>Bạn có thắc mắc? Hãy trò chuyện với chúng tôi.</div>
+                  <div style={{ color: '#666' }}>{t("chat.haveQuestionsPrompt")}</div>
                   <Button type="primary" onClick={initAdminChat} style={{ borderRadius: '20px', marginTop: '10px' }}>
-                    Bắt đầu chát
+                    {t("chat.startChatBtn")}
                   </Button>
                 </div>
               );
@@ -374,13 +376,13 @@ const ChatWidget = () => {
                 <div key={msg.id} className={`message-wrapper ${msg.sender}`}>
                   <div className={`message ${msg.sender}`}>
                     <div style={{ whiteSpace: "pre-wrap" }}>
-                      {formatText(msg.text)}
+                      {formatText(msg.textKey ? t(msg.textKey) : msg.text)}
                     </div>
                   </div>
 
                   {activeTab === "admin" && msg.sender === "user" && isLastUserMsg && msg.isRead && (
                     <div className="read-receipt" style={{ fontSize: '11px', color: '#8c8c8c', marginTop: '2px', textAlign: 'right', width: '100%', paddingRight: '8px' }}>
-                      Đã xem
+                      {t("chat.seenStatus")}
                     </div>
                   )}
 
@@ -391,7 +393,7 @@ const ChatWidget = () => {
                           key={p.id}
                           className="chat-product-card"
                           onClick={() => handleRedirectBook(p)}
-                          title="Xem chi tiết"
+                          title={t("orderHistory.viewDetailBtn")}
                         >
                           <img
                             src={`${import.meta.env.VITE_BACKEND_URL}/upload/${p.img}`}
@@ -414,19 +416,19 @@ const ChatWidget = () => {
               );
             });
           })()}
-          {activeTab === "ai" && isTypingAI && <div className="typing-indicator">Đang tìm kiếm...</div>}
+          {activeTab === "ai" && isTypingAI && <div className="typing-indicator">{t("chat.aiTyping")}</div>}
           <div ref={messagesEndRef} />
         </div>
 
         <div className="chat-footer">
           {activeTab === "admin" && conversationStatus === "CLOSED" ? (
             <div className="closed-conversation-actions" style={{ padding: '12px', textAlign: 'center', width: '100%' }}>
-              <Button type="primary" onClick={startNewAdminChat} style={{ width: '100%', borderRadius: '20px' }}>Bắt đầu trò chuyện mới</Button>
+              <Button type="primary" onClick={startNewAdminChat} style={{ width: '100%', borderRadius: '20px' }}>{t("chat.startNewChatBtn")}</Button>
             </div>
           ) : activeTab === "admin" && !conversationId ? (
             <div className="input-wrapper">
               <Input
-                placeholder="Vui lòng bắt đầu chát..."
+                placeholder={t("chat.pleaseStartChatPlaceholder")}
                 disabled
                 bordered={false}
                 className="chat-input"
@@ -438,7 +440,7 @@ const ChatWidget = () => {
           ) : (
             <div className="input-wrapper">
               <Input
-                placeholder={activeTab === "ai" ? "Hỏi AI..." : "Nhắn tin cho Admin..."}
+                placeholder={activeTab === "ai" ? t("chat.aiInputPlaceholder") : t("chat.adminInputPlaceholder")}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyPress={handleKeyPress}
@@ -460,7 +462,7 @@ const ChatWidget = () => {
       <div
         className="chat-fab"
         onClick={() => setIsOpen(!isOpen)}
-        title="Trò chuyện với chúng tôi"
+        title={t("chat.chatWithUsTitle")}
       >
         {isOpen ? <CloseOutlined /> : <MessageOutlined />}
       </div>

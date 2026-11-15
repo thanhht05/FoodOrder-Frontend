@@ -5,10 +5,12 @@ import { callFetchOrders, callFetchOrderDetails, callUpdateOrderStatus } from '.
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import './order.scss';
+import { useTranslation } from '../../../i18n';
 
 const { TabPane } = Tabs;
 
 const ManageOrderPage = () => {
+  const { t } = useTranslation();
   const [tables, setTables] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('PENDING');
@@ -52,7 +54,7 @@ const ManageOrderPage = () => {
             try {
               const data = JSON.parse(msg.body);
               if (data.status === "PAID" || data.paymentStatus === "PAID" || data.message || data.paymentStatus === "UNPAID") {
-                message.info(`Có cập nhật đơn hàng mới!`);
+                message.info(t("admin.order.newOrderUpdateInfo"));
                 if (isSoundEnabledRef.current) {
                   const audio = new Audio('/notification.mp3');
                   audio.play().catch(e => console.log("Audio play blocked", e));
@@ -101,11 +103,11 @@ const ManageOrderPage = () => {
         }));
         setTables(mappedTables);
       } else {
-        message.error("Không thể lấy danh sách đơn hàng");
+        message.error(t("admin.order.fetchOrdersError"));
       }
     } catch (error) {
       console.error(error);
-      message.error("Có lỗi xảy ra khi lấy danh sách đơn hàng");
+      message.error(t("admin.order.fetchOrdersError"));
     } finally {
       setLoading(false);
     }
@@ -121,11 +123,11 @@ const ManageOrderPage = () => {
         console.log("selected order", res.data)
         setSelectedOrder(res.data);
       } else {
-        message.error("Không thể lấy chi tiết đơn hàng");
+        message.error(t("admin.order.fetchOrderDetailsError"));
       }
     } catch (error) {
       console.error(error);
-      message.error("Lỗi khi lấy chi tiết đơn hàng");
+      message.error(t("admin.order.fetchOrderDetailsError"));
     } finally {
       setLoadingDetails(false);
     }
@@ -136,15 +138,15 @@ const ManageOrderPage = () => {
     try {
       const res = await callUpdateOrderStatus(selectedOrder.orderId, status);
       if (res && res.data) {
-        message.success(`Cập nhật trạng thái thành công`);
+        message.success(res.message || t("admin.order.updateStatusSuccess"));
         setIsDrawerOpen(false);
         fetchOrders(activeTab);
       } else {
-        message.error(`Không thể cập nhật trạng thái đơn hàng`);
+        message.error(t("admin.order.updateStatusError"));
       }
     } catch (error) {
       console.error(error);
-      message.error("Lỗi khi cập nhật trạng thái đơn hàng");
+      message.error(t("admin.order.updateStatusError"));
     }
   };
 
@@ -162,15 +164,14 @@ const ManageOrderPage = () => {
 
   const getStatusLabel = (status) => {
     switch (status?.toUpperCase()) {
-
-      case 'PENDING': return 'Chờ xử lý';
-      case 'CONFIRMED': return 'Đã xác nhận';
-      case 'DELIVERING': return 'Đang giao';
-      case 'COMPLETED': return 'Hoàn thành';
-      case 'PREPARING': return 'Đang chuẩn bị';
-      case 'READY': return 'Đã xong';
-
-
+      case 'PENDING': return t('admin.order.tabPending');
+      case 'CONFIRMED': return t('admin.order.tabConfirmed');
+      case 'DELIVERING': return t('admin.order.tabDelivering');
+      case 'COMPLETED': return t('admin.order.tabDelivered');
+      case 'PREPARING': return t('admin.order.statusPreparing');
+      case 'READY': return t('admin.order.statusReady');
+      case 'CANCELLED': return t('admin.order.tabCancelled');
+      default: return status;
     }
   };
 
@@ -189,29 +190,29 @@ const ManageOrderPage = () => {
 
   const columns = [
     {
-      title: 'Order',
+      title: t('admin.order.colOrderId'),
       dataIndex: 'id',
       key: 'id',
       render: (text) => <strong>#{text}</strong>,
     },
     {
-      title: 'Customer',
+      title: t('admin.order.colCustomer'),
       dataIndex: 'customerName',
       key: 'customerName',
     },
     {
-      title: 'Date',
+      title: t('admin.order.colCreatedAt'),
       dataIndex: 'date',
       key: 'date',
     },
     {
-      title: 'Total',
+      title: t('admin.order.colTotalPrice'),
       dataIndex: 'total',
       key: 'total',
       render: (total) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(total),
     },
     {
-      title: 'Status',
+      title: t('admin.order.colOrderStatus'),
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
@@ -222,10 +223,10 @@ const ManageOrderPage = () => {
       )
     },
     {
-      title: 'Action',
+      title: t('admin.order.colActions'),
       key: 'action',
       render: (_, record) => (
-        <Button type="link" onClick={() => handleCardClick(record.id)}>View</Button>
+        <Button type="link" onClick={() => handleCardClick(record.id)}>{t('admin.order.detailBtn')}</Button>
       ),
     },
   ];
@@ -233,14 +234,14 @@ const ManageOrderPage = () => {
   return (
     <div className="manage-order-page">
       <div className="header-actions" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <h2>Quản lý đơn hàng</h2>
+        <h2>{t('admin.order.pageTitle')}</h2>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <SoundOutlined style={{ fontSize: '18px', color: isSoundEnabled ? '#1890ff' : '#999' }} />
           <Switch
             checked={isSoundEnabled}
             onChange={handleToggleSound}
-            checkedChildren="Bật âm báo"
-            unCheckedChildren="Tắt âm báo"
+            checkedChildren={t('admin.order.soundOn')}
+            unCheckedChildren={t('admin.order.soundOff')}
           />
         </div>
       </div>
@@ -251,11 +252,11 @@ const ManageOrderPage = () => {
         type="card"
         style={{ marginBottom: 16 }}
       >
-        <TabPane tab="Chờ xử lý " key="PENDING" />
-        <TabPane tab="Đã xác nhận " key="CONFIRMED" />
-        <TabPane tab="Đang giao " key="DELIVERING" />
-        <TabPane tab="Hoàn thành " key="COMPLETED" />
-        <TabPane tab="Đã hủy " key="CANCELLED" />
+        <TabPane tab={t('admin.order.tabPending')} key="PENDING" />
+        <TabPane tab={t('admin.order.tabConfirmed')} key="CONFIRMED" />
+        <TabPane tab={t('admin.order.tabDelivering')} key="DELIVERING" />
+        <TabPane tab={t('admin.order.tabDelivered')} key="COMPLETED" />
+        <TabPane tab={t('admin.order.tabCancelled')} key="CANCELLED" />
       </Tabs>
 
       {loading ? (
@@ -274,14 +275,14 @@ const ManageOrderPage = () => {
 
       {/* Order Details Drawer */}
       <Drawer
-        title={selectedOrder ? `Order #${selectedOrder.orderId}` : 'Chi tiết đơn hàng'}
+        title={selectedOrder ? t('admin.order.modalDetailTitle', { id: selectedOrder.orderId }) : t('admin.order.detailBtn')}
         placement="right"
         onClose={() => setIsDrawerOpen(false)}
         open={isDrawerOpen}
         width={500}
         footer={
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px' }}>
-            <Button onClick={() => setIsDrawerOpen(false)}>Đóng</Button>
+            <Button onClick={() => setIsDrawerOpen(false)}>{t('common.close')}</Button>
             {selectedOrder &&
               ['PENDING', 'CONFIRMED'].includes(selectedOrder.status) && (
                 <>
@@ -289,7 +290,7 @@ const ManageOrderPage = () => {
                     danger
                     onClick={() => handleUpdateStatus('CANCELLED')}
                   >
-                    Hủy đơn
+                    {t('admin.order.cancelBtn')}
                   </Button>
 
                   {selectedOrder.status === 'PENDING' && (
@@ -297,19 +298,19 @@ const ManageOrderPage = () => {
                       type="primary"
                       onClick={() => handleUpdateStatus('CONFIRMED')}
                     >
-                      Xác nhận
+                      {t('common.confirm')}
                     </Button>
                   )}
                 </>
               )}
             {selectedOrder && selectedOrder.status === 'CONFIRMED' && (
               <Button type="primary" onClick={() => handleUpdateStatus('DELIVERING')}>
-                Giao hàng
+                {t('admin.order.deliverBtn')}
               </Button>
             )}
             {selectedOrder && selectedOrder.status === 'DELIVERING' && (
               <Button type="primary" onClick={() => handleUpdateStatus('COMPLETED')}>
-                Hoàn thành
+                {t('admin.order.completeBtn')}
               </Button>
             )}
           </div>
@@ -320,7 +321,7 @@ const ManageOrderPage = () => {
         ) : selectedOrder ? (
           <div className="order-drawer-content">
             <div className="drawer-status">
-              <div className="status-title">Trạng thái</div>
+              <div className="status-title">{t('common.status')}</div>
               <div className={`status-badge ${getStatusClass(selectedOrder.status)}`} style={{ padding: '4px 10px', borderRadius: '9999px', display: 'inline-flex', alignItems: 'center', fontSize: '13px', fontWeight: 600, border: '1px solid currentColor' }}>
                 <span className="dot" style={{ width: '8px', height: '8px', borderRadius: '50%', marginRight: '6px', background: 'currentColor' }}></span>
                 {getStatusLabel(selectedOrder.status)}
@@ -331,22 +332,22 @@ const ManageOrderPage = () => {
 
             <div className="info-section">
               <div className="info-block">
-                <div className="info-title">Khách hàng </div>
+                <div className="info-title">{t('admin.order.colCustomer')}</div>
                 <div className="info-content">
 
                   {selectedOrder.user?.phone && <div>📞 {selectedOrder.user.phone}</div>}
                 </div>
               </div>
               <div className="info-block">
-                <div className="info-title">Thông tin giao hàng</div>
+                <div className="info-title">{t('orderHistory.recipientInfoTitle')}</div>
                 <div className="info-content">
-                  <p> <strong>Người nhận hàng:</strong> {selectedOrder.address.recipientName}</p>
-                  <p> <strong>Số điện thoại:</strong> {selectedOrder.address.phone}</p>
-                  <p> <strong>Địa chỉ giao hàng:</strong> {selectedOrder.address.addressDetail}  {selectedOrder.address.ward}  {selectedOrder.address.district} {selectedOrder.address.province} </p>
+                  <p> <strong>{t('admin.order.recipientLabel')}</strong> {selectedOrder.address.recipientName}</p>
+                  <p> <strong>{t('admin.order.phoneLabel')}</strong> {selectedOrder.address.phone}</p>
+                  <p> <strong>{t('admin.order.addressLabel')}</strong> {selectedOrder.address.addressDetail}  {selectedOrder.address.ward}  {selectedOrder.address.district} {selectedOrder.address.province} </p>
                 </div>
               </div>
               <div className="info-block">
-                <div className="info-title">Thanh toán</div>
+                <div className="info-title">{t('admin.order.colPayment')}</div>
                 <div className="info-content">
                   {selectedOrder.paymentStatus}
                 </div>
@@ -354,7 +355,7 @@ const ManageOrderPage = () => {
             </div>
 
             <div className="products-section">
-              <div className="products-title">Sản phẩm</div>
+              <div className="products-title">{t('admin.order.colProduct')}</div>
               {selectedOrder.items?.map(item => (
                 <div className="product-item" key={item.productId}>
                   <div className="product-name">{item.productName}</div>
@@ -368,17 +369,17 @@ const ManageOrderPage = () => {
 
             <div className="summary-section">
               <div className="summary-row">
-                <span>Tổng phụ</span>
+                <span>{t('admin.order.subtotalLabel')}</span>
                 <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedOrder.totalPrice)}</span>
               </div>
               <div className="summary-row total">
-                <span>Tổng cộng</span>
+                <span>{t('admin.order.totalLabel')}</span>
                 <span>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(selectedOrder.totalPrice)}</span>
               </div>
             </div>
           </div>
         ) : (
-          <p>Không có chi tiết.</p>
+          <p>{t('admin.order.noDetails')}</p>
         )}
       </Drawer>
     </div>

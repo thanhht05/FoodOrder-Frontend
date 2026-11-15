@@ -9,6 +9,7 @@ import {
 } from "antd";
 import { callCreateAUser } from "../../../services/api";
 import { useState } from "react";
+import { useTranslation } from "../../../i18n";
 const UserModalCreate = ({
   openModalCreateUser,
   setOpenModalCreateUser,
@@ -16,6 +17,7 @@ const UserModalCreate = ({
 }) => {
   const [form] = Form.useForm();
   const [isSubmit, setIsSubmit] = useState(false);
+  const { t } = useTranslation();
 
   const showModal = () => {
     setOpenModalCreateUser(true);
@@ -32,15 +34,15 @@ const UserModalCreate = ({
       const res = await callCreateAUser(fullName, email, password, phone);
 
       if (res && res.data) {
-        message.success("Tạo người dùng thành công");
+        message.success(res.message || t("admin.user.createSuccess"));
         form.resetFields();
         setOpenModalCreateUser(false);
         await fetchUser();
       }
     } catch (error) {
       notification.error({
-        message: "Tạo người dùng thất bại",
-        description: error?.response?.data?.message || "Lỗi máy chủ",
+        message: t("common.errorTitle"),
+        description: error?.response?.data?.message || t("apiError.ERR_INTERNAL_SERVER"),
       });
     } finally {
       setIsSubmit(false);
@@ -49,10 +51,10 @@ const UserModalCreate = ({
   return (
     <>
       <Button type="primary" onClick={showModal}>
-        Thêm mới
+        {t("common.add")}
       </Button>
       <Modal
-        title="Thêm mới người dùng"
+        title={t("admin.user.createModalTitle")}
         closable={{ "aria-label": "Custom Close Button" }}
         open={openModalCreateUser}
         onOk={() => {
@@ -65,29 +67,29 @@ const UserModalCreate = ({
         <Form form={form} onFinish={onFinish} autoComplete="off" name="basic">
           <Form.Item
             name="email"
-            label="Email"
-            rules={[{ required: true, message: "Vui lòng nhập email!" }]}
+            label={t("admin.user.colEmail")}
+            rules={[{ required: true, message: t("auth.emailRequired") }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="fullName"
-            label="Họ và tên"
-            rules={[{ required: true, message: "Vui lòng nhập họ và tên!" }]}
+            label={t("admin.user.colFullName")}
+            rules={[{ required: true, message: t("auth.fullNameRequired") }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="password"
-            label="Mật khẩu"
-            rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
+            label={t("admin.user.passwordLabel")}
+            rules={[{ required: true, message: t("admin.user.passwordRequired") }]}
           >
             <Input.Password />
           </Form.Item>
           <Form.Item
             name="phone"
-            label="Số điện thoại"
-            rules={[{ required: true, message: "Vui lòng nhập số điện thoại!" }]}
+            label={t("admin.user.colPhone")}
+            rules={[{ required: true, message: t("auth.phoneRequired") }]}
           >
             <Input />
           </Form.Item>

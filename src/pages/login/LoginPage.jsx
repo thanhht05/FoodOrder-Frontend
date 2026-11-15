@@ -21,6 +21,7 @@ import { doLoginAction } from "../../redux/slices/account/accountSlice";
 import { callLogin, callGoogleLogin } from "../../services/api";
 import "./loginPage.scss";
 import { getCartAPI } from "../../redux/thunk/getCartThunk";
+import { useTranslation } from "../../i18n";
 
 const { Title, Text } = Typography;
 
@@ -29,6 +30,7 @@ const LoginPage = () => {
   const [isSubmit, setIsSubmit] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const onFinish = async (values) => {
     try {
       setIsSubmit(true); // Bật loading khi bắt đầu submit
@@ -44,8 +46,8 @@ const LoginPage = () => {
         // Luôn gọi lấy giỏ hàng mới từ DB về sau khi đã login (bất kể giỏ trống hay có đồ)
         await dispatch(getCartAPI()).unwrap();
 
-        // THÔNG BÁO & CHUYỂN TRANG (Nằm ngoài khối if giỏ hàng)
-        message.success("Đăng nhập thành công!");
+        // THÔNG BÁO & CHUYỂN TRANG (res.message đã được axiosCumtome.js dịch tự động từ SUC_LOGIN)
+        message.success(res.message || t("apiSuccess.SUC_LOGIN"));
 
         if (res.data.userLogin.role.name === "ADMIN") {
           navigate("/admin");
@@ -56,15 +58,16 @@ const LoginPage = () => {
         // TRƯỜNG HỢP 2: API chạy thành công nhưng không có data (Sai mật khẩu/tài khoản do Backend trả về)
       } else {
         notification.error({
-          message: "Lỗi đăng nhập",
+          message: t("auth.loginErrorTitle"),
           description:
-            res.message || "Tên đăng nhập hoặc mật khẩu không chính xác",
+            res.message || t("apiError.ERR_BAD_CREDENTIALS"),
         });
       }
     } catch (error) {
       // TRƯỜNG HỢP 3: Lỗi kết nối, lỗi 400/500 từ axios/fetch khi gọi callLogin
+      // error?.response?.data?.message đã được axiosCumtome.js dịch tự động theo mã lỗi!
       notification.error({
-        message: "Đăng nhập thất bại",
+        message: t("auth.loginFailedTitle"),
         description: error?.response?.data?.message || error.message,
       });
     } finally {
@@ -78,8 +81,8 @@ const LoginPage = () => {
       const idToken = response.credential;
       if (!idToken) {
         notification.error({
-          message: "Lỗi đăng nhập Google",
-          description: "Không nhận được token xác thực từ Google",
+          message: t("auth.googleErrorTitle"),
+          description: t("auth.googleNoToken"),
         });
         return;
       }
@@ -96,7 +99,7 @@ const LoginPage = () => {
           // ignore cart errors if empty
         }
 
-        message.success("Đăng nhập bằng Google thành công!");
+        message.success(res.message || t("apiSuccess.SUC_GOOGLE_LOGIN"));
 
         if (res.data.userLogin?.role?.name === "ADMIN") {
           navigate("/admin");
@@ -105,13 +108,13 @@ const LoginPage = () => {
         }
       } else {
         notification.error({
-          message: "Lỗi đăng nhập Google",
-          description: res.message || "Xác thực tài khoản Google thất bại",
+          message: t("auth.googleErrorTitle"),
+          description: res.message || t("auth.googleAuthFailed"),
         });
       }
     } catch (error) {
       notification.error({
-        message: "Đăng nhập Google thất bại",
+        message: t("auth.googleLoginFailedTitle"),
         description: error?.response?.data?.message || error.message,
       });
     } finally {
@@ -165,18 +168,16 @@ const LoginPage = () => {
             <div className="hero-top">
               <div className="brand-logo">AMU</div>
               <Link to="/" className="back-btn">
-                <ArrowLeftOutlined /> Quay lại trang chủ
+                <ArrowLeftOutlined /> {t("auth.backToHome")}
               </Link>
             </div>
 
             <div className="hero-main">
               <Title level={1} className="hero-title">
-                Chào mừng bạn <br />
-                <span>trở lại.</span>
+                {t("auth.loginTitle")}
               </Title>
               <Text className="hero-subtitle">
-                Đăng nhập để tiếp tục khám phá những món ngon tuyệt vời nhất
-                cùng chúng tôi.
+                {t("auth.loginHeroDesc")}
               </Text>
             </div>
 
@@ -197,9 +198,9 @@ const LoginPage = () => {
         <Col xs={24} lg={12} className="form-section">
           <div className="form-card">
             <div className="form-header">
-              <Title level={2}>Đăng nhập</Title>
+              <Title level={2}>{t("auth.loginBtn")}</Title>
               <Text type="secondary">
-                Chưa có tài khoản? <Link to="/register">Đăng ký ngay</Link>
+                {t("auth.noAccount")} <Link to="/register">{t("auth.registerNow")}</Link>
               </Text>
             </div>
 
@@ -212,29 +213,29 @@ const LoginPage = () => {
               className="main-form"
             >
               <Form.Item
-                label="Tên đăng nhập / Email"
+                label={t("auth.usernameOrEmailLabel")}
                 name="username"
                 rules={[
-                  { required: true, message: "Vui lòng nhập tên đăng nhập!" },
+                  { required: true, message: t("auth.usernameRequired") },
                 ]}
               >
                 <Input placeholder="username@example.com" size="large" />
               </Form.Item>
 
               <Form.Item
-                label="Mật khẩu"
+                label={t("auth.passwordLabel")}
                 name="password"
-                rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
+                rules={[{ required: true, message: t("auth.passwordRequired") }]}
               >
                 <Input.Password placeholder="••••••••" size="large" />
               </Form.Item>
 
               <div className="form-options">
                 <Form.Item name="remember" valuePropName="checked" noStyle>
-                  <Checkbox>Ghi nhớ đăng nhập</Checkbox>
+                  <Checkbox>{t("auth.rememberMe")}</Checkbox>
                 </Form.Item>
                 <Link className="forgot-link" to="/forgot-password">
-                  Quên mật khẩu?
+                  {t("auth.forgotPassword")}
                 </Link>
               </div>
 
@@ -247,12 +248,12 @@ const LoginPage = () => {
                   loading={isSubmit}
                   className="submit-btn"
                 >
-                  Đăng nhập
+                  {t("auth.loginBtn")}
                 </Button>
               </Form.Item>
 
               <div className="divider-text">
-                <span>Hoặc đăng nhập với</span>
+                <span>{t("auth.orLoginWith")}</span>
               </div>
 
               <div className="social-login">
@@ -274,7 +275,7 @@ const LoginPage = () => {
                         window.google.accounts.id.prompt();
                       } else {
                         message.warning(
-                          "Google Sign-In đang khởi tạo, vui lòng thử lại sau giây lát.",
+                          t("auth.googleLoadingWarning"),
                         );
                       }
                     }}

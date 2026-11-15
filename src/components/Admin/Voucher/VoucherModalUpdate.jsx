@@ -2,8 +2,10 @@ import { DatePicker, Form, Input, InputNumber, message, Modal, notification } fr
 import { useEffect, useState } from "react";
 import { callUpdateVoucher } from "../../../services/api";
 import dayjs from "dayjs";
+import { useTranslation } from "../../../i18n";
 
 const VoucherModalUpdate = (props) => {
+  const { t } = useTranslation();
   const { openModalUpdate, setOpenModalUpdate, dataUpdate, setDataUpdate, fetchVoucher } = props;
   const [isSubmit, setIsSubmit] = useState(false);
   const [form] = Form.useForm();
@@ -29,13 +31,13 @@ const VoucherModalUpdate = (props) => {
     setIsSubmit(false);
     
     if (res && res.data) {
-      message.success("Cập nhật voucher thành công");
+      message.success(t("admin.voucher.updateSuccess"));
       setOpenModalUpdate(false);
       setDataUpdate(null);
       await fetchVoucher();
     } else {
       notification.error({
-        message: "Đã có lỗi xảy ra",
+        message: t("common.errorOccurred"),
         description: res.message,
       });
     }
@@ -43,15 +45,15 @@ const VoucherModalUpdate = (props) => {
 
   return (
     <Modal
-      title="Cập nhật voucher"
+      title={t("admin.voucher.updateModalTitle")}
       open={openModalUpdate}
       onOk={() => form.submit()}
       onCancel={() => {
         setOpenModalUpdate(false);
         setDataUpdate(null);
       }}
-      okText="Cập nhật"
-      cancelText="Hủy"
+      okText={t("common.update")}
+      cancelText={t("common.cancel")}
       confirmLoading={isSubmit}
     >
       <Form
@@ -62,35 +64,35 @@ const VoucherModalUpdate = (props) => {
         layout="vertical"
       >
         <Form.Item
-          label="Mã Voucher"
+          label={t("admin.voucher.codeLabel")}
           name="code"
-          rules={[{ required: true, message: "Vui lòng nhập mã voucher!" }]}
+          rules={[{ required: true, message: t("admin.voucher.codeRequired") }]}
         >
           <Input />
         </Form.Item>
         <Form.Item
-          label="Phần trăm giảm (%)"
+          label={t("admin.voucher.percentLabel")}
           name="percentDiscount"
-          rules={[{ required: true, message: "Vui lòng nhập phần trăm giảm!" }]}
+          rules={[{ required: true, message: t("admin.voucher.percentRequired") }]}
         >
           <InputNumber min={0} max={100} style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item
-          label="Giảm tối đa (VNĐ)"
+          label={t("admin.voucher.maxDiscountLabel")}
           name="maxDiscount"
-          rules={[{ required: true, message: "Vui lòng nhập số tiền giảm tối đa!" }]}
+          rules={[{ required: true, message: t("admin.voucher.maxDiscountRequired") }]}
         >
           <InputNumber min={0} style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item
-          label="Giới hạn sử dụng"
+          label={t("admin.voucher.usageLimitLabel")}
           name="usageLimit"
-          rules={[{ required: true, message: "Vui lòng nhập giới hạn sử dụng!" }]}
+          rules={[{ required: true, message: t("admin.voucher.usageLimitRequired") }]}
         >
           <InputNumber min={1} style={{ width: "100%" }} />
         </Form.Item>
         <Form.Item
-          label="Ngày hết hạn"
+          label={t("admin.voucher.expirationLabel")}
           name="expiration"
         >
           <DatePicker style={{ width: "100%" }} />

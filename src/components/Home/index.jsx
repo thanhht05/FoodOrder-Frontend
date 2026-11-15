@@ -23,10 +23,12 @@ import {
 } from "@ant-design/icons";
 import { callFetchAllCategory, callFetchAllProcut } from "../../services/api";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "../../i18n";
 const { Text, Title } = Typography;
 
 const Home = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { Meta } = Card;
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
@@ -86,10 +88,10 @@ const Home = () => {
   }, [currentPage, sortQuery, filter, searchKeyword]);
 
   const tabItems = [
-    { key: "sold,desc", label: "Phổ biến" },
-    { key: "updatedAt,desc", label: "Hàng mới" },
-    { key: "price,asc", label: "Giá thấp đến cao" },
-    { key: "price,desc", label: "Giá cao đến thấp" },
+    { key: "sold,desc", label: t("home.sortPopular") },
+    { key: "updatedAt,desc", label: t("home.sortNew") },
+    { key: "price,asc", label: t("home.sortPriceAsc") },
+    { key: "price,desc", label: t("home.sortPriceDesc") },
   ];
 
   const handleChangeFilter = (changedValues, values) => {
@@ -171,11 +173,11 @@ const Home = () => {
       <div className="filter-header">
         <span>
           <FilterOutlined className="icon-green" />
-          <span className="filter-title">BỘ LỌC TÌM KIẾM</span>
+          <span className="filter-title">{t("home.filterTitle").toUpperCase()}</span>
         </span>
         <ReloadOutlined
           className="reset-btn"
-          title="Làm mới"
+          title={t("common.reset")}
           onClick={() => {
             form.resetFields();
             setFilter("");
@@ -192,7 +194,7 @@ const Home = () => {
         }
         layout="vertical"
       >
-        <Form.Item name="category" label="Danh mục sản phẩm">
+        <Form.Item name="category" label={t("home.foodCategory")}>
           <Checkbox.Group className="custom-checkbox-group">
             <Row style={{ marginBottom: 8 }}>
               {categoryData.map((i) => (
@@ -210,11 +212,11 @@ const Home = () => {
 
         <Divider />
 
-        <Form.Item label="Khoảng giá">
+        <Form.Item label={t("home.priceRange")}>
           <div className="price-range-inputs">
             <Form.Item name={["price", "from"]} noStyle>
               <InputNumber
-                placeholder="Từ đ"
+                placeholder={t("home.priceFrom")}
                 formatter={(val) =>
                   `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 }
@@ -223,7 +225,7 @@ const Home = () => {
             <span className="separator">-</span>
             <Form.Item name={["price", "to"]} noStyle>
               <InputNumber
-                placeholder="Đến đ"
+                placeholder={t("home.priceTo")}
                 formatter={(val) =>
                   `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 }
@@ -237,7 +239,7 @@ const Home = () => {
             block
             className="apply-btn"
           >
-            Áp dụng
+            {t("home.applyFilter")}
           </Button>
         </Form.Item>
       </Form>
@@ -274,7 +276,7 @@ const Home = () => {
                         icon={<FilterOutlined />}
                         onClick={() => setOpenDrawer(true)}
                       >
-                        Lọc Sản Phẩm
+                        {t("home.filterDrawerTitle")}
                       </Button>
                     </div>
 
@@ -332,7 +334,7 @@ const Home = () => {
                                   <Rate disabled defaultValue={5} style={{ fontSize: '12px', color: '#fadb14' }} />
                                 </span>
                                 <Text type="secondary" className="sold-count">
-                                  Đã bán 1.2k
+                                  {t("home.soldCount", { count: p.sold ?? "1.2k" })}
                                 </Text>
                               </div>
                             </div>
@@ -358,7 +360,7 @@ const Home = () => {
         </div>
       )}
       <Drawer
-        title="Bộ lọc tìm kiếm"
+        title={t("home.filterTitle")}
         placement="left"
         onClose={() => setOpenDrawer(false)}
         open={openDrawer}

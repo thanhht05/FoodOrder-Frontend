@@ -16,8 +16,10 @@ import VoucherModalCreate from "./VoucherModalCreate";
 import VoucherModalUpdate from "./VoucherModalUpdate";
 import VoucherViewDetail from "./VoucherViewDetail";
 import dayjs from "dayjs";
+import { useTranslation } from "../../../i18n";
 
 const VoucherTable = () => {
+  const { t } = useTranslation();
   const [listVoucher, setListVoucher] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const pageSize = 5;
@@ -71,11 +73,11 @@ const VoucherTable = () => {
   const handleDelete = async (id) => {
     const res = await callDeleteVoucher(id);
     if (res && res.data) {
-      message.success("Xóa voucher thành công");
+      message.success(t("admin.voucher.deleteSuccess"));
       fetchVoucher();
     } else {
       notification.error({
-        message: "Có lỗi xảy ra",
+        message: t("common.errorOccurred"),
         description: res.message,
       });
     }
@@ -86,16 +88,16 @@ const VoucherTable = () => {
     const res = await callUpdateVoucherStatus(record.id, status);
 
     if (res && res.data) {
-      message.success(checked ? "Đã bật voucher" : "Đã tắt voucher");
+      message.success(checked ? t("admin.voucher.toggleActiveSuccess") : t("admin.voucher.toggleInactiveSuccess"));
       fetchVoucher();
     } else {
-      message.error("Có lỗi xảy ra");
+      message.error(t("common.errorOccurred"));
     }
   };
 
   const columns = [
     {
-      title: "ID",
+      title: t("admin.voucher.colId"),
       dataIndex: "id",
       key: "id",
       render: (_, record) => (
@@ -110,42 +112,41 @@ const VoucherTable = () => {
       ),
     },
     {
-      title: "Mã Voucher",
+      title: t("admin.voucher.colCode"),
       dataIndex: "code",
       key: "code",
       sorter: true,
     },
     {
-      title: "Phần trăm giảm",
+      title: t("admin.voucher.colPercentDiscount"),
       dataIndex: "percentDiscount",
       key: "percentDiscount",
       render: (val) => `${val}%`
     },
     {
-      title: "Giảm tối đa",
+      title: t("admin.voucher.colMaxDiscount"),
       dataIndex: "maxDiscount",
       key: "maxDiscount",
       render: (val) => `${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val)}`
     },
     {
-      title: "Lượt dùng",
+      title: t("admin.voucher.colUsageLimit"),
       dataIndex: "usageLimit",
       key: "usageLimit",
     },
     {
-      title: "Hết hạn",
+      title: t("admin.voucher.colExpiration"),
       dataIndex: "expiration",
       key: "expiration",
       render: (expiration) =>
         dayjs(expiration).isValid()
           ? dayjs(expiration).format("DD/MM/YYYY")
-          : "Không có thời hạn",
+          : t("admin.voucher.noExpiration"),
     },
     {
-      title: "Trạng thái",
+      title: t("admin.voucher.colStatus"),
       key: "status",
       render: (_, record) => {
-        // Assume status field is "ACTIVE" or "INACTIVE"
         const isActive = record.status === "ACTIVE";
         return (
           <Switch
@@ -156,7 +157,7 @@ const VoucherTable = () => {
       }
     },
     {
-      title: "Thao tác",
+      title: t("admin.voucher.colActions"),
       key: "action",
       render: (_, record) => {
         return (
@@ -167,16 +168,16 @@ const VoucherTable = () => {
                 setDataUpdate(record);
               }}
             >
-              Cập nhật
+              {t("common.update")}
             </a>
             <Popconfirm
-              title="Xóa voucher"
-              description="Bạn có chắc chắn muốn xóa voucher này không?"
+              title={t("admin.voucher.deleteTitle")}
+              description={t("admin.voucher.deleteConfirmDesc")}
               onConfirm={() => handleDelete(record.id)}
-              okText="Có"
-              cancelText="Không"
+              okText={t("common.yes")}
+              cancelText={t("common.no")}
             >
-              <a style={{ marginLeft: "8px" }}>Xóa</a>
+              <a style={{ marginLeft: "8px" }}>{t("common.delete")}</a>
             </Popconfirm>
           </>
         );
@@ -191,14 +192,14 @@ const VoucherTable = () => {
   const renderHeader = () => {
     return (
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <span>Danh sách voucher</span>
+        <span>{t("admin.voucher.tableTitle")}</span>
         <span style={{ display: "flex", gap: 15 }}>
           <Button
             icon={<PlusOutlined />}
             type="primary"
             onClick={() => setOpenModalCreate(true)}
           >
-            Thêm mới
+            {t("common.addNew")}
           </Button>
         </span>
       </div>

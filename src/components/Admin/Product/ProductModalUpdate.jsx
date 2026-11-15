@@ -19,6 +19,7 @@ import {
 import TextArea from "antd/es/input/TextArea";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { v4 as uuidv4 } from "uuid";
+import { useTranslation } from "../../../i18n";
 
 const ProductModalUpdate = ({
   openModalUpdateProduct,
@@ -27,6 +28,7 @@ const ProductModalUpdate = ({
   productDataUpdate,
   fetchProduct,
 }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
 
   const [isSubmit, setIsSubmit] = useState(false);
@@ -106,11 +108,11 @@ const ProductModalUpdate = ({
   const beforeUpload = (file) => {
     const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
     if (!isJpgOrPng) {
-      message.error("Chỉ có thể tải lên tệp JPG/PNG!");
+      message.error(t("admin.product.imageFormatError"));
     }
     const isLt2M = file.size / 1024 / 1024 < 2;
     if (!isLt2M) {
-      message.error("Kích thước ảnh phải nhỏ hơn 2MB!");
+      message.error(t("admin.product.imageSizeError"));
     }
     return isJpgOrPng && isLt2M;
   };
@@ -145,7 +147,7 @@ const ProductModalUpdate = ({
       ]);
       onSuccess("ok");
     } else {
-      onError("Đã có lỗi khi upload file");
+      onError(t("admin.product.uploadFileError"));
     }
   };
   const onFinish = async (values) => {
@@ -164,7 +166,7 @@ const ProductModalUpdate = ({
     setIsSubmit(true);
 
     if (res && res.data) {
-      message.success("Cập nhật sản phẩm thành công");
+      message.success(t("admin.product.updateSuccess"));
       form.resetFields();
       setDataImg([]);
       setInitForm(null);
@@ -172,7 +174,7 @@ const ProductModalUpdate = ({
       await fetchProduct();
     } else {
       notification.error({
-        message: "Đã có lỗi xảy ra",
+        message: t("common.errorOccurred"),
         description: res.message,
       });
     }
@@ -181,7 +183,7 @@ const ProductModalUpdate = ({
   return (
     <>
       <Modal
-        title="Cập nhật sản phẩm"
+        title={t("admin.product.updateModalTitle")}
         closable={{ "aria-label": "Custom Close Button" }}
         open={openModalUpdateProduct}
         onOk={() => {
@@ -189,6 +191,8 @@ const ProductModalUpdate = ({
         }}
         onCancel={handleCancel}
         confirmLoading={isSubmit}
+        okText={t("common.update")}
+        cancelText={t("common.cancel")}
       >
         <Divider />
         <Form form={form} onFinish={onFinish} autoComplete="off" name="basic">
@@ -197,15 +201,15 @@ const ProductModalUpdate = ({
           </Form.Item>
           <Form.Item
             name="name"
-            label="Tên sản phẩm"
-            rules={[{ required: true, message: "Vui lòng nhập tên sản phẩm!" }]}
+            label={t("admin.product.searchNameLabel")}
+            rules={[{ required: true, message: t("admin.product.nameRequired") }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="price"
-            label="Giá"
-            rules={[{ required: true, message: "Vui lòng nhập giá!" }]}
+            label={t("admin.product.colPrice")}
+            rules={[{ required: true, message: t("admin.product.priceRequired") }]}
           >
             <InputNumber
               min={0}
@@ -218,8 +222,8 @@ const ProductModalUpdate = ({
           </Form.Item>
           <Form.Item
             name="quantity"
-            label="Số lượng"
-            rules={[{ required: true, message: "Vui lòng nhập số lượng!" }]}
+            label={t("admin.product.colQuantity")}
+            rules={[{ required: true, message: t("admin.product.quantityRequired") }]}
           >
             <InputNumber
               min={0}
@@ -232,25 +236,25 @@ const ProductModalUpdate = ({
 
           <Form.Item
             name="categoryName"
-            label="Danh mục"
-            rules={[{ required: true, message: "Vui lòng chọn thể loại!" }]}
+            label={t("admin.product.colCategory")}
+            rules={[{ required: true, message: t("admin.product.categoryRequired") }]}
           >
             <Select
               showSearch
               optionFilterProp="label"
-              placeholder="Chọn danh mục"
+              placeholder={t("admin.product.searchCategoryPlaceholder")}
               options={listCategory}
             />
           </Form.Item>
           <Form.Item
             name="description"
-            label="Mô tả"
-            rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
+            label={t("admin.product.colDescription")}
+            rules={[{ required: true, message: t("admin.product.descriptionRequired") }]}
           >
             <TextArea />
           </Form.Item>
 
-          <Form.Item name="file" label="Tải ảnh lên">
+          <Form.Item name="file" label={t("admin.product.productImagesSection")}>
             <Upload
               multiple
               name="file"
@@ -268,7 +272,7 @@ const ProductModalUpdate = ({
             >
               <div>
                 {loading ? <LoadingOutlined /> : <PlusOutlined />}
-                <div style={{ marginTop: 8 }}>Tải lên</div>
+                <div style={{ marginTop: 8 }}>{t("admin.product.uploadBtn")}</div>
               </div>
             </Upload>
           </Form.Item>

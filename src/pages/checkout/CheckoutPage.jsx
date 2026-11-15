@@ -34,6 +34,7 @@ import {
 } from "../../services/api";
 import { clearCart } from "../../redux/slices/cart/CartSlice";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "../../i18n";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -41,6 +42,7 @@ const { TextArea } = Input;
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [paymentMethod, setPaymentMethod] = useState("QR");
   const [loading, setLoading] = useState(false);
@@ -86,7 +88,7 @@ const CheckoutPage = () => {
 
   const handleApplyVoucher = async () => {
     if (!voucherCodeInput.trim()) {
-      setVoucherError("Vui lòng nhập mã voucher");
+      setVoucherError(t("checkout.pleaseEnterVoucher"));
       setVoucherSuccessMsg("");
       return;
     }
@@ -95,16 +97,16 @@ const CheckoutPage = () => {
     setVoucherSuccessMsg("");
     try {
 
-      const res = await callApplyVouycher({ orderId: 0, code: voucherCodeInput.trim() });
+      const res = await callApplyVoucher({ orderId: 0, code: voucherCodeInput.trim() });
       if (res && res.data) {
         setAppliedVoucher(res.data);
-        setVoucherSuccessMsg("Voucher hợp lệ");
+        setVoucherSuccessMsg(t("checkout.voucherValid"));
         setVoucherError("");
       }
     } catch (e) {
       setAppliedVoucher(null);
       setVoucherError(
-        "Voucher không hợp lệ hoặc đã hết hạn"
+        e?.response?.data?.message || t("checkout.voucherInvalid")
       );
     } finally {
       setIsApplyingVoucher(false);
@@ -135,7 +137,7 @@ const CheckoutPage = () => {
         appliedVoucher?.code || null
       );
       if (resOrder?.data) {
-        message.success("Đặt hàng thành công");
+        message.success(resOrder.message || t("checkout.orderPlacedSuccess"));
         const newOrderId = resOrder.data?.orderId;
         if (paymentMethod === "QR") {
           dispatch(clearCart());
@@ -151,12 +153,12 @@ const CheckoutPage = () => {
             if (payLinkRes?.data?.checkoutUrl) {
               window.location.href = payLinkRes.data.checkoutUrl;
             } else {
-              message.error("Không thể tạo link thanh toán");
+              message.error(t("checkout.createPaymentLinkFailed"));
               navigate("/order-history");
             }
           } catch (err) {
             console.error("Create payment link error:", err);
-            message.error("Lỗi tạo link thanh toán");
+            message.error(t("checkout.createPaymentLinkError"));
             navigate("/order-history");
           }
         } else {
@@ -167,7 +169,7 @@ const CheckoutPage = () => {
     } catch (e) {
       notification.error({
         message:
-          e?.response?.data?.message || e.message || "Place order failed",
+          e?.response?.data?.message || e.message || t("common.errorTitle"),
       });
     } finally {
       setLoading(false);
@@ -193,14 +195,14 @@ const CheckoutPage = () => {
                 <Col xs={24} md={12}>
                   <Form.Item
                     name="fullName"
-                    label="Họ và tên"
+                    label={t("checkout.recipientNameLabel")}
                     rules={[
-                      { required: true, message: "Vui lòng nhập họ tên!" },
+                      { required: true, message: t("checkout.recipientNameRequired") },
                     ]}
                   >
                     <Input
                       prefix={<UserOutlined />}
-                      placeholder="Nguyễn Văn A"
+                      placeholder={t("checkout.recipientNamePlaceholder")}
                       size="large"
                     />
                   </Form.Item>
@@ -208,14 +210,14 @@ const CheckoutPage = () => {
                 <Col xs={24} md={12}>
                   <Form.Item
                     name="phone"
-                    label="Số điện thoại"
+                    label={t("checkout.phoneLabel")}
                     rules={[
-                      { required: true, message: "Vui lòng nhập số điện thoại!" },
+                      { required: true, message: t("checkout.phoneRequired") },
                     ]}
                   >
                     <Input
                       prefix={<PhoneOutlined />}
-                      placeholder="0912345678"
+                      placeholder={t("checkout.phonePlaceholder")}
                       size="large"
                     />
                   </Form.Item>
@@ -226,12 +228,12 @@ const CheckoutPage = () => {
                 <Col xs={24} md={8}>
                   <Form.Item
                     name="province"
-                    label="Tỉnh/Thành phố"
-                    rules={[{ required: true, message: "Vui lòng chọn Tỉnh/Thành phố!" }]}
+                    label={t("checkout.provinceLabel")}
+                    rules={[{ required: true, message: t("checkout.provinceRequired") }]}
                   >
                     <Select
                       size="large"
-                      placeholder="Chọn Tỉnh/Thành phố"
+                      placeholder={t("checkout.provincePlaceholder")}
                       onChange={handleProvinceChange}
                       showSearch
                       optionFilterProp="children"
@@ -248,12 +250,12 @@ const CheckoutPage = () => {
                 <Col xs={24} md={8}>
                   <Form.Item
                     name="ward"
-                    label="Phường/Xã"
-                    rules={[{ required: true, message: "Vui lòng chọn Phường/Xã!" }]}
+                    label={t("checkout.wardLabel")}
+                    rules={[{ required: true, message: t("checkout.wardRequired") }]}
                   >
                     <Select
                       size="large"
-                      placeholder="Chọn Phường/Xã"
+                      placeholder={t("checkout.wardPlaceholder")}
                       showSearch
                       optionFilterProp="children"
                       disabled={wards.length === 0}
@@ -270,27 +272,27 @@ const CheckoutPage = () => {
 
               <Form.Item
                 name="address"
-                label="Địa chỉ cụ thể"
-                rules={[{ required: true, message: "Vui lòng nhập địa chỉ cụ thể!" }]}
+                label={t("checkout.addressDetailLabel")}
+                rules={[{ required: true, message: t("checkout.addressDetailRequired") }]}
               >
                 <Input
                   prefix={<EnvironmentOutlined />}
-                  placeholder="Số nhà, ngõ, ngách, tên đường..."
+                  placeholder={t("checkout.addressDetailPlaceholder")}
                   size="large"
                 />
               </Form.Item>
 
-              <Form.Item name="note" label="Ghi chú cho đơn hàng (Tùy chọn)">
+              <Form.Item name="note" label={t("checkout.noteLabel")}>
                 <TextArea
                   rows={3}
-                  placeholder="Giao hàng vào giờ hành chính..."
+                  placeholder={t("checkout.notePlaceholder")}
                 />
               </Form.Item>
             </Card>
 
             <Card className="checkout-card mt-24" bordered={false}>
               <Title level={4} className="section-title">
-                2. Phương thức thanh toán
+                {t("checkout.paymentMethodSection")}
               </Title>
               <Radio.Group
                 onChange={(e) => setPaymentMethod(e.target.value)}
@@ -299,16 +301,16 @@ const CheckoutPage = () => {
               >
                 <Radio value="QR" className="payment-option">
                   <span className="option-title">
-                    Chuyển khoản qua mã QR (Khuyên dùng)
+                    {t("checkout.qrOptionTitle")}
                   </span>
                   <Text type="secondary" className="option-desc">
-                    Thanh toán tự động, nhanh chóng và chính xác.
+                    {t("checkout.qrOptionDesc")}
                   </Text>
                 </Radio>
                 <Radio value="COD" className="payment-option">
-                  <span className="option-title">Thanh toán tiền mặt</span>
+                  <span className="option-title">{t("checkout.codOptionTitle")}</span>
                   <Text type="secondary" className="option-desc">
-                    Thanh toán bằng tiền mặt
+                    {t("checkout.codOptionDesc")}
                   </Text>
                 </Radio>
               </Radio.Group>
@@ -319,7 +321,7 @@ const CheckoutPage = () => {
           <Col xs={24} lg={10} className="summary-section">
             <Card className="summary-card" bordered={false}>
               <Title level={4} className="section-title">
-                Tổng quan đơn hàng
+                {t("cart.orderSummaryTitle")}
               </Title>
 
               <div className="order-items">
@@ -343,7 +345,7 @@ const CheckoutPage = () => {
 
                       <div>
                         {/* Tên sản phẩm */}
-                        <Text strong>{item.name || "Tên sản phẩm"}</Text>
+                        <Text strong>{item.name}</Text>
                       </div>
                     </Space>
 
@@ -353,17 +355,17 @@ const CheckoutPage = () => {
                         ? (item.price * (item.quantity || 1)).toLocaleString(
                           "vi-VN",
                         ) + "₫"
-                        : "1.250.000₫"}
+                        : "0₫"}
                     </Text>
                   </div>
                 ))}
               </div>
 
               <div className="voucher-section" style={{ marginTop: 24, marginBottom: 24 }}>
-                <Text strong>Mã giảm giá</Text>
+                <Text strong>{t("checkout.voucherTitle")}</Text>
                 <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
                   <Input
-                    placeholder="Nhập mã voucher"
+                    placeholder={t("checkout.voucherInputPlaceholder")}
                     value={voucherCodeInput}
                     onChange={(e) => setVoucherCodeInput(e.target.value)}
                     disabled={isApplyingVoucher || loading}
@@ -374,14 +376,14 @@ const CheckoutPage = () => {
                     loading={isApplyingVoucher}
                     disabled={loading || !voucherCodeInput.trim()}
                   >
-                    Áp dụng
+                    {t("checkout.applyBtn")}
                   </Button>
                 </div>
                 {voucherSuccessMsg && (
                   <div style={{ color: '#52c41a', marginTop: 8, fontSize: 14 }}>
                     ✓ {voucherSuccessMsg}
                     <br />
-                    Giảm giá: -{new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(appliedVoucher?.discountAmount || 0)}
+                    {t("checkout.voucherDiscount")}: -{new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(appliedVoucher?.discountAmount || 0)}
                   </div>
                 )}
                 {voucherError && (
@@ -394,7 +396,7 @@ const CheckoutPage = () => {
               <Divider dashed />
 
               <div className="price-row">
-                <Text type="secondary">Tạm tính</Text>
+                <Text type="secondary">{t("checkout.merchandiseSubtotal")}</Text>
                 <Text strong>
                   {new Intl.NumberFormat("vi-VN", {
                     style: "currency",
@@ -405,7 +407,7 @@ const CheckoutPage = () => {
 
               {appliedVoucher && (
                 <div className="price-row">
-                  <Text type="secondary">Giảm giá</Text>
+                  <Text type="secondary">{t("checkout.voucherDiscount")}</Text>
                   <Text type="danger" strong>
                     -{new Intl.NumberFormat("vi-VN", {
                       style: "currency",
@@ -416,14 +418,14 @@ const CheckoutPage = () => {
               )}
 
               <div className="price-row">
-                <Text type="secondary">Phí vận chuyển</Text>
-                <Text type="success">Miễn phí</Text>
+                <Text type="secondary">{t("checkout.shippingFee")}</Text>
+                <Text type="success">{t("checkout.freeShipping")}</Text>
               </div>
 
               <Divider />
 
               <div className="price-row total-row">
-                <Text strong>Tổng cộng</Text>
+                <Text strong>{t("checkout.totalPayment")}</Text>
                 <Text className="total-amount" strong>
                   {new Intl.NumberFormat("vi-VN", {
                     style: "currency",
@@ -442,7 +444,7 @@ const CheckoutPage = () => {
                 htmlType="submit"
                 loading={loading}
               >
-                HOÀN TẤT ĐẶT HÀNG
+                {t("checkout.completeOrderBtn")}
               </Button>
             </Card>
           </Col>

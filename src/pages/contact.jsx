@@ -1,4 +1,7 @@
+import { useTranslation } from "../i18n";
+
 const Contact = () => {
-  return <h1>Trang liên hệ</h1>;
+  const { t } = useTranslation();
+  return <h1>{t("contact.pageTitle")}</h1>;
 };
 export default Contact;

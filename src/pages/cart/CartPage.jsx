@@ -22,6 +22,7 @@ import "./cartPage.scss";
 import { useDispatch, useSelector } from "react-redux";
 import CartSteps from "../../components/Cart/CartSteps";
 import { updateCartAPI } from "../../redux/thunk/updateCartAPI";
+import { useTranslation } from "../../i18n";
 
 const { Title, Text } = Typography;
 
@@ -29,6 +30,7 @@ const CartPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const cartItems = useSelector((state) => state.cart.items);
 
@@ -68,7 +70,7 @@ const CartPage = () => {
       }),
     );
 
-    message.success("Xóa thành công");
+    message.success(t("cart.deletedItemSuccess"));
   };
 
   const handleCheckout = () => {
@@ -84,10 +86,10 @@ const CartPage = () => {
       <div className="cart-empty">
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="Giỏ hàng của bạn đang trống"
+          description={t("cart.emptyCartText")}
         >
           <Button type="primary" onClick={() => navigate("/")}>
-            Mua sắm ngay
+            {t("cart.buyNowBtn")}
           </Button>
         </Empty>
       </div>
@@ -102,7 +104,7 @@ const CartPage = () => {
         </div>
 
         <Title level={3} className="page-title">
-          Giỏ hàng của bạn
+          {t("cart.yourCartTitle")}
         </Title>
 
         <Row gutter={[24, 24]}>
@@ -179,11 +181,11 @@ const CartPage = () => {
           {/* CỘT PHẢI - TỔNG KẾT ĐƠN HÀNG */}
           <Col xs={24} lg={8}>
             <Card className="cart-summary-card">
-              <Title level={4}>Tổng đơn hàng</Title>
+              <Title level={4}>{t("cart.orderSummaryTitle")}</Title>
               <Divider />
 
               <div className="summary-row">
-                <Text type="secondary">Tạm tính</Text>
+                <Text type="secondary">{t("cart.subtotal")}</Text>
                 <Text strong>
                   {new Intl.NumberFormat("vi-VN", {
                     style: "currency",
@@ -193,14 +195,14 @@ const CartPage = () => {
               </div>
 
               <div className="summary-row">
-                <Text type="secondary">Phí vận chuyển</Text>
+                <Text type="secondary">{t("checkout.shippingFee")}</Text>
                 <Text strong>0₫</Text>
               </div>
 
               <Divider />
 
               <div className="summary-row total">
-                <Text size="large">Tổng cộng</Text>
+                <Text size="large">{t("cart.totalPayment")}</Text>
                 <Text className="final-price">
                   {new Intl.NumberFormat("vi-VN", {
                     style: "currency",
@@ -217,7 +219,7 @@ const CartPage = () => {
                 onClick={handleCheckout}
                 loading={loading}
               >
-                Tiến hành đặt hàng
+                {t("cart.checkoutBtn", { count: cartItems.length })}
               </Button>
 
               <div className="secure-info">
@@ -226,7 +228,7 @@ const CartPage = () => {
                   type="secondary"
                   size="small"
                 >
-                  🔒 Thanh toán an toàn và bảo mật
+                  {t("cart.secureCheckoutNote")}
                 </Text>
               </div>
             </Card>

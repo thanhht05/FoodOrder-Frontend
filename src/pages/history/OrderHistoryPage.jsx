@@ -4,10 +4,12 @@ import "./OrderHistory.scss";
 import OrderCard from "../../components/Order/OrderCard";
 import OrderDetailDrawer from "../../components/Order/OrderDetailDrawer";
 import { callFetchOrderHistory } from "../../services/api";
+import { useTranslation } from "../../i18n";
 
 const { Title } = Typography;
 
 const OrderHistory = () => {
+  const { t } = useTranslation();
   const [orderData, setOrderData] = useState(null);
   const [loading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("ALL");
@@ -39,11 +41,11 @@ const OrderHistory = () => {
   }, []);
 
   const tabItems = [
-    { key: "ALL", label: "Tất cả" },
-    { key: "PENDING", label: "Chờ xác nhận" },
-    { key: "DELIVERING", label: "Đang giao" },
-    { key: "COMPLETED", label: "Đã giao" },
-    { key: "CANCELLED", label: "Đã hủy" },
+    { key: "ALL", label: t("orderHistory.tabAll") },
+    { key: "PENDING", label: t("orderHistory.tabPending") },
+    { key: "DELIVERING", label: t("orderHistory.tabShipping") },
+    { key: "COMPLETED", label: t("orderHistory.tabDelivered") },
+    { key: "CANCELLED", label: t("orderHistory.tabCancelled") },
   ];
 
   const filteredOrders = useMemo(() => {
@@ -85,7 +87,7 @@ const OrderHistory = () => {
       ) : (
         <div className="order-history-container">
           <Title level={4} className="section-title">
-            Đơn Hàng Của Tôi
+            {t("orderHistory.pageTitle")}
           </Title>
 
           <Tabs
@@ -101,7 +103,7 @@ const OrderHistory = () => {
               <OrderCard key={order.orderId} order={order} onShowDetail={handleShowDetail} />
             ))
           ) : (
-            <Empty description="Chưa có đơn hàng nào" style={{ marginTop: 40 }} />
+            <Empty description={t("orderHistory.emptyOrders")} style={{ marginTop: 40 }} />
           )}
         </div>
       )}
