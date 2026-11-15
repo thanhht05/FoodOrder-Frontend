@@ -13,6 +13,8 @@ import {
   Rate,
   Typography,
   Drawer,
+  Empty,
+  Tag,
 } from "antd";
 import "./home.scss";
 import { useEffect, useState } from "react";
@@ -20,16 +22,19 @@ import {
   FilterOutlined,
   ReloadOutlined,
   ShoppingCartOutlined,
+  ThunderboltFilled,
+  SafetyCertificateFilled,
+  FireFilled,
 } from "@ant-design/icons";
 import { callFetchAllCategory, callFetchAllProcut } from "../../services/api";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "../../i18n";
-const { Text, Title } = Typography;
+
+const { Text, Title, Paragraph } = Typography;
 
 const Home = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { Meta } = Card;
   const [form] = Form.useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [categoryData, setCategoryData] = useState([]);
@@ -37,7 +42,7 @@ const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [total, setTotal] = useState(0);
   const pageSize = 8;
-  const [sortQuery, setSortQuery] = useState("");
+  const [sortQuery, setSortQuery] = useState("sold,desc");
   const [filter, setFilter] = useState("");
   const [openDrawer, setOpenDrawer] = useState(false);
 
@@ -53,10 +58,8 @@ const Home = () => {
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-
   const searchKeyword = params.get("search");
 
-  // const search = params.get("search");
   useEffect(() => {
     let query = `page=${currentPage}&size=${pageSize}`;
     if (sortQuery) {
@@ -73,7 +76,6 @@ const Home = () => {
       setIsLoading(true);
       try {
         const res = await callFetchAllProcut(query);
-
         if (res && res.data) {
           setProductData(res.data.results);
           setTotal(res.data.meta.totalElements);
@@ -101,9 +103,9 @@ const Home = () => {
         const f = cate.join(",");
         setFilter(`category=${f}`);
       } else {
-        //reset data -> fetch all
         setFilter("");
       }
+      setCurrentPage(1);
     }
   };
 
@@ -114,13 +116,12 @@ const Home = () => {
         const cate = values?.category?.join(",");
         f += `&category=${cate}`;
       }
-
-      // if(values?.category?.length){
-      //   f+=`&`
-      // }
       setFilter(f);
+      setCurrentPage(1);
+      setOpenDrawer(false);
     }
   };
+
   const nonAccentVietnamese = (str) => {
     str = str.replace(/A|Á|À|Ã|Ạ|Â|Ấ|Ầ|Ẫ|Ậ|Ă|Ắ|Ằ|Ẵ|Ặ/g, "A");
     str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
@@ -136,17 +137,16 @@ const Home = () => {
     str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
     str = str.replace(/Đ/g, "D");
     str = str.replace(/đ/g, "d");
-    // Some system encode vietnamese combining accent as individual utf-8 characters
-    str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ""); // Huyền sắc hỏi ngã nặng
-    str = str.replace(/\u02C6|\u0306|\u031B/g, ""); // Â, Ê, Ă, Ơ, Ư
+    str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, "");
+    str = str.replace(/\u02C6|\u0306|\u031B/g, "");
     return str;
   };
+
   const convertSlug = (str) => {
     str = nonAccentVietnamese(str);
-    str = str.replace(/^\s+|\s+$/g, ""); // trim
+    str = str.replace(/^\s+|\s+$/g, "");
     str = str.toLowerCase();
 
-    // remove accents, swap ñ for n, etc
     const from =
       "ÁÄÂÀÃÅČÇĆĎÉĚËÈÊẼĔȆĞÍÌÎÏİŇÑÓÖÒÔÕØŘŔŠŞŤÚŮÜÙÛÝŸŽáäâàãåčçćďéěëèêẽĕȇğíìîïıňñóöòôõøðřŕšşťúůüùûýÿžþÞĐđßÆa·/_,:;";
     const to =
@@ -155,12 +155,10 @@ const Home = () => {
       str = str.replace(new RegExp(from.charAt(i), "g"), to.charAt(i));
     }
 
-    str = str
-      .replace(/[^a-z0-9 -]/g, "") // remove invalid chars
-      .replace(/\s+/g, "-") // collapse whitespace and replace by -
-      .replace(/-+/g, "-"); // collapse dashes
-
-    return str;
+    return str
+      .replace(/[^a-z0-9 -]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
   };
 
   const handleRedirectBook = (product) => {
@@ -171,9 +169,9 @@ const Home = () => {
   const FilterContent = (
     <div className="filter-sidebar">
       <div className="filter-header">
-        <span>
-          <FilterOutlined className="icon-green" />
-          <span className="filter-title">{t("home.filterTitle").toUpperCase()}</span>
+        <span className="filter-header-left">
+          <FilterOutlined className="icon-brand" />
+          <span className="filter-title">{t("home.filterTitle")}</span>
         </span>
         <ReloadOutlined
           className="reset-btn"
@@ -181,10 +179,11 @@ const Home = () => {
           onClick={() => {
             form.resetFields();
             setFilter("");
+            setCurrentPage(1);
           }}
         />
       </div>
-      <Divider />
+      <Divider style={{ margin: "14px 0" }} />
 
       <Form
         form={form}
@@ -196,35 +195,35 @@ const Home = () => {
       >
         <Form.Item name="category" label={t("home.foodCategory")}>
           <Checkbox.Group className="custom-checkbox-group">
-            <Row style={{ marginBottom: 8 }}>
+            <Row gutter={[0, 8]}>
               {categoryData.map((i) => (
-                <Col
-                  key={i.id}
-                  span={24}
-                  style={{ padding: "6px" }}
-                >
-                  <Checkbox value={i.name}>{i.name}</Checkbox>
+                <Col key={i.id} span={24}>
+                  <Checkbox value={i.name} className="category-checkbox-item">
+                    {i.name}
+                  </Checkbox>
                 </Col>
               ))}
             </Row>
           </Checkbox.Group>
         </Form.Item>
 
-        <Divider />
+        <Divider style={{ margin: "14px 0" }} />
 
-        <Form.Item label={t("home.priceRange")}>
+        <Form.Item label={t("home.priceRange")} style={{ marginBottom: 0 }}>
           <div className="price-range-inputs">
             <Form.Item name={["price", "from"]} noStyle>
               <InputNumber
+                min={0}
                 placeholder={t("home.priceFrom")}
                 formatter={(val) =>
                   `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                 }
               />
             </Form.Item>
-            <span className="separator">-</span>
+            <span className="separator">—</span>
             <Form.Item name={["price", "to"]} noStyle>
               <InputNumber
+                min={0}
                 placeholder={t("home.priceTo")}
                 formatter={(val) =>
                   `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
@@ -246,119 +245,165 @@ const Home = () => {
     </div>
   );
 
+  const visibleProducts = productData.filter((p) => p.quantity > 0);
+
   return (
-    <>
-      {isLoading ? (
-        <Row gutter={[16, 16]}>
-          {Array.from({ length: 8 }).map((_, i) => (
-            <Col xs={12} sm={8} md={8} lg={6} key={i}>
-              <Card loading={true} />
-            </Col>
-          ))}
-        </Row>
-      ) : (
-        <div className="home-container">
-          <div className="container-layout">
-            <Row gutter={[24, 24]}>
-              {/* Sidebar Filter - Desktop only */}
-              <Col xs={0} lg={5}>
-                {FilterContent}
-              </Col>
+    <div className="home-container">
+      <div className="container-layout">
+        {/* Hero Banner */}
+        <div className="storefront-hero">
+          <div className="hero-content">
+            <div className="hero-badges">
+              <span className="hero-pill">
+                <FireFilled /> {t("footer.todayMenu")}
+              </span>
+              <span className="hero-pill secondary">
+                <ThunderboltFilled /> {t("product.fastDelivery")}
+              </span>
+              <span className="hero-pill secondary hide-xs">
+                <SafetyCertificateFilled /> {t("product.qualityGuarantee")}
+              </span>
+            </div>
+            <Title level={1} className="hero-title">
+              {t("auth.loginHeroTitle")}
+            </Title>
+            <Paragraph className="hero-subtitle">
+              {t("auth.loginHeroDesc")}
+            </Paragraph>
+          </div>
+        </div>
 
-              {/* Product Listing Area */}
+        <Row gutter={[24, 24]}>
+          {/* Sidebar Filter - Desktop only */}
+          <Col xs={0} lg={6} xl={5}>
+            {FilterContent}
+          </Col>
 
-              <Col xs={24} lg={19}>
+          {/* Product Listing Area */}
+          <Col xs={24} lg={18} xl={19}>
+            <div className="product-content-area">
+              <div className="toolbar-row">
+                <div className="mobile-filter-container">
+                  <Button
+                    className="mobile-filter-btn"
+                    icon={<FilterOutlined />}
+                    onClick={() => setOpenDrawer(true)}
+                  >
+                    {t("home.filterDrawerTitle")}
+                  </Button>
+                </div>
+
+                <div className="sorting-tabs">
+                  <Tabs
+                    activeKey={sortQuery}
+                    items={tabItems}
+                    onChange={(key) => {
+                      setSortQuery(key);
+                      setCurrentPage(1);
+                    }}
+                  />
+                </div>
+              </div>
+
+              {isLoading ? (
+                <Row gutter={[18, 18]}>
+                  {Array.from({ length: 8 }).map((_, i) => (
+                    <Col xs={12} sm={8} md={8} xl={6} key={i}>
+                      <Card loading={true} className="skeleton-card" />
+                    </Col>
+                  ))}
+                </Row>
+              ) : visibleProducts.length === 0 ? (
+                <div className="empty-products-box">
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description={t("common.notAvailable")}
+                  />
+                </div>
+              ) : (
                 <Spin size="large" spinning={isLoading}>
-                  <div className="product-content-area">
-                    <div className="mobile-filter-container">
-                      <Button
-                        className="mobile-filter-btn"
-                        icon={<FilterOutlined />}
-                        onClick={() => setOpenDrawer(true)}
+                  <Row gutter={[18, 18]}>
+                    {visibleProducts.map((p) => (
+                      <Col
+                        key={p.id}
+                        xs={12}
+                        sm={8}
+                        md={8}
+                        xl={6}
+                        onClick={() => handleRedirectBook(p)}
                       >
-                        {t("home.filterDrawerTitle")}
-                      </Button>
-                    </div>
-
-                    <div className="sorting-tabs">
-                      <Tabs
-                        defaultActiveKey="1"
-                        activeKey={sortQuery}
-                        items={tabItems}
-                        onChange={(key) => setSortQuery(key)}
-                      />
-                    </div>
-
-                    <Row gutter={[16, 16]}>
-                      {productData.map((p) => (p.quantity > 0) && (
-                        <Col
-                          key={p.id}
-                          xs={12}
-                          sm={8}
-                          md={8}
-                          lg={6}
-                          onClick={() => {
-                            handleRedirectBook(p);
-                          }}
+                        <Card
+                          hoverable
+                          bordered={false}
+                          className="product-card premium-card"
+                          cover={
+                            <div className="image-wrapper">
+                              {p.productCate?.name && (
+                                <Tag className="category-badge">
+                                  {p.productCate.name}
+                                </Tag>
+                              )}
+                              <img
+                                alt={p.name}
+                                src={p.lstImg?.[0]?.name}
+                                loading="lazy"
+                              />
+                            </div>
+                          }
                         >
-                          <Card
-                            hoverable
-                            bordered={false}
-                            className="product-card premium-card"
-                            cover={
-                              <div className="image-wrapper">
-                                <img
-                                  alt={p.name}
-                                  src={p.lstImg?.[0]?.name}
-                                />
-                              </div>
-                            }
-                          >
-                            <div className="product-info">
-                              <div className="product-name-wrapper">
-                                <Text
-                                  title={p.name}
-                                  className="product-name"
-                                >
-                                  {p.name}
-                                </Text>
-                              </div>
-                              <div className="product-price">
+                          <div className="product-info">
+                            <div className="product-name-wrapper">
+                              <Text title={p.name} className="product-name">
+                                {p.name}
+                              </Text>
+                            </div>
+
+                            <div className="product-price-row">
+                              <span className="product-price">
                                 {new Intl.NumberFormat("vi-VN", {
                                   style: "currency",
                                   currency: "VND",
                                 }).format(p.price)}
-                              </div>
-                              <div className="product-footer">
-                                <span>
-                                  <Rate disabled defaultValue={5} style={{ fontSize: '12px', color: '#fadb14' }} />
-                                </span>
-                                <Text type="secondary" className="sold-count">
-                                  {t("home.soldCount", { count: p.sold ?? "1.2k" })}
-                                </Text>
-                              </div>
+                              </span>
+                              <span className="quick-cart-icon">
+                                <ShoppingCartOutlined />
+                              </span>
                             </div>
-                          </Card>
-                        </Col>
-                      ))}
-                    </Row>
 
-                    <div className="pagination-wrapper">
-                      <Pagination
-                        current={currentPage}
-                        total={total}
-                        pageSize={pageSize}
-                        onChange={(page) => setCurrentPage(page)}
-                        showSizeChanger={false}
-                      />
-                    </div>
+                            <div className="product-footer">
+                              <Rate
+                                disabled
+                                defaultValue={5}
+                                className="card-rate"
+                              />
+                              <Text type="secondary" className="sold-count">
+                                {t("home.soldCount", {
+                                  count: p.sold ?? "1.2k",
+                                })}
+                              </Text>
+                            </div>
+                          </div>
+                        </Card>
+                      </Col>
+                    ))}
+                  </Row>
+
+                  <div className="pagination-wrapper">
+                    <Pagination
+                      current={currentPage}
+                      total={total}
+                      pageSize={pageSize}
+                      onChange={(page) => setCurrentPage(page)}
+                      showSizeChanger={false}
+                    />
                   </div>
                 </Spin>
-              </Col>
-            </Row>
-          </div>
-        </div>
-      )}
+              )}
+            </div>
+          </Col>
+        </Row>
+      </div>
+
       <Drawer
         title={t("home.filterTitle")}
         placement="left"
@@ -369,7 +414,7 @@ const Home = () => {
       >
         {FilterContent}
       </Drawer>
-    </>
+    </div>
   );
 };
 

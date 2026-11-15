@@ -1,26 +1,78 @@
 .food-header-container {
-  background: rgba(255, 255, 255, 0.9) !important;
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   position: sticky;
   top: 0;
   z-index: 1000;
-  height: 70px !important;
-  line-height: 70px !important;
+  height: auto !important;
+  min-height: 74px;
+  line-height: normal !important;
   padding: 0 !important;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
 
   .header-wrapper {
-    max-width: 1200px;
+    max-width: 1360px;
     margin: 0 auto;
-    padding: 0 15px; // Smaller padding for mobile
+    padding: 12px 24px;
   }
 
-  // --- Search Bar ---
+  .logo-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+  }
+
+  // --- Pill Search Bar ---
   .search-col {
     padding: 0 20px;
+  }
+
+  .search-bar-box {
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 999px;
+    padding: 4px 4px 4px 16px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:focus-within {
+      background: #ffffff;
+      border-color: #ff4d4f;
+      box-shadow: 0 0 0 4px rgba(255, 77, 79, 0.12);
+    }
+
+    .search-prefix-icon {
+      color: #94a3b8;
+      font-size: 16px;
+      margin-right: 4px;
+    }
+
     .custom-input {
-      border-radius: 10px;
-      background: #f5f5f5;
+      flex: 1;
+      font-size: 14px;
+      background: transparent !important;
+      padding: 4px 8px;
+    }
+
+    .search-submit-btn {
+      border-radius: 999px;
+      height: 36px;
+      padding: 0 20px;
+      font-weight: 600;
+      font-size: 13.5px;
+      background: linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%);
+      border: none;
+      box-shadow: 0 4px 12px rgba(255, 77, 79, 0.25);
+      transition: all 0.25s ease;
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(255, 77, 79, 0.35);
+        background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%) !important;
+      }
     }
   }
 
@@ -29,23 +81,81 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 15px; // Smaller gap for mobile space
+    gap: 14px;
 
     .mobile-search-icon {
-      display: none; // Hidden on desktop
-      font-size: 20px;
+      display: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid #e2e8f0;
+      background: #f8fafc;
+      color: #334155;
+      font-size: 16px;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: #ff4d4f;
+        border-color: #ffccc7;
+        background: #fff2f0;
+      }
+    }
+
+    .lang-switch-btn {
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 12.5px;
+      color: #334155;
+      border-color: #e2e8f0;
+      background: #f8fafc;
+      transition: all 0.2s ease;
+
+      &:hover {
+        color: #ff4d4f !important;
+        border-color: #ff4d4f !important;
+        background: #fff2f0 !important;
+      }
     }
 
     .icon-wrapper {
-      width: 38px;
-      height: 38px;
+      width: 40px;
+      height: 40px;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f9f9f9;
+      background: #fff2f0;
+      color: #ff4d4f;
+      border: 1px solid #ffccc7;
       border-radius: 50%;
-      font-size: 18px;
+      font-size: 19px;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &:hover {
+        transform: translateY(-2px);
+        background: #ff4d4f;
+        color: #ffffff;
+        box-shadow: 0 6px 16px rgba(255, 77, 79, 0.28);
+      }
+    }
+
+    .login-cta-btn {
+      height: 38px;
+      padding: 0 20px;
+      font-weight: 600;
+      background: linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%);
+      border: none;
+      box-shadow: 0 4px 12px rgba(255, 77, 79, 0.25);
+
+      &:hover {
+        transform: translateY(-1px);
+        background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%) !important;
+      }
     }
   }
 
@@ -53,60 +163,106 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    padding: 4px 6px 4px 12px;
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+    &:hover {
+      border-color: #ffccc7;
+      background: #fff7f5;
+    }
 
     .user-meta {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+      flex-direction: column;
+      align-items: flex-end;
+      line-height: 1.2;
+
       .welcome {
-        // font-size: 10px;
-        color: #8c8c8c;
+        font-size: 11px;
+        color: #64748b;
       }
       .name {
-        font-size: 18px;
-        max-width: 80px;
+        font-size: 13.5px;
+        color: #0f172a;
+        max-width: 110px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
     }
+
+    .avatar-glow {
+      border: 2px solid #ffffff;
+      box-shadow: 0 2px 8px rgba(255, 77, 79, 0.2);
+    }
+  }
+
+  // --- Mobile Search Drawer/Bar ---
+  .mobile-search-bar {
+    padding: 0 16px 12px;
+    background: rgba(255, 255, 255, 0.98);
+    border-top: 1px solid #f1f5f9;
+    animation: slideDownSearch 0.2s ease-out;
+  }
+}
+
+@keyframes slideDownSearch {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 // --- RESPONSIVE BREAKPOINTS ---
-
 @media (max-width: 768px) {
   .food-header-container {
-    height: 60px !important;
-    line-height: 60px !important;
+    min-height: 62px;
 
     .header-wrapper {
-      padding: 0 10px;
+      padding: 10px 14px;
     }
 
-    // 1. Hide the "Xin chào, Name" text to save space
     .hide-on-mobile {
       display: none !important;
     }
 
-    // 2. Show a search icon instead of a full bar
-    .mobile-search-icon {
-      display: block;
+    .profile-trigger {
+      padding: 2px;
+      border: none;
+      background: transparent;
     }
 
-    // 3. Make logo brand text smaller or hidden if needed
-    .logo-container .brand-main {
-      font-size: 14px !important;
+    .header-actions {
+      gap: 10px;
+
+      .mobile-search-icon {
+        display: inline-flex;
+      }
     }
-    .logo-container .brand-sub {
-      display: none;
+
+    .logo-container .brand-main {
+      font-size: 15px !important;
     }
   }
 }
 
 @media (max-width: 480px) {
-  .header-actions {
-    gap: 10px; // Even tighter gap for small phones
+  .food-header-container {
+    .header-actions {
+      gap: 8px;
+
+      .lang-switch-btn {
+        padding: 0 8px;
+        font-size: 11.5px;
+      }
+    }
   }
 }

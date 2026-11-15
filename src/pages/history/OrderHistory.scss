@@ -1,19 +1,20 @@
 // --- Design Tokens & Variables ---
 $bg-gradient: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
 $card-bg: #ffffff;
-$text-main: #0f172a; // Deep slate for extreme readability
-$text-muted: #64748b; // Perfect cool gray for secondary details
-$border-color: #e2e8f0; // Soft borders
+$text-main: #0f172a;
+$text-muted: #64748b;
+$border-color: #e2e8f0;
 $radius-lg: 16px;
 $radius-md: 12px;
 $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 // --- Layout Wrapper ---
 .order-history-container {
+  max-width: 1280px;
   margin: 0 auto;
-  padding: 48px 24px;
+  padding: 36px 24px 56px;
   background: $bg-gradient;
-  min-height: 100vh;
+  min-height: calc(100vh - 74px);
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 
@@ -23,7 +24,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid $border-color;
     border-radius: $radius-lg;
     box-shadow: 0 4px 20px -2px rgba(148, 163, 184, 0.12);
-    margin-bottom: 40px;
+    margin-bottom: 32px;
     padding: 8px;
 
     .stat-item {
@@ -42,13 +43,12 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   // --- Section Title ---
   .section-title {
     color: $text-main;
-    font-weight: 700;
+    font-weight: 800;
     letter-spacing: -0.02em;
     margin-bottom: 24px !important;
     position: relative;
     padding-left: 14px;
 
-    // Elegant vertical accent bar next to "Order History"
     &::before {
       content: "";
       position: absolute;
@@ -56,7 +56,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       top: 4px;
       bottom: 4px;
       width: 4px;
-      background: #1677ff; // Dynamic AntD primary color fallback
+      background: #ff4d4f;
       border-radius: 2px;
     }
   }
@@ -64,25 +64,29 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   // --- Tabs Styling ---
   .order-tabs {
     margin-bottom: 24px;
-    
-    :global(.ant-tabs-nav::before) {
+
+    .ant-tabs-nav::before {
       border-bottom: 1px solid $border-color;
     }
-    
-    :global(.ant-tabs-tab) {
+
+    .ant-tabs-tab {
       font-size: 15px;
       font-weight: 500;
       color: $text-muted;
       padding: 12px 16px;
-      
+
       &:hover {
-        color: #1677ff;
+        color: #ff4d4f;
       }
     }
-    
-    :global(.ant-tabs-tab-active .ant-tabs-tab-btn) {
-      color: #1677ff;
+
+    .ant-tabs-tab-active .ant-tabs-tab-btn {
+      color: #ff4d4f !important;
       font-weight: 600;
+    }
+
+    .ant-tabs-ink-bar {
+      background: #ff4d4f;
     }
   }
 
@@ -92,14 +96,14 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid $border-color;
     border-radius: $radius-lg;
     box-shadow: 0 10px 30px -10px rgba(148, 163, 184, 0.15);
-    margin-bottom: 28px;
+    margin-bottom: 24px;
     overflow: hidden;
     transition: $transition-smooth;
 
     &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px -15px rgba(148, 163, 184, 0.25);
-      border-color: cbd5e1;
+      transform: translateY(-3px);
+      box-shadow: 0 16px 36px -12px rgba(148, 163, 184, 0.22);
+      border-color: #cbd5e1;
     }
 
     &.order-card-pending {
@@ -107,40 +111,39 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 4px 20px -2px rgba(250, 173, 20, 0.15);
     }
 
-    // AntD Card sub-body reset
-    :global(.ant-card-body) {
+    .ant-card-body {
       padding: 0 !important;
     }
 
     // --- Order Card Header ---
     .order-card-header {
       background: #f8fafc;
-      padding: 20px 28px;
+      padding: 18px 24px;
       border-bottom: 1px solid $border-color;
 
       .order-id {
         color: $text-main;
         font-size: 16px;
-        font-weight: 600;
+        font-weight: 700;
       }
 
       .order-date,
       .table-id {
         color: $text-muted;
-        font-size: 13.5px;
+        font-size: 13px;
         display: inline-flex;
         align-items: center;
         gap: 6px;
         background: #ffffff;
         padding: 4px 10px;
-        border-radius: 6px;
+        border-radius: 8px;
         border: 1px solid rgba(226, 232, 240, 0.8);
       }
 
       .status-tag {
         font-weight: 600;
         padding: 4px 14px;
-        border-radius: 8px;
+        border-radius: 999px;
         border: none;
         letter-spacing: 0.02em;
       }
@@ -148,29 +151,29 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     // --- 3. Products AntD Table Style Overrides ---
     .products-table {
-      padding: 12px 28px;
+      padding: 12px 24px;
 
-      :global(.ant-table) {
+      .ant-table {
         background: transparent !important;
       }
 
-      :global(.ant-table-thead > tr > th) {
+      .ant-table-thead > tr > th {
         background: transparent !important;
         color: $text-muted;
-        font-size: 13px;
+        font-size: 12.5px;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.04em;
         border-bottom: 1px solid $border-color;
       }
 
-      :global(.ant-table-tbody > tr > td) {
+      .ant-table-tbody > tr > td {
         border-bottom: 1px solid rgba(228, 235, 243, 0.6);
-        padding: 16px 0;
+        padding: 14px 0;
       }
 
-      :global(.ant-table-tbody > tr:last-child > td) {
-        border-bottom: none; // Removes ugly trailing bottom line
+      .ant-table-tbody > tr:last-child > td {
+        border-bottom: none;
       }
 
       .product-name {
@@ -180,8 +183,7 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         transition: $transition-smooth;
       }
 
-      // Smooth rendering for square product images
-      :global(.ant-avatar) {
+      .ant-avatar {
         border-radius: $radius-md;
         border: 1px solid $border-color;
         background-color: #f1f5f9;
@@ -193,14 +195,14 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     // --- Order Card Footer ---
     .order-card-footer {
-      padding: 20px 28px;
+      padding: 18px 24px;
       background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
       border-top: 1px solid $border-color;
 
       .grand-total-price {
-        font-size: 22px;
+        font-size: 20px;
         font-weight: 800;
-        letter-spacing: -0.03em;
+        letter-spacing: -0.02em;
       }
     }
   }
@@ -210,18 +212,17 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 60vh;
     font-size: 16px;
     font-weight: 500;
     color: $text-muted;
-    background: $bg-gradient;
   }
 }
 
 // --- Responsive Rules for Mobile viewports ---
 @media (max-width: 768px) {
   .order-history-container {
-    padding: 16px 8px;
+    padding: 16px 12px 36px;
 
     .profile-header-card {
       padding: 4px;
@@ -234,21 +235,21 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     .order-card {
       margin-bottom: 16px;
-      border-radius: 12px;
+      border-radius: 14px;
 
       .order-card-header {
-        padding: 16px 12px;
-        
+        padding: 14px 12px;
+
         .order-id {
           font-size: 14px;
         }
 
-        .order-date, .table-id {
+        .order-date,
+        .table-id {
           font-size: 12px;
           padding: 2px 6px;
         }
-        
-        // Ensure status tag doesn't get pushed off-screen and is aligned left on mobile
+
         .ant-row {
           .ant-col:last-child {
             margin-top: 8px;
@@ -259,17 +260,17 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       .products-table {
         padding: 0;
 
-        :global(.ant-table-thead > tr > th),
-        :global(.ant-table-tbody > tr > td) {
+        .ant-table-thead > tr > th,
+        .ant-table-tbody > tr > td {
           padding-left: 12px !important;
           padding-right: 12px !important;
         }
 
-        :global(.ant-space) {
+        .ant-space {
           gap: 8px !important;
         }
 
-        :global(.ant-avatar) {
+        .ant-avatar {
           width: 40px !important;
           height: 40px !important;
           line-height: 40px !important;
@@ -286,8 +287,8 @@ $transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
       .order-card-footer {
-        padding: 16px 12px;
-        
+        padding: 14px 12px;
+
         .grand-total-price {
           font-size: 18px;
         }

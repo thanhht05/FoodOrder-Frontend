@@ -334,9 +334,13 @@ const CheckoutPage = () => {
                   >
                     <Space align="start">
                       {/* Hiển thị số lượng của từng item */}
-                      <Badge count={item.quantity || 1} color="#1890ff">
+                      <Badge count={item.quantity || 1} color="#ff4d4f">
                         <img
-                          src={`${import.meta.env.VITE_BACKEND_URL}/upload/${item.img}`}
+                          src={
+                            item.img?.startsWith("http")
+                              ? item.img
+                              : `${import.meta.env.VITE_BACKEND_URL}/upload/${item.img}`
+                          }
                           alt={item.name}
                           className="item-img-mock"
                           style={{ objectFit: "cover" }}

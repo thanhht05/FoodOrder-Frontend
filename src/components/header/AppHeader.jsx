@@ -17,6 +17,8 @@ import {
   SettingOutlined,
   SearchOutlined,
   GlobalOutlined,
+  DashboardOutlined,
+  CloseOutlined,
 } from "@ant-design/icons";
 import "./AppHeader.scss";
 import { useSelector, useDispatch } from "react-redux";
@@ -40,6 +42,9 @@ const AppHeader = () => {
   const navigate = useNavigate();
   const { t, i18n, language } = useTranslation();
 
+  const [value, setValue] = useState("");
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
   const handleLogout = async () => {
     const res = await callLogout();
     if (res?.data) {
@@ -54,16 +59,25 @@ const AppHeader = () => {
     i18n.changeLanguage(language === "en" ? "vie" : "en");
   };
 
-  const [value, setValue] = useState("");
   const handleSearch = () => {
-    if (value) {
-      navigate(`/?search=${value}`);
+    if (value.trim()) {
+      navigate(`/?search=${encodeURIComponent(value.trim())}`);
     } else {
       navigate("/");
     }
+    setMobileSearchOpen(false);
   };
 
   const userMenuItems = [
+    ...(user?.role === "ADMIN"
+      ? [
+          {
+            key: "admin",
+            label: <Link to="/admin">{t("header.adminDashboard")}</Link>,
+            icon: <DashboardOutlined />,
+          },
+        ]
+      : []),
     {
       key: "1",
       label: <Link to="/profile">{t("header.profile")}</Link>,
@@ -88,53 +102,72 @@ const AppHeader = () => {
   return (
     <AntHeader className="food-header-container">
       <div className="header-wrapper">
-        <Row align="middle" justify="space-between">
-          {/* Logo: Takes 6/24 on mobile, 4/24 on desktop */}
-          <Col xs={6} sm={6} md={4}>
+        <Row align="middle" justify="space-between" wrap={false}>
+          {/* Logo */}
+          <Col flex="none">
             <Link to="/" className="logo-link">
               <Logo />
             </Link>
           </Col>
 
-          {/* Search: Hidden on mobile (xs=0), shows on desktop (md=12) */}
-          <Col xs={0} md={12} lg={13} className="search-col">
-            <div style={{ display: "flex" }}>
+          {/* Search: Desktop & Tablet */}
+          <Col xs={0} md={11} lg={12} className="search-col">
+            <div className="search-bar-box">
+              <SearchOutlined className="search-prefix-icon" />
               <Input
+                value={value}
                 onChange={(e) => setValue(e.target.value)}
                 placeholder={t("header.searchPlaceholder")}
-                suffix={<SearchOutlined />}
                 size="large"
                 onPressEnter={handleSearch}
+                variant="borderless"
                 className="custom-input"
+                allowClear
               />
-              <Button onClick={handleSearch}>{t("header.searchBtn")}</Button>
+              <Button
+                type="primary"
+                className="search-submit-btn"
+                onClick={handleSearch}
+              >
+                {t("header.searchBtn")}
+              </Button>
             </div>
           </Col>
 
-          {/* Actions: Takes 18/24 on mobile to fit cart + avatar */}
-          <Col xs={18} sm={18} md={8} lg={7}>
+          {/* Actions */}
+          <Col flex="none">
             <div className="header-actions">
-              {/* Search Icon for Mobile Only */}
-              <div className="mobile-search-icon">
-                <SearchOutlined />
-              </div>
+              {/* Mobile Search Trigger */}
+              <button
+                type="button"
+                className="mobile-search-icon"
+                onClick={() => setMobileSearchOpen((prev) => !prev)}
+                aria-label="Search"
+              >
+                {mobileSearchOpen ? <CloseOutlined /> : <SearchOutlined />}
+              </button>
 
               <Button
                 size="small"
                 icon={<GlobalOutlined />}
                 onClick={toggleLanguage}
-                style={{ fontWeight: 600 }}
+                className="lang-switch-btn"
               >
                 {language === "en" ? "ENG" : "VIE"}
               </Button>
 
               <Dropdown
-                trigger={["hover"]}
-                placement="bottom"
+                trigger={["hover", "click"]}
+                placement="bottomRight"
                 dropdownRender={() => <CartDropdown />}
               >
-                <Badge count={cart?.length || 0} size="small" color="#ff4d4f">
-                  <div className="icon-wrapper">
+                <Badge
+                  count={cart?.length || 0}
+                  size="small"
+                  color="#ff4d4f"
+                  offset={[-2, 4]}
+                >
+                  <div className="icon-wrapper" onClick={() => navigate("/cart")}>
                     <ShoppingCartOutlined />
                   </div>
                 </Badge>
@@ -148,7 +181,6 @@ const AppHeader = () => {
                     placement="bottomRight"
                   >
                     <div className="profile-trigger">
-                      {/* Note the 'hide-on-mobile' class here */}
                       <div className="user-meta hide-on-mobile">
                         <Text className="welcome">{t("header.welcome")}</Text>
                         <Text strong className="name">
@@ -166,6 +198,7 @@ const AppHeader = () => {
                   <Button
                     type="primary"
                     shape="round"
+                    className="login-cta-btn"
                     onClick={() => navigate("/login")}
                   >
                     {t("header.login")}
@@ -176,6 +209,32 @@ const AppHeader = () => {
           </Col>
         </Row>
       </div>
+
+      {/* Expandable Mobile Search Bar */}
+      {mobileSearchOpen && (
+        <div className="mobile-search-bar">
+          <div className="search-bar-box mobile">
+            <SearchOutlined className="search-prefix-icon" />
+            <Input
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder={t("header.searchPlaceholder")}
+              onPressEnter={handleSearch}
+              variant="borderless"
+              className="custom-input"
+              autoFocus
+              allowClear
+            />
+            <Button
+              type="primary"
+              className="search-submit-btn"
+              onClick={handleSearch}
+            >
+              {t("header.searchBtn")}
+            </Button>
+          </div>
+        </div>
+      )}
     </AntHeader>
   );
 };

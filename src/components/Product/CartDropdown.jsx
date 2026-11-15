@@ -1,4 +1,5 @@
-import { Button } from "antd";
+import { Button, Badge, Empty } from "antd";
+import { ShoppingCartOutlined, ArrowRightOutlined } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "../../i18n";
@@ -25,17 +26,16 @@ const CartDropdown = () => {
     str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
     str = str.replace(/Đ/g, "D");
     str = str.replace(/đ/g, "d");
-    // Some system encode vietnamese combining accent as individual utf-8 characters
-    str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ""); // Huyền sắc hỏi ngã nặng
-    str = str.replace(/\u02C6|\u0306|\u031B/g, ""); // Â, Ê, Ă, Ơ, Ư
+    str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, "");
+    str = str.replace(/\u02C6|\u0306|\u031B/g, "");
     return str;
   };
+
   const convertSlug = (str) => {
     str = nonAccentVietnamese(str);
-    str = str.replace(/^\s+|\s+$/g, ""); // trim
+    str = str.replace(/^\s+|\s+$/g, "");
     str = str.toLowerCase();
 
-    // remove accents, swap ñ for n, etc
     const from =
       "ÁÄÂÀÃÅČÇĆĎÉĚËÈÊẼĔȆĞÍÌÎÏİŇÑÓÖÒÔÕØŘŔŠŞŤÚŮÜÙÛÝŸŽáäâàãåčçćďéěëèêẽĕȇğíìîïıňñóöòôõøðřŕšşťúůüùûýÿžþÞĐđßÆa·/_,:;";
     const to =
@@ -44,89 +44,123 @@ const CartDropdown = () => {
       str = str.replace(new RegExp(from.charAt(i), "g"), to.charAt(i));
     }
 
-    str = str
-      .replace(/[^a-z0-9 -]/g, "") // remove invalid chars
-      .replace(/\s+/g, "-") // collapse whitespace and replace by -
-      .replace(/-+/g, "-"); // collapse dashes
-
-    return str;
+    return str
+      .replace(/[^a-z0-9 -]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
   };
 
   const handleRedirectBook = (product) => {
     const slug = convertSlug(product.name);
     navigate(`/product/${slug}?id=${product.id}`);
   };
+
   return (
     <div
       style={{
-        width: 320,
-        padding: 12,
-        background: "#fff",
-        borderRadius: 8,
+        width: 340,
+        padding: 16,
+        background: "#ffffff",
+        borderRadius: 16,
+        boxShadow: "0 16px 40px -4px rgba(15, 23, 42, 0.14)",
+        border: "1px solid #e2e8f0",
       }}
     >
-      <h4 style={{ marginBottom: 10 }}>{t("cart.stepCart")}</h4>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: 12,
+          paddingBottom: 10,
+          borderBottom: "1px solid #f1f5f9",
+        }}
+      >
+        <span style={{ fontWeight: 700, fontSize: 15, color: "#0f172a" }}>
+          <ShoppingCartOutlined style={{ color: "#ff4d4f", marginRight: 8 }} />
+          {t("cart.stepCart")}
+        </span>
+        <Badge count={cart.length} color="#ff4d4f" />
+      </div>
 
       {/* LIST ITEM */}
       <div
         style={{
-          maxHeight: 300,
+          maxHeight: 280,
           overflowY: "auto",
+          paddingRight: 4,
         }}
       >
         {cart.length === 0 ? (
-          <p style={{ textAlign: "center" }}>{t("product.emptyCart")}</p>
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={t("product.emptyCart")}
+            style={{ margin: "20px 0" }}
+          />
         ) : (
           cart.map((item) => (
             <div
               onClick={() => handleRedirectBook(item)}
-              key={item.productId}
+              key={item.productId || item.id}
               style={{
                 cursor: "pointer",
                 display: "flex",
-                gap: 10,
-                marginBottom: 12,
+                gap: 12,
+                padding: "8px",
+                marginBottom: 6,
+                borderRadius: 10,
                 alignItems: "center",
+                transition: "background 0.2s ease",
               }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background = "#fff7f5")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background = "transparent")
+              }
             >
-              {/* IMAGE */}
               <img
                 src={item.img}
                 alt={item.name}
                 style={{
-                  width: 50,
-                  height: 50,
+                  width: 52,
+                  height: 52,
                   objectFit: "cover",
-                  borderRadius: 6,
+                  borderRadius: 10,
+                  border: "1px solid #f1f5f9",
+                  flexShrink: 0,
                 }}
               />
 
-              {/* INFO */}
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
-                    fontSize: 14,
-                    fontWeight: 500,
-                    lineHeight: "16px",
+                    fontSize: 13.5,
+                    fontWeight: 600,
+                    color: "#1e293b",
+                    lineHeight: "18px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   {item.name}
                 </div>
 
-                <div style={{ fontSize: 12, color: "#888" }}>
-                  x{item.quantity}
+                <div style={{ fontSize: 12, color: "#64748b", marginTop: 2 }}>
+                  {item.price?.toLocaleString("vi-VN")}₫ × {item.quantity}
                 </div>
               </div>
 
-              {/* PRICE */}
               <div
                 style={{
                   color: "#ff4d4f",
-                  fontWeight: 500,
-                  fontSize: 14,
+                  fontWeight: 700,
+                  fontSize: 13.5,
+                  flexShrink: 0,
                 }}
               >
-                {(item.price * item.quantity).toLocaleString()}₫
+                {(item.price * item.quantity).toLocaleString("vi-VN")}₫
               </div>
             </div>
           ))
@@ -138,27 +172,36 @@ const CartDropdown = () => {
         <>
           <div
             style={{
-              borderTop: "1px solid #f0f0f0",
-              paddingTop: 10,
-              marginTop: 10,
+              borderTop: "1px dashed #e2e8f0",
+              paddingTop: 12,
+              marginTop: 8,
               display: "flex",
               justifyContent: "space-between",
-              fontWeight: 500,
+              alignItems: "center",
             }}
           >
-            <span>{t("cart.subtotal")}</span>
-            <span style={{ color: "#ff4d4f" }}>{total.toLocaleString()}₫</span>
+            <span style={{ color: "#64748b", fontSize: 13.5 }}>
+              {t("cart.subtotal")}
+            </span>
+            <span style={{ color: "#ff4d4f", fontWeight: 800, fontSize: 16 }}>
+              {total.toLocaleString("vi-VN")}₫
+            </span>
           </div>
 
           <Button
-            // type="primary"
-
+            type="primary"
             block
+            icon={<ArrowRightOutlined />}
+            iconPosition="end"
             style={{
-              marginTop: 10,
-              background: "#ff4d4f",
-              color: "#fff",
-              fontSize: "18px",
+              marginTop: 12,
+              height: 42,
+              borderRadius: 10,
+              background: "linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%)",
+              border: "none",
+              fontWeight: 600,
+              fontSize: 14,
+              boxShadow: "0 6px 16px rgba(255, 77, 79, 0.25)",
             }}
             onClick={() => navigate("/cart")}
           >
