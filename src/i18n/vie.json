@@ -43,7 +43,8 @@
     "ERR_VOUCHER_FULLY_USED": "Mã giảm giá đã hết lượt sử dụng.",
     "ERR_VOUCHER_ALREADY_USED_BY_USER": "Bạn đã sử dụng mã giảm giá này trước đó.",
     "ERR_CONVERSATION_NOT_FOUND": "Không tìm thấy cuộc trò chuyện.",
-    "ERR_AI_PARSE_FAILED": "Không thể phân tích yêu cầu, vui lòng thử lại."
+    "ERR_AI_PARSE_FAILED": "Không thể phân tích yêu cầu, vui lòng thử lại.",
+    "ERR_TOO_MANY_REQUESTS": "Bạn đang thao tác quá nhanh. Vui lòng thử lại sau ít phút!"
   },
   "apiSuccess": {
     "SUC_CALL_API": "Thao tác thành công!",

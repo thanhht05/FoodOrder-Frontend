@@ -43,7 +43,8 @@
     "ERR_VOUCHER_FULLY_USED": "This voucher has reached its usage limit.",
     "ERR_VOUCHER_ALREADY_USED_BY_USER": "You have already used this voucher.",
     "ERR_CONVERSATION_NOT_FOUND": "Conversation not found.",
-    "ERR_AI_PARSE_FAILED": "Could not understand your request. Please try again."
+    "ERR_AI_PARSE_FAILED": "Could not understand your request. Please try again.",
+    "ERR_TOO_MANY_REQUESTS": "Too many requests. Please try again in a few moments!"
   },
   "apiSuccess": {
     "SUC_CALL_API": "Action completed successfully!",
