@@ -10,7 +10,7 @@ import {
   Typography,
 } from "antd";
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import {
   ArrowLeftOutlined,
   GoogleOutlined,
@@ -28,7 +28,6 @@ const { Title, Text } = Typography;
 const LoginPage = () => {
   const [form] = Form.useForm();
   const [isSubmit, setIsSubmit] = useState(false);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const onFinish = async (values) => {
@@ -43,16 +42,21 @@ const LoginPage = () => {
         localStorage.setItem("access_token", res.data.accessToken);
         dispatch(doLoginAction(res.data));
 
-        // Luôn gọi lấy giỏ hàng mới từ DB về sau khi đã login (bất kể giỏ trống hay có đồ)
-        await dispatch(getCartAPI()).unwrap();
+        try {
+          // Luôn gọi lấy giỏ hàng mới từ DB về sau khi đã login (nếu có lỗi giỏ hàng thì bỏ qua không chặn login)
+          await dispatch(getCartAPI()).unwrap();
+        } catch {
+          // ignore cart errors
+        }
 
-        // THÔNG BÁO & CHUYỂN TRANG (res.message đã được axiosCumtome.js dịch tự động từ SUC_LOGIN)
+        // THÔNG BÁO & CHUYỂN TRANG
         message.success(res.message || t("apiSuccess.SUC_LOGIN"));
 
-        if (res.data.userLogin.role.name === "ADMIN") {
-          navigate("/admin");
+        const roleName = res.data.userLogin?.role?.name;
+        if (roleName === "ADMIN" || roleName === "ROLE_ADMIN") {
+          window.location.href = "/admin";
         } else {
-          navigate("/");
+          window.location.href = "/";
         }
 
         // TRƯỜNG HỢP 2: API chạy thành công nhưng không có data (Sai mật khẩu/tài khoản do Backend trả về)
@@ -64,14 +68,12 @@ const LoginPage = () => {
         });
       }
     } catch (error) {
-      // TRƯỜNG HỢP 3: Lỗi kết nối, lỗi 400/500 từ axios/fetch khi gọi callLogin
-      // error?.response?.data?.message đã được axiosCumtome.js dịch tự động theo mã lỗi!
       notification.error({
         message: t("auth.loginFailedTitle"),
         description: error?.response?.data?.message || error.message,
       });
     } finally {
-      setIsSubmit(false); // SỬA: Tắt loading sau khi mọi thứ đã chạy xong
+      setIsSubmit(false); 
     }
   };
 
@@ -99,12 +101,14 @@ const LoginPage = () => {
           // ignore cart errors if empty
         }
 
+        
         message.success(res.message || t("apiSuccess.SUC_GOOGLE_LOGIN"));
 
-        if (res.data.userLogin?.role?.name === "ADMIN") {
-          navigate("/admin");
+        const roleName = res.data.userLogin?.role?.name;
+        if (roleName === "ADMIN" || roleName === "ROLE_ADMIN") {
+          window.location.href = "/admin";
         } else {
-          navigate("/");
+          window.location.href = "/";
         }
       } else {
         notification.error({

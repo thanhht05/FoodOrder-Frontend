@@ -9,15 +9,15 @@ import {
 import LoginPage from "./pages/login/LoginPage";
 import RegisterPage from "./pages/register/RegisterPage";
 import Contact from "./pages/contact";
-import Footer from "./components/Footer/footer";
+import Footer from "./components/footer/footer";
 import { useDispatch, useSelector } from "react-redux";
 import { callGetAccount } from "./services/api";
 import { doGetAccountAction, doSetLoadingAction } from "./redux/slices/account/accountSlice";
 import { useEffect } from "react";
 import Loading from "./components/Loading/loading";
 import NotFound from "./components/NotFound/notfound";
-import ProtectedRoute from "./pages/protectedRoute/ProtectedRoute";
-import AppHeader from "./components/Header/AppHeader";
+import ProtectedRoute from "./pages/protectedRoute/protectedRoute";
+import AppHeader from "./components/header/AppHeader";
 import LayoutAdmin from "./components/Admin/LayoutAdmin";
 import ManageUserPage from "./pages/admin/user";
 import ManageProductPage from "./pages/admin/product";
@@ -52,6 +52,149 @@ const Layout = () => {
 		</div>
 	);
 };
+
+const router = createBrowserRouter([
+	{
+		path: "/",
+		element: <Layout />,
+		errorElement: <NotFound />,
+		children: [
+			{
+				index: true,
+				element: <Home />,
+			},
+			{
+				path: "contact",
+				element: <Contact />,
+			},
+			{
+				path: "product/:slug",
+				element: <ProductPage />,
+			},
+			{
+				path: "cart",
+				element: (
+					<ProtectedRoute>
+						<CartPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "checkout",
+				element: (
+					<ProtectedRoute>
+						<CheckoutPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "payment/success",
+				element: (
+					<ProtectedRoute>
+						<PaymentSuccess />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "payment/cancel",
+				element: (
+					<ProtectedRoute>
+						<PaymentCancel />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "payment/:orderId",
+				element: (
+					<ProtectedRoute>
+						<PaymentPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "order-history",
+				element: (
+					<ProtectedRoute>
+						<OrderHistory />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "profile",
+				element: (
+					<ProtectedRoute>
+						<ProfilePage />
+					</ProtectedRoute>
+				),
+			},
+		],
+	},
+	{
+		path: "/admin",
+		element: <LayoutAdmin />,
+		errorElement: <NotFound />,
+		children: [
+			{
+				index: true,
+				element: (
+					<ProtectedRoute roles={ ["ADMIN"] }>
+						<DashboardPage />
+					</ProtectedRoute>
+				),
+			},
+
+			{
+				path: "user",
+				element: (
+					<ProtectedRoute roles={ ["ADMIN"] }>
+						<ManageUserPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "product",
+				element: (
+					<ProtectedRoute roles={ ["ADMIN"] }>
+						<ManageProductPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "voucher",
+				element: (
+					<ProtectedRoute roles={ ["ADMIN"] }>
+						<ManageVoucherPage />
+					</ProtectedRoute>
+				),
+			},
+			{
+				path: "order",
+				element: (
+					<ProtectedRoute roles={ ["ADMIN"] }>
+						<ManageOrderPage />
+					</ProtectedRoute>
+				),
+			},
+
+			{
+				path: "chat",
+				element: (
+					<ProtectedRoute roles={ ["ADMIN"] }>
+						<AdminChatPage />
+					</ProtectedRoute>
+				),
+			},
+		],
+	},
+	{
+		path: "/register",
+		element: <RegisterPage />,
+	},
+	{
+		path: "/login",
+		element: <LoginPage />,
+	},
+]);
 
 function App() {
 	const dispatch = useDispatch();
@@ -89,148 +232,7 @@ function App() {
 		getAccount();
 
 	}, []);
-	const router = createBrowserRouter([
-		{
-			path: "/",
-			element: <Layout />,
-			errorElement: <NotFound />,
-			children: [
-				{
-					index: true,
-					element: <Home />,
-				},
-				{
-					path: "contact",
-					element: <Contact />,
-				},
-				{
-					path: "product/:slug",
-					element: <ProductPage />,
-				},
-				{
-					path: "cart",
-					element: (
-						<ProtectedRoute>
-							<CartPage />
-						</ProtectedRoute>
-					),
-				},
-				{
-					path: "checkout",
-					element: (
-						<ProtectedRoute>
-							<CheckoutPage />
-						</ProtectedRoute>
-					),
-				},
-				{
-					path: "payment/success",
-					element: (
-						<ProtectedRoute>
-							<PaymentSuccess />
-						</ProtectedRoute>
-					),
-				},
-				{
-					path: "payment/cancel",
-					element: (
-						<ProtectedRoute>
-							<PaymentCancel />
-						</ProtectedRoute>
-					),
-				},
-				{
-					path: "payment/:orderId",
-					element: (
-						<ProtectedRoute>
-							<PaymentPage />
-						</ProtectedRoute>
-					),
-				},
-				{
-					path: "order-history",
-					element: (
-						<ProtectedRoute>
-							<OrderHistory />
-						</ProtectedRoute>
-					),
-				},
-				{
-					path: "profile",
-					element: (
-						<ProtectedRoute>
-							<ProfilePage />
-						</ProtectedRoute>
-					),
-				},
-			],
-		},
-		{
-			path: "/admin",
-			element: <LayoutAdmin />,
-			errorElement: <NotFound />,
-			children: [
-				{
-					index: true,
-					element: (
-						<ProtectedRoute roles={ ["ADMIN"] }>
-							<DashboardPage />
-						</ProtectedRoute>
-					),
-				},
 
-				{
-					path: "user",
-					element: (
-						<ProtectedRoute roles={ ["ADMIN"] }>
-							<ManageUserPage />
-						</ProtectedRoute>
-					),
-				},
-				{
-					path: "product",
-					element: (
-						<ProtectedRoute roles={ ["ADMIN"] }>
-							<ManageProductPage />
-						</ProtectedRoute>
-					),
-				},
-				{
-					path: "voucher",
-					element: (
-						<ProtectedRoute roles={ ["ADMIN"] }>
-							<ManageVoucherPage />
-						</ProtectedRoute>
-					),
-				},
-				{
-					path: "order",
-					element: (
-						<ProtectedRoute roles={ ["ADMIN"] }>
-							<ManageOrderPage />
-						</ProtectedRoute>
-					),
-				},
-
-				{
-					path: "chat",
-					element: (
-						<ProtectedRoute roles={ ["ADMIN"] }>
-							<AdminChatPage />
-						</ProtectedRoute>
-					),
-				},
-			],
-		},
-		{
-			path: "/register",
-			element: <RegisterPage />,
-		},
-		{
-			path: "/login",
-			element: <LoginPage />,
-		},
-	]);
 	return (
 		<ConfigProvider locale={ language === "en" ? enUS : viVN }>
 			{ isLoading == false ||
