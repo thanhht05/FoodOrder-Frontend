@@ -1,6 +1,6 @@
-$bg-main: #f8fafc;
+﻿$bg-main: #f8fafc;
 $card-bg: #ffffff;
-$accent-color: #ff4d4f;
+$accent-color: var(--color-primary);
 $text-dark: #0f172a;
 $border-radius-lg: 18px;
 $border-radius-md: 12px;
@@ -146,7 +146,7 @@ $border-radius-md: 12px;
       font-size: 15.5px;
       font-weight: 700;
       border-radius: $border-radius-md;
-      background: linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%);
+      background: var(--color-primary-gradient);
       border: none;
       box-shadow: 0 8px 20px rgba(255, 77, 79, 0.28);
       transition: all 0.25s ease;
@@ -154,7 +154,7 @@ $border-radius-md: 12px;
       &:hover {
         transform: translateY(-2px);
         box-shadow: 0 12px 24px rgba(255, 77, 79, 0.36);
-        background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%) !important;
+        background: var(--color-primary-gradient-hover) !important;
       }
     }
   }

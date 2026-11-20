@@ -1,4 +1,4 @@
-.home-container {
+﻿.home-container {
   background-color: #f8fafc;
   padding: 24px 0 48px;
   min-height: calc(100vh - 74px);
@@ -57,7 +57,7 @@
       border-radius: 999px;
       font-size: 12.5px;
       font-weight: 600;
-      background: linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%);
+      background: var(--color-primary-gradient);
       color: #ffffff;
       box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3);
 
@@ -110,7 +110,7 @@
     }
 
     .icon-brand {
-      color: #ff4d4f;
+      color: var(--color-primary);
       font-size: 16px;
     }
 
@@ -129,8 +129,8 @@
       transition: all 0.3s ease;
 
       &:hover {
-        color: #ff4d4f;
-        background: #fff2f0;
+        color: var(--color-primary);
+        background: var(--color-primary-light);
         transform: rotate(-90deg);
       }
     }
@@ -173,7 +173,7 @@
   }
 
   .apply-btn {
-    background: linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%);
+    background: var(--color-primary-gradient);
     border: none;
     height: 40px;
     border-radius: 10px;
@@ -184,7 +184,7 @@
     &:hover {
       transform: translateY(-1px);
       box-shadow: 0 6px 16px rgba(255, 77, 79, 0.32);
-      background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%) !important;
+      background: var(--color-primary-gradient-hover) !important;
     }
   }
 }
@@ -224,12 +224,12 @@
       border: 1px solid transparent;
 
       &:hover {
-        color: #ff4d4f;
-        background-color: #fff2f0;
+        color: var(--color-primary);
+        background-color: var(--color-primary-light);
       }
 
       &.ant-tabs-tab-active {
-        background: linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%);
+        background: var(--color-primary-gradient);
         box-shadow: 0 4px 10px rgba(255, 77, 79, 0.25);
 
         .ant-tabs-tab-btn {
@@ -286,7 +286,7 @@
       }
 
       .quick-cart-icon {
-        background: #ff4d4f;
+        background: var(--color-primary);
         color: #ffffff;
         transform: scale(1.08);
       }
@@ -362,7 +362,7 @@
     }
 
     .product-price {
-      color: #ff4d4f;
+      color: var(--color-primary);
       font-size: 17px;
       font-weight: 800;
     }
@@ -371,8 +371,8 @@
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: #fff2f0;
-      color: #ff4d4f;
+      background: var(--color-primary-light);
+      color: var(--color-primary);
       display: inline-flex;
       align-items: center;
       justify-content: center;

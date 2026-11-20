@@ -1,11 +1,11 @@
-.logo-container {
+﻿.logo-container {
   display: flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
 
   .logo-icon {
-    background: linear-gradient(135deg, #ff4d4f 0%, #ff7875 100%);
+    background: var(--color-primary-gradient);
     color: white;
     width: 35px;
     height: 35px;
@@ -31,7 +31,7 @@
     .brand-sub {
       font-size: 12px;
       font-weight: 400;
-      color: #ff4d4f;
+      color: var(--color-primary);
       margin-top: 2px;
     }
   }

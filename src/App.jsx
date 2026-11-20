@@ -41,6 +41,7 @@ import { ConfigProvider } from "antd";
 import viVN from "antd/locale/vi_VN";
 import enUS from "antd/locale/en_US";
 import { useTranslation } from "./i18n";
+import antdTheme from "./styles/antdTheme";
 
 const Layout = () => {
 	return (
@@ -234,7 +235,7 @@ function App() {
 	}, []);
 
 	return (
-		<ConfigProvider locale={ language === "en" ? enUS : viVN }>
+		<ConfigProvider locale={ language === "en" ? enUS : viVN } theme={ antdTheme }>
 			{ isLoading == false ||
 				window.location.pathname === "/login" ||
 				window.location.pathname === "/register" ||

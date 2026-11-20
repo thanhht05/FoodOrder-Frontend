@@ -1,10 +1,10 @@
-@import "react-image-gallery/styles/image-gallery.css";
+﻿@import "react-image-gallery/styles/image-gallery.css";
 
 $bg-page: #f8fafc;
 $text-dark: #0f172a;
 $border-radius-lg: 24px;
 $border-radius-md: 12px;
-$primary-color: #ff4d4f;
+$primary-color: var(--color-primary);
 
 .product-detail-page {
   background-color: $bg-page;
@@ -28,7 +28,7 @@ $primary-color: #ff4d4f;
 
       &:hover {
         color: $primary-color;
-        background: #fff2f0;
+        background: var(--color-primary-light);
       }
     }
   }
@@ -151,7 +151,7 @@ $primary-color: #ff4d4f;
         border: none;
         border-radius: 999px;
         padding: 3px 12px;
-        background: #fff2f0;
+        background: var(--color-primary-light);
         color: $primary-color;
         margin: 0;
       }
@@ -231,7 +231,7 @@ $primary-color: #ff4d4f;
 
           &.active {
             font-weight: 600;
-            background: linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%);
+            background: var(--color-primary-gradient);
             border: none;
             box-shadow: 0 4px 12px rgba(255, 77, 79, 0.25);
           }
@@ -290,7 +290,7 @@ $primary-color: #ff4d4f;
         font-weight: 700;
         font-size: 15.5px;
         letter-spacing: 0.4px;
-        background: linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%);
+        background: var(--color-primary-gradient);
         border: none;
         box-shadow: 0 8px 20px rgba(255, 77, 79, 0.28);
         transition: all 0.25s ease;
@@ -298,7 +298,7 @@ $primary-color: #ff4d4f;
         &:hover {
           transform: translateY(-2px);
           box-shadow: 0 12px 24px rgba(255, 77, 79, 0.36);
-          background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%) !important;
+          background: var(--color-primary-gradient-hover) !important;
         }
       }
 

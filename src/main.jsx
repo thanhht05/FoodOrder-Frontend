@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./i18n";
+import "./styles/theme.scss";
 import App from "./App.jsx";
 import { Provider } from "react-redux";
 import { persistor, store } from "./redux/store.js";

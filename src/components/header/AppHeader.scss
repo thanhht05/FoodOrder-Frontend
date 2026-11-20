@@ -1,4 +1,4 @@
-.food-header-container {
+﻿.food-header-container {
   background: rgba(255, 255, 255, 0.92) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -40,7 +40,7 @@
 
     &:focus-within {
       background: #ffffff;
-      border-color: #ff4d4f;
+      border-color: var(--color-primary);
       box-shadow: 0 0 0 4px rgba(255, 77, 79, 0.12);
     }
 
@@ -63,7 +63,7 @@
       padding: 0 20px;
       font-weight: 600;
       font-size: 13.5px;
-      background: linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%);
+      background: var(--color-primary-gradient);
       border: none;
       box-shadow: 0 4px 12px rgba(255, 77, 79, 0.25);
       transition: all 0.25s ease;
@@ -71,7 +71,7 @@
       &:hover {
         transform: translateY(-1px);
         box-shadow: 0 6px 16px rgba(255, 77, 79, 0.35);
-        background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%) !important;
+        background: var(--color-primary-gradient-hover) !important;
       }
     }
   }
@@ -98,9 +98,9 @@
       transition: all 0.2s ease;
 
       &:hover {
-        color: #ff4d4f;
+        color: var(--color-primary);
         border-color: #ffccc7;
-        background: #fff2f0;
+        background: var(--color-primary-light);
       }
     }
 
@@ -116,9 +116,9 @@
       transition: all 0.2s ease;
 
       &:hover {
-        color: #ff4d4f !important;
-        border-color: #ff4d4f !important;
-        background: #fff2f0 !important;
+        color: var(--color-primary) !important;
+        border-color: var(--color-primary) !important;
+        background: var(--color-primary-light) !important;
       }
     }
 
@@ -128,8 +128,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #fff2f0;
-      color: #ff4d4f;
+      background: var(--color-primary-light);
+      color: var(--color-primary);
       border: 1px solid #ffccc7;
       border-radius: 50%;
       font-size: 19px;
@@ -138,7 +138,7 @@
 
       &:hover {
         transform: translateY(-2px);
-        background: #ff4d4f;
+        background: var(--color-primary);
         color: #ffffff;
         box-shadow: 0 6px 16px rgba(255, 77, 79, 0.28);
       }
@@ -148,13 +148,13 @@
       height: 38px;
       padding: 0 20px;
       font-weight: 600;
-      background: linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%);
+      background: var(--color-primary-gradient);
       border: none;
       box-shadow: 0 4px 12px rgba(255, 77, 79, 0.25);
 
       &:hover {
         transform: translateY(-1px);
-        background: linear-gradient(135deg, #ff7875 0%, #ff4d4f 100%) !important;
+        background: var(--color-primary-gradient-hover) !important;
       }
     }
   }
