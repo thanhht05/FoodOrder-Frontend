@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Row,
   Col,
@@ -13,17 +13,10 @@ import {
   Badge,
   message,
   notification,
-  Select,
 } from "antd";
-import {
-  UserOutlined,
-  PhoneOutlined,
-  EnvironmentOutlined,
-  MailOutlined,
-  TabletOutlined,
-} from "@ant-design/icons";
 import "./checkoutPage.scss";
 import CartSteps from "../../components/Cart/CartSteps";
+import ShippingAddressCard from "../../components/Checkout/ShippingAddressCard";
 import { useDispatch, useSelector } from "react-redux";
 import {
   callBuyNowItem,
@@ -39,6 +32,21 @@ import { useTranslation } from "../../i18n";
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
+const getInitialShippingAddress = () => {
+  try {
+    const saved = localStorage.getItem("food_order_shipping_address");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (parsed?.recipientName && parsed?.phone && parsed?.province && parsed?.addressDetail) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.error("Lỗi đọc địa chỉ từ localStorage:", e);
+  }
+  return null;
+};
+
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -50,8 +58,8 @@ const CheckoutPage = () => {
 
   const dispatch = useDispatch();
 
-  const [provinces, setProvinces] = useState([]);
-  const [wards, setWards] = useState([]);
+  // Shipping Address State
+  const [shippingAddress, setShippingAddress] = useState(getInitialShippingAddress);
 
   // Voucher states
   const [voucherCodeInput, setVoucherCodeInput] = useState("");
@@ -59,25 +67,6 @@ const CheckoutPage = () => {
   const [isApplyingVoucher, setIsApplyingVoucher] = useState(false);
   const [voucherError, setVoucherError] = useState("");
   const [voucherSuccessMsg, setVoucherSuccessMsg] = useState("");
-
-  useEffect(() => {
-    fetch("https://provinces.open-api.vn/api/v2/p/")
-      .then((res) => res.json())
-      .then((data) => setProvinces(data))
-      .catch((err) => console.error(err));
-  }, []);
-
-  const handleProvinceChange = (value, option) => {
-
-
-    form.setFieldsValue({ district: undefined, ward: undefined });
-    setWards([]);
-    fetch(`https://provinces.open-api.vn/api/v2/p/${option.key}?depth=2`)
-      .then((res) => res.json())
-      .then((data) => setWards(data.wards || []))
-      .catch((err) => console.error(err));
-  };
-
 
   const total = cartItems.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -113,21 +102,15 @@ const CheckoutPage = () => {
     }
   };
 
-
   const onFinish = async (values) => {
     if (loading) return;
+    if (!shippingAddress) {
+      message.warning(t("checkout.pleaseSelectAddress") || "Vui lòng nhập địa chỉ giao hàng!");
+      return;
+    }
     setLoading(true);
     try {
       let resOrder;
-
-
-      const shippingAddress = {
-        recipientName: values.fullName,
-        phone: values.phone,
-        province: values.province,
-        ward: values.ward,
-        addressDetail: values.address
-      }
 
       resOrder = await callPlaceAnOrder(
         cartDetailIds,
@@ -188,109 +171,23 @@ const CheckoutPage = () => {
         className="checkout-form"
       >
         <Row gutter={[32, 32]}>
-          {/* CỘT TRÁI: THÔNG TIN NHẬN HÀNG */}
+          {/* CỘT TRÁI: THÔNG TIN NHẬN HÀNG & PHƯƠNG THỨC THANH TOÁN */}
           <Col xs={24} lg={14} className="shipping-section">
-            <Card className="checkout-card" bordered={false}>
-              <Row gutter={16}>
-                <Col xs={24} md={12}>
-                  <Form.Item
-                    name="fullName"
-                    label={t("checkout.recipientNameLabel")}
-                    rules={[
-                      { required: true, message: t("checkout.recipientNameRequired") },
-                    ]}
-                  >
-                    <Input
-                      prefix={<UserOutlined />}
-                      placeholder={t("checkout.recipientNamePlaceholder")}
-                      size="large"
-                    />
-                  </Form.Item>
-                </Col>
-                <Col xs={24} md={12}>
-                  <Form.Item
-                    name="phone"
-                    label={t("checkout.phoneLabel")}
-                    rules={[
-                      { required: true, message: t("checkout.phoneRequired") },
-                    ]}
-                  >
-                    <Input
-                      prefix={<PhoneOutlined />}
-                      placeholder={t("checkout.phonePlaceholder")}
-                      size="large"
-                    />
-                  </Form.Item>
-                </Col>
-              </Row>
+            <ShippingAddressCard
+              address={shippingAddress}
+              onAddressChange={setShippingAddress}
+            />
 
-              <Row gutter={16}>
-                <Col xs={24} md={8}>
-                  <Form.Item
-                    name="province"
-                    label={t("checkout.provinceLabel")}
-                    rules={[{ required: true, message: t("checkout.provinceRequired") }]}
-                  >
-                    <Select
-                      size="large"
-                      placeholder={t("checkout.provincePlaceholder")}
-                      onChange={handleProvinceChange}
-                      showSearch
-                      optionFilterProp="children"
-                    >
-                      {provinces.map((p) => (
-                        <Select.Option key={p.code} value={p.name}>
-                          {p.name}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24} md={8}>
-                  <Form.Item
-                    name="ward"
-                    label={t("checkout.wardLabel")}
-                    rules={[{ required: true, message: t("checkout.wardRequired") }]}
-                  >
-                    <Select
-                      size="large"
-                      placeholder={t("checkout.wardPlaceholder")}
-                      showSearch
-                      optionFilterProp="children"
-                      disabled={wards.length === 0}
-                    >
-                      {wards.map((w) => (
-                        <Select.Option key={w.code} value={w.name}>
-                          {w.name}
-                        </Select.Option>
-                      ))}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              </Row>
-
-              <Form.Item
-                name="address"
-                label={t("checkout.addressDetailLabel")}
-                rules={[{ required: true, message: t("checkout.addressDetailRequired") }]}
-              >
-                <Input
-                  prefix={<EnvironmentOutlined />}
-                  placeholder={t("checkout.addressDetailPlaceholder")}
-                  size="large"
-                />
-              </Form.Item>
-
-              <Form.Item name="note" label={t("checkout.noteLabel")}>
+            <Card className="checkout-card note-card" bordered={false}>
+              <Form.Item name="note" label={t("checkout.noteLabel")} style={{ marginBottom: 0 }}>
                 <TextArea
-                  rows={3}
+                  rows={2}
                   placeholder={t("checkout.notePlaceholder")}
                 />
               </Form.Item>
             </Card>
 
-            <Card className="checkout-card mt-24" bordered={false}>
+            <Card className="checkout-card" bordered={false}>
               <Title level={4} className="section-title">
                 {t("checkout.paymentMethodSection")}
               </Title>

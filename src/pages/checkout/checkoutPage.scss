@@ -1,4 +1,4 @@
-﻿$bg-main: #f8fafc;
+$bg-main: #f8fafc;
 $card-bg: #ffffff;
 $accent-color: var(--color-primary);
 $text-dark: #0f172a;
@@ -23,7 +23,14 @@ $border-radius-md: 12px;
     box-shadow: 0 8px 28px -4px rgba(15, 23, 42, 0.04);
 
     .ant-card-body {
-      padding: 28px;
+      padding: 24px;
+    }
+
+    &.note-card {
+      margin-bottom: 20px;
+      .ant-card-body {
+        padding: 16px 20px;
+      }
     }
 
     .section-title {

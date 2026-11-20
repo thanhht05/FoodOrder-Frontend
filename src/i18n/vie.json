@@ -358,7 +358,16 @@
     "voucherInvalid": "Voucher không hợp lệ hoặc đã hết hạn",
     "createPaymentLinkFailed": "Không thể tạo link thanh toán",
     "createPaymentLinkError": "Lỗi tạo link thanh toán",
-    "completeOrderBtn": "HOÀN TẤT ĐẶT HÀNG"
+    "completeOrderBtn": "HOÀN TẤT ĐẶT HÀNG",
+    "deliveryAddressTitle": "Địa chỉ nhận hàng",
+    "deliveryTag": "Giao tận nơi",
+    "noAddressTitle": "Chưa có địa chỉ nhận hàng",
+    "noAddressDesc": "Vui lòng thêm địa chỉ để tài xế giao món đến đúng nơi cho bạn",
+    "addShippingAddress": "Thêm địa chỉ nhận hàng",
+    "editShippingAddress": "Cập nhật địa chỉ nhận hàng",
+    "addressSavedSuccess": "Đã lưu địa chỉ nhận hàng thành công!",
+    "pleaseSelectAddress": "Vui lòng thêm địa chỉ nhận hàng trước khi đặt đơn!",
+    "phoneInvalid": "Số điện thoại không hợp lệ (10 số, bắt đầu bằng 03, 05, 07, 08, 09)"
   },
   "payment": {
     "orderNotFound": "Không tìm thấy thông tin đơn hàng!",

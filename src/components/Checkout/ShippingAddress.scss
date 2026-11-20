@@ -1,0 +1,155 @@
+.shipping-address-card {
+  margin-bottom: 24px;
+  transition: all 0.25s ease;
+  position: relative;
+
+  .ant-card-body {
+    padding: 24px;
+  }
+
+  &:hover {
+    border-color: var(--color-primary-border, #fdba74);
+    box-shadow: 0 8px 24px rgba(249, 115, 22, 0.08);
+  }
+
+  &.has-address {
+    border-color: #fed7aa;
+    background: #fffdfb;
+  }
+
+  .address-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .location-icon-wrapper {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--color-primary-light, #fff7ed);
+        color: var(--color-primary, #f97316);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+      }
+
+      .card-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #0f172a;
+      }
+    }
+
+    .btn-edit-address {
+      font-weight: 600;
+      color: var(--color-primary, #f97316);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 8px;
+
+      &:hover {
+        color: var(--color-primary-hover, #ea580c);
+        background: var(--color-primary-light, #fff7ed);
+        border-radius: 6px;
+      }
+    }
+  }
+
+  .address-body {
+    padding-left: 42px;
+
+    .recipient-info {
+      font-size: 14.5px;
+      margin-bottom: 6px;
+      color: #1e293b;
+
+      .recipient-name {
+        font-weight: 700;
+      }
+
+      .divider {
+        color: #cbd5e1;
+        margin: 0 8px;
+      }
+
+      .recipient-phone {
+        color: #475569;
+        font-weight: 500;
+      }
+    }
+
+    .address-text {
+      font-size: 13.5px;
+      color: #64748b;
+      line-height: 1.5;
+    }
+  }
+
+  .empty-address-state {
+    text-align: center;
+    padding: 16px 0;
+
+    .empty-icon {
+      font-size: 36px;
+      color: #cbd5e1;
+      margin-bottom: 8px;
+    }
+
+    .empty-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 4px;
+    }
+
+    .empty-desc {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 16px;
+    }
+
+    .btn-add-address {
+      border-radius: 8px;
+      font-weight: 600;
+      height: 40px;
+      padding: 0 20px;
+      background: var(--color-primary, #f97316);
+      border-color: var(--color-primary, #f97316);
+
+      &:hover {
+        background: var(--color-primary-hover, #ea580c) !important;
+        border-color: var(--color-primary-hover, #ea580c) !important;
+      }
+    }
+  }
+}
+
+.shipping-modal {
+  .ant-modal-content {
+    border-radius: 16px;
+    padding: 24px 28px;
+  }
+
+  .ant-modal-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ant-form-item-label > label {
+    font-weight: 600;
+    color: #334155;
+    font-size: 13.5px;
+  }
+}

@@ -358,7 +358,16 @@
     "voucherInvalid": "Invalid or expired voucher code",
     "createPaymentLinkFailed": "Could not create payment link",
     "createPaymentLinkError": "Error creating payment link",
-    "completeOrderBtn": "COMPLETE ORDER"
+    "completeOrderBtn": "COMPLETE ORDER",
+    "deliveryAddressTitle": "Delivery Address",
+    "deliveryTag": "Door Delivery",
+    "noAddressTitle": "No delivery address yet",
+    "noAddressDesc": "Please add a delivery address so the driver can deliver your food",
+    "addShippingAddress": "Add Delivery Address",
+    "editShippingAddress": "Update Delivery Address",
+    "addressSavedSuccess": "Delivery address saved successfully!",
+    "pleaseSelectAddress": "Please add a delivery address before placing order!",
+    "phoneInvalid": "Invalid phone number (10 digits starting with 03, 05, 07, 08, 09)"
   },
   "payment": {
     "orderNotFound": "Order information not found!",
