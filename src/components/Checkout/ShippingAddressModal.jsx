@@ -16,7 +16,7 @@ const ShippingAddressModal = ({ open, onCancel, onSave, initialAddress }) => {
   const [loadingProvinces] = useState(false);
   const [loadingWards, setLoadingWards] = useState(false);
 
-  // Fetch danh sách tỉnh thành khi mở modal (hoàn toàn bất đồng bộ, không setState đồng bộ trong effect)
+  // Fetch provinces when modal opens asynchronously
   useEffect(() => {
     if (!open) return;
 
@@ -29,7 +29,7 @@ const ShippingAddressModal = ({ open, onCancel, onSave, initialAddress }) => {
         const list = data || [];
         setProvinces(list);
 
-        // Nếu đang sửa địa chỉ đã có sẵn Tỉnh/Thành, tự động nạp danh sách Phường/Xã
+        // Auto-load wards if editing an existing address with a selected province
         if (initialAddress?.province) {
           const found = list.find((p) => p.name === initialAddress.province);
           if (found?.code) {
@@ -57,7 +57,7 @@ const ShippingAddressModal = ({ open, onCancel, onSave, initialAddress }) => {
     };
   }, [open, initialAddress]);
 
-  // Cập nhật giá trị Form sau khi Modal mở (dùng afterOpenChange thay vì setState trong effect)
+  // Populate form values on modal open via afterOpenChange
   const handleAfterOpenChange = (isOpen) => {
     if (isOpen) {
       if (initialAddress) {

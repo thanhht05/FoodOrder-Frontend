@@ -38,7 +38,7 @@ instance.interceptors.request.use(
 
 const NO_RETRY_HEADER = "x-no-retry";
 
-// Add a response interceptor (tự động dịch message thành công & lỗi tại 1 chỗ duy nhất)
+// Response interceptor: centralized localization for success and error messages
 instance.interceptors.response.use(
   function (response) {
     if (response?.data) {
@@ -56,8 +56,8 @@ instance.interceptors.response.use(
       translateApiError(error.response.data);
     }
 
-    // Phiên bị vô hiệu (đăng nhập ở trình duyệt khác / đổi mật khẩu):
-    // xử lý trước bước refresh token vì refresh cũng sẽ thất bại.
+    // Invalidated session (logged in from another browser / password changed):
+    // Handle before token refresh since refresh would also fail.
     const errorCode = error.response?.data?.error;
     if (error.response?.status === 401 && isForceLogoutError(errorCode)) {
       forceLogout(errorCode);

@@ -32,17 +32,17 @@ export const cartSlice = createSlice({
         state.items = data.lst.map((item) => ({
           cartDetailId: item.cartDetailId,
 
-          // số lượng user thêm vào cart
+          // Quantity added by user
           quantity: item.quantity,
 
-          // thông tin product
+          // Product details
           id: item.productsInnerCartDetail.id,
           name: item.productsInnerCartDetail.name,
           price: item.productsInnerCartDetail.price,
           categoryName: item.productsInnerCartDetail.categoryName,
           img: item.productsInnerCartDetail.img,
 
-          // số lượng tồn kho
+          // Available stock quantity
           stockQuantity: item.productsInnerCartDetail.quantity,
 
         }));
@@ -58,17 +58,17 @@ export const cartSlice = createSlice({
         state.items = data.lst.map((item) => ({
           cartDetailId: item.cartDetailId,
 
-          // số lượng user thêm vào cart
+          // Quantity added by user
           quantity: item.quantity,
 
-          // thông tin product
+          // Product details
           id: item.productsInnerCartDetail.id,
           name: item.productsInnerCartDetail.name,
           price: item.productsInnerCartDetail.price,
           categoryName: item.productsInnerCartDetail.categoryName,
           img: item.productsInnerCartDetail.img,
 
-          // số lượng tồn kho
+          // Available stock quantity
           stockQuantity: item.productsInnerCartDetail.quantity,
 
         }));
@@ -84,17 +84,17 @@ export const cartSlice = createSlice({
         state.items = data.lst.map((item) => ({
           cartDetailId: item.cartDetailId,
 
-          // số lượng user thêm vào cart
+          // Quantity added by user
           quantity: item.quantity,
 
-          // thông tin product
+          // Product details
           id: item.productsInnerCartDetail.id,
           name: item.productsInnerCartDetail.name,
           price: item.productsInnerCartDetail.price,
           categoryName: item.productsInnerCartDetail.categoryName,
           img: item.productsInnerCartDetail.img,
 
-          // số lượng tồn kho
+          // Available stock quantity
           stockQuantity: item.productsInnerCartDetail.quantity,
 
         }));

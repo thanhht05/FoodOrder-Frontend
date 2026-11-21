@@ -98,7 +98,7 @@ const CartPage = () => {
   return (
     <div className="cart-page-container">
       <div className="cart-wrapper">
-        {/* Bước thanh toán */}
+        {/* Checkout steps */}
         <div className="cart-steps">
           <CartSteps />
         </div>
@@ -108,7 +108,7 @@ const CartPage = () => {
         </Title>
 
         <Row gutter={[24, 24]}>
-          {/* CỘT TRÁI - DANH SÁCH SẢN PHẨM */}
+          {/* Left column: Cart items */}
           <Col xs={24} lg={16}>
             <div className="cart-items-list">
               {cartItems.map((item) => (
@@ -178,7 +178,7 @@ const CartPage = () => {
             </div>
           </Col>
 
-          {/* CỘT PHẢI - TỔNG KẾT ĐƠN HÀNG */}
+          {/* Right column: Order summary */}
           <Col xs={24} lg={8}>
             <Card className="cart-summary-card">
               <Title level={4}>{t("cart.orderSummaryTitle")}</Title>

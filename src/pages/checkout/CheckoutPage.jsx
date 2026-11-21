@@ -171,7 +171,7 @@ const CheckoutPage = () => {
         className="checkout-form"
       >
         <Row gutter={[32, 32]}>
-          {/* CỘT TRÁI: THÔNG TIN NHẬN HÀNG & PHƯƠNG THỨC THANH TOÁN */}
+          {/* Left column: Shipping address & payment methods */}
           <Col xs={24} lg={14} className="shipping-section">
             <ShippingAddressCard
               address={shippingAddress}
@@ -214,7 +214,7 @@ const CheckoutPage = () => {
             </Card>
           </Col>
 
-          {/* CỘT PHẢI: TỔNG QUAN & MÃ QR */}
+          {/* Right column: Order summary */}
           <Col xs={24} lg={10} className="summary-section">
             <Card className="summary-card" bordered={false}>
               <Title level={4} className="section-title">
@@ -223,14 +223,13 @@ const CheckoutPage = () => {
 
               <div className="order-items">
                 {cartItems.map((item, index) => (
-                  // Đưa item-row vào trong vòng lặp và thêm key
-                  <div
+                                    <div
                     className="item-row"
                     key={item.id || index}
                     style={{ marginBottom: "16px" }}
                   >
                     <Space align="start">
-                      {/* Hiển thị số lượng của từng item */}
+                      {/* Item quantity */}
                       <Badge count={item.quantity || 1} color="#ff4d4f">
                         <img
                           src={
@@ -245,12 +244,12 @@ const CheckoutPage = () => {
                       </Badge>
 
                       <div>
-                        {/* Tên sản phẩm */}
+                        {/* Product name */}
                         <Text strong>{item.name}</Text>
                       </div>
                     </Space>
 
-                    {/* Hiển thị giá tiền (Nhân với số lượng nếu cần và format chuẩn VNĐ) */}
+                    {/* Item subtotal formatted in VND */}
                     <Text strong>
                       {item.price
                         ? (item.price * (item.quantity || 1)).toLocaleString(
@@ -335,8 +334,7 @@ const CheckoutPage = () => {
                 </Text>
               </div>
 
-              {/* KHU VỰC HIỂN THỊ MÃ QR ĐÃ ĐƯỢC CHUYỂN SANG TRANG PAYMENT */}
-
+              
               <Button
                 type="primary"
                 size="large"

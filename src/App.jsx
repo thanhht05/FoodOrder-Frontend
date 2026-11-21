@@ -203,7 +203,7 @@ function App() {
 
 	const isLoading = useSelector((state) => state.account.isLoading);
 
-	// Single active session: tự đăng xuất khi tài khoản đăng nhập ở trình duyệt khác
+	// Single active session: auto logout when account logs in from another browser
 	useSessionGuard();
 	const getAccount = async () => {
 		if (
@@ -222,9 +222,9 @@ function App() {
 			}
 		} catch (error) {
 			console.error("Get account failed:", error);
-			// Khi callGetAccount lỗi, có thể dispatch thêm action reset user nếu cần
+			// Optional: dispatch reset action if getAccount fails
 		} finally {
-			// Khối này LUÔN CHẠY bất kể API thành công hay gặp lỗi (400, 401, 500)
+			// Always runs regardless of API success or error
 			dispatch(doSetLoadingAction(false));
 		}
 	};

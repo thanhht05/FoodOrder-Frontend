@@ -54,7 +54,7 @@ const i18n = {
     let value = getNestedValue(dict, key);
 
     if (value === undefined) {
-      // Fallback sang vie nếu thiếu key
+      // Fallback to vie if key is missing
       value = getNestedValue(resources.vie, key);
     }
 
@@ -90,7 +90,7 @@ const i18n = {
 };
 
 /**
- * Tự động dịch thông báo thành công từ RestResponse của Backend (dùng tại axiosCumtome.js)
+ * Localize success messages from Backend RestResponse (used in axios interceptor)
  */
 export const translateApiSuccess = (resData) => {
   if (!resData || typeof resData !== "object") return resData;
@@ -101,7 +101,7 @@ export const translateApiSuccess = (resData) => {
     return resData;
   }
 
-  // Hỗ trợ trường hợp message chứa trực tiếp mã SUC_...
+  // Handle cases where message directly contains code SUC_...
   if (typeof resData.message === "string" && i18n.exists(`apiSuccess.${resData.message}`)) {
     resData.message = i18n.t(`apiSuccess.${resData.message}`);
   }
@@ -110,7 +110,7 @@ export const translateApiSuccess = (resData) => {
 };
 
 /**
- * Tự động dịch thông báo lỗi từ RestResponse của Backend (dùng tại axiosCumtome.js)
+ * Localize error messages from Backend RestResponse (used in axios interceptor)
  */
 export const translateApiError = (errorData) => {
   if (!errorData || typeof errorData !== "object") return errorData;
@@ -121,7 +121,7 @@ export const translateApiError = (errorData) => {
     return errorData;
   }
 
-  // Hỗ trợ trường hợp message chứa trực tiếp mã ERR_...
+  // Handle cases where message directly contains code ERR_...
   if (typeof errorData.message === "string" && i18n.exists(`apiError.${errorData.message}`)) {
     errorData.message = i18n.t(`apiError.${errorData.message}`);
   }
@@ -130,7 +130,7 @@ export const translateApiError = (errorData) => {
 };
 
 /**
- * React Hook chuẩn để sử dụng trong các Component
+ * Standard React Hook for i18n translation
  */
 export const useTranslation = () => {
   const language = useSyncExternalStore(i18n.subscribe, i18n.getSnapshot);

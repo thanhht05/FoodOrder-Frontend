@@ -1,4 +1,4 @@
-$primary-color: #4f46e5; // Indigo hiện đại
+$primary-color: #4f46e5; // Modern Indigo
 $bg-body: #f8fafc;
 $sidebar-bg: #ffffff;
 $header-bg: rgba(255, 255, 255, 0.8);
@@ -31,7 +31,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   .ant-layout-header {
     background: $header-bg;
-    backdrop-filter: blur(8px); // Hiệu ứng kính mờ hiện đại
+    backdrop-filter: blur(8px); // Modern glassmorphism blur effect
     padding: 0 24px;
     display: flex;
     align-items: center;
@@ -51,7 +51,7 @@ $transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     min-height: 280px;
   }
 
-  // Custom Menu Antd cho đẹp hơn
+  // Custom Antd Menu styling
   .ant-menu {
     border-inline-end: none !important;
     padding: 8px;

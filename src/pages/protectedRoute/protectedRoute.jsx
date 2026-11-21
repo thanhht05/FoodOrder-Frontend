@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children, roles }) => {
   const userRole = user?.role?.name;
   const isLoading = useSelector((state) => state.account.isLoading);
 
-  // 1. Ưu tiên kiểm tra trạng thái đang tải dữ liệu trước
+  // 1. Check loading state first
   if (isLoading) {
     return (
       <div
@@ -26,17 +26,17 @@ const ProtectedRoute = ({ children, roles }) => {
     );
   }
 
-  // 2. Kiểm tra xem đã đăng nhập chưa
+  // 2. Check authentication status
   if (!isAuthenticated) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  // 3. Kiểm tra quyền hạn (Role)
+  // 3. Check role authorization
   if (roles && !roles.includes(userRole)) {
     return <NotPermitted />;
   }
 
-  // 4. Hợp lệ -> Render component con
+  // 4. Authorized: render child components
   return <>{children}</>;
 };
 

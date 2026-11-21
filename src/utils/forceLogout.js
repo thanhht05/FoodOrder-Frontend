@@ -1,7 +1,7 @@
 import { Modal } from "antd";
 import i18n from "../i18n";
 
-// Mã lỗi backend trả về trong trường "error" của response 401
+// Backend error code in 401 response error field
 export const AUTH_ERROR = {
   LOGGED_IN_ELSEWHERE: "ERR_LOGGED_IN_ELSEWHERE",
   PASSWORD_CHANGED: "ERR_PASSWORD_CHANGED",
@@ -20,12 +20,12 @@ const getForceLogoutMessage = (code) => {
   };
 };
 
-// Chặn mở nhiều modal khi nhiều request cùng bị 401
+// Prevent multiple modals when concurrent requests get 401
 let isHandling = false;
 
 /**
- * Đăng xuất bắt buộc: xoá token, hiện thông báo (đã dịch theo vie.json / en.json), chuyển về /login.
- * Dùng window.location để reload sạch Redux state và đóng mọi kết nối WebSocket.
+ * Force logout: clear tokens, show localized modal, redirect to /login.
+ * Uses window.location to cleanly reset Redux state and terminate WebSocket connections.
  */
 export const forceLogout = (code) => {
   if (isHandling) return;

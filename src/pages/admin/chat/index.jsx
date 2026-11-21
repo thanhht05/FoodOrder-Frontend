@@ -100,7 +100,7 @@ const AdminChatPage = () => {
       // 1. Fetch History
       loadHistory(activeConversation.id);
 
-      // 2. subscribe realtime - → bắt đầu nghe message mới của conversation;
+      // 2. Subscribe to real-time conversation messages
       if (stompClientRef.current && stompClientRef.current.connected) {
         subscribeToConversation(activeConversation, stompClientRef.current);
       }

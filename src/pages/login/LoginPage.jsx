@@ -32,24 +32,24 @@ const LoginPage = () => {
   const { t } = useTranslation();
   const onFinish = async (values) => {
     try {
-      setIsSubmit(true); // Bật loading khi bắt đầu submit
+      setIsSubmit(true); // Enable loading state on submit
       const { username, password } = values;
 
       const res = await callLogin(username, password);
 
-      // TRƯỜNG HỢP 1: API trả về data thành công
+      // Case 1: API returned success data
       if (res?.data) {
         localStorage.setItem("access_token", res.data.accessToken);
         dispatch(doLoginAction(res.data));
 
         try {
-          // Luôn gọi lấy giỏ hàng mới từ DB về sau khi đã login (nếu có lỗi giỏ hàng thì bỏ qua không chặn login)
+          // Refresh cart from DB after login (ignore cart errors to not block login)
           await dispatch(getCartAPI()).unwrap();
         } catch {
           // ignore cart errors
         }
 
-        // THÔNG BÁO & CHUYỂN TRANG
+        // Notification & redirect
         message.success(res.message || t("apiSuccess.SUC_LOGIN"));
 
         const roleName = res.data.userLogin?.role?.name;
@@ -59,7 +59,7 @@ const LoginPage = () => {
           window.location.href = "/";
         }
 
-        // TRƯỜNG HỢP 2: API chạy thành công nhưng không có data (Sai mật khẩu/tài khoản do Backend trả về)
+        // Case 2: Invalid credentials returned by backend
       } else {
         notification.error({
           message: t("auth.loginErrorTitle"),
