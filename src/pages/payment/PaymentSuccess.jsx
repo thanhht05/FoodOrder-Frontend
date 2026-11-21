@@ -1,11 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Result } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../i18n';
+import { useDispatch } from 'react-redux';
+import { clearCart } from '../../redux/slices/cart/CartSlice';
+import { getCartAPI } from '../../redux/thunk/getCartThunk';
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(clearCart());
+    dispatch(getCartAPI());
+  }, [dispatch]);
 
   return (
     <div style={{ padding: '50px' }}>
