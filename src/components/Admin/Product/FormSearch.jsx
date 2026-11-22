@@ -15,10 +15,10 @@ const FormSearch = ({ handleSearch, setFilter }) => {
   const onFinish = (values) => {
     let query = "";
     if (values.keyword) {
-      query += `&keyword=${values.keyword.trim()}`;
+      query += `&keyword=${encodeURIComponent(values.keyword.trim())}`;
     }
     if (values.category) {
-      query += `&category=${values.category.trim()}`;
+      query += `&category=${encodeURIComponent(values.category.trim())}`;
     }
 
     handleSearch(query);

@@ -100,7 +100,7 @@ const Home = () => {
     if (changedValues.category) {
       const cate = values.category;
       if (cate && cate.length > 0) {
-        const f = cate.join(",");
+        const f = cate.map((c) => encodeURIComponent(c)).join(",");
         setFilter(`category=${f}`);
       } else {
         setFilter("");
@@ -113,7 +113,7 @@ const Home = () => {
     if (values?.price?.from >= 0 && values?.price?.to >= 0) {
       let f = `from=${values?.price?.from}&to=${values?.price?.to}`;
       if (values?.category?.length) {
-        const cate = values?.category?.join(",");
+        const cate = values?.category?.map((c) => encodeURIComponent(c)).join(",");
         f += `&category=${cate}`;
       }
       setFilter(f);
