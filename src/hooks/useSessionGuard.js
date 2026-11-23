@@ -17,12 +17,12 @@ const SESSION_QUEUE = "/user/queue/session";
 const useSessionGuard = () => {
   const isAuthenticated = useSelector((state) => state.account.isAuthenticated);
   const userId = useSelector((state) => state.account.user?.id);
-
   useEffect(() => {
     if (!isAuthenticated || !userId) return;
 
     const client = new Client({
-      webSocketFactory: () => new SockJS(import.meta.env.VITE_BACKEND_URL + "/ws"),
+      webSocketFactory: () =>
+        new SockJS(import.meta.env.VITE_BACKEND_URL + "/ws"),
       reconnectDelay: 5000,
       // Retrieve latest token on every connect/reconnect in case access token was refreshed
       beforeConnect: () => {
@@ -53,4 +53,3 @@ const useSessionGuard = () => {
 };
 
 export default useSessionGuard;
-

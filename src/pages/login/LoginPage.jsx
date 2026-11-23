@@ -10,7 +10,7 @@ import {
   Typography,
 } from "antd";
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   ArrowLeftOutlined,
   GoogleOutlined,
@@ -29,6 +29,7 @@ const LoginPage = () => {
   const [form] = Form.useForm();
   const [isSubmit, setIsSubmit] = useState(false);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const onFinish = async (values) => {
     try {
@@ -36,7 +37,6 @@ const LoginPage = () => {
       const { username, password } = values;
 
       const res = await callLogin(username, password);
-
       // Case 1: API returned success data
       if (res?.data) {
         localStorage.setItem("access_token", res.data.accessToken);
@@ -54,17 +54,16 @@ const LoginPage = () => {
 
         const roleName = res.data.userLogin?.role?.name;
         if (roleName === "ADMIN" || roleName === "ROLE_ADMIN") {
-          window.location.href = "/admin";
+          navigate("/admin");
         } else {
-          window.location.href = "/";
+          navigate("/");
         }
 
         // Case 2: Invalid credentials returned by backend
       } else {
         notification.error({
           message: t("auth.loginErrorTitle"),
-          description:
-            res.message || t("apiError.ERR_BAD_CREDENTIALS"),
+          description: res.message || t("apiError.ERR_BAD_CREDENTIALS"),
         });
       }
     } catch (error) {
@@ -73,7 +72,7 @@ const LoginPage = () => {
         description: error?.response?.data?.message || error.message,
       });
     } finally {
-      setIsSubmit(false); 
+      setIsSubmit(false);
     }
   };
 
@@ -101,14 +100,13 @@ const LoginPage = () => {
           // ignore cart errors if empty
         }
 
-        
         message.success(res.message || t("apiSuccess.SUC_GOOGLE_LOGIN"));
 
         const roleName = res.data.userLogin?.role?.name;
         if (roleName === "ADMIN" || roleName === "ROLE_ADMIN") {
-          window.location.href = "/admin";
+          navigate("/admin");
         } else {
-          window.location.href = "/";
+          navigate("/");
         }
       } else {
         notification.error({
@@ -180,9 +178,7 @@ const LoginPage = () => {
               <Title level={1} className="hero-title">
                 {t("auth.loginTitle")}
               </Title>
-              <Text className="hero-subtitle">
-                {t("auth.loginHeroDesc")}
-              </Text>
+              <Text className="hero-subtitle">{t("auth.loginHeroDesc")}</Text>
             </div>
 
             <div className="hero-footer">
@@ -204,7 +200,8 @@ const LoginPage = () => {
             <div className="form-header">
               <Title level={2}>{t("auth.loginBtn")}</Title>
               <Text type="secondary">
-                {t("auth.noAccount")} <Link to="/register">{t("auth.registerNow")}</Link>
+                {t("auth.noAccount")}{" "}
+                <Link to="/register">{t("auth.registerNow")}</Link>
               </Text>
             </div>
 
@@ -229,7 +226,9 @@ const LoginPage = () => {
               <Form.Item
                 label={t("auth.passwordLabel")}
                 name="password"
-                rules={[{ required: true, message: t("auth.passwordRequired") }]}
+                rules={[
+                  { required: true, message: t("auth.passwordRequired") },
+                ]}
               >
                 <Input.Password placeholder="••••••••" size="large" />
               </Form.Item>
@@ -278,9 +277,7 @@ const LoginPage = () => {
                       if (window.google?.accounts?.id) {
                         window.google.accounts.id.prompt();
                       } else {
-                        message.warning(
-                          t("auth.googleLoadingWarning"),
-                        );
+                        message.warning(t("auth.googleLoadingWarning"));
                       }
                     }}
                   >
